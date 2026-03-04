@@ -24,7 +24,7 @@ Submits an image generation request. The image is generated asynchronously — u
   The text description of the image to generate. Length limits vary by model (see [Models](/features/models)).
 </ParamField>
 
-<ParamField body="modelId" type="string" default="nanobanana-2">
+<ParamField body="modelId" type="string" default="gemini-3-pro-image-preview">
   The model to use for generation. Get available models from the [List Models](/api-reference/endpoint/models) endpoint.
 
   Available values: `nanobanana-2`, `gemini-3-pro-image-preview`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-niji7`, `z-image-turbo`, `rhart-1.5`, `veo-3.1`
@@ -72,18 +72,48 @@ Submits an image generation request. The image is generated asynchronously — u
 
 ## Response
 
-<ResponseField name="generationId" type="string" required>
+<ResponseField name="success" type="boolean">
+  Whether the request was accepted.
+</ResponseField>
+
+<ResponseField name="generationId" type="string">
   The unique ID of the generation request. Use this to poll for status.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Initial status, always `"processing"`.
 </ResponseField>
 
 <ResponseField name="creditsUsed" type="number">
   The number of credits deducted for this generation.
 </ResponseField>
 
+<ResponseField name="modelId" type="string">
+  The model used for this generation.
+</ResponseField>
+
+<ResponseField name="credits" type="object">
+  Updated credit balances after deduction.
+
+  | Field | Type | Description |
+  | --- | --- | --- |
+  | daily | number | Remaining daily free credits |
+  | purchased | number | Remaining purchased credits |
+  | unlimited | boolean | Whether user has unlimited credits |
+</ResponseField>
+
 ```json
 {
+  "success": true,
   "generationId": "550e8400-e29b-41d4-a716-446655440000",
-  "creditsUsed": 5
+  "status": "processing",
+  "creditsUsed": 5,
+  "modelId": "gemini-3-pro-image-preview",
+  "credits": {
+    "daily": 10,
+    "purchased": 50,
+    "unlimited": false
+  }
 }
 ```
 
@@ -95,11 +125,17 @@ GET /api/generate/v2/status/:generationId
 
 Poll this endpoint to check if your image is ready.
 
-### Response (Pending)
+### Response (Processing)
 
 ```json
 {
-  "status": "pending"
+  "jobId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "processing",
+  "imageUrl": null,
+  "videoUrl": null,
+  "mediaType": "image",
+  "r2Key": null,
+  "error": null
 }
 ```
 
@@ -107,12 +143,13 @@ Poll this endpoint to check if your image is ready.
 
 ```json
 {
+  "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "completed",
   "imageUrl": "https://images.meigen.art/generations/xxx.png",
-  "prompt": "A serene Japanese garden...",
-  "model": "nanobanana-2",
-  "aspectRatio": "16:9",
-  "createdAt": "2025-03-01T12:00:00Z"
+  "videoUrl": null,
+  "mediaType": "image",
+  "r2Key": "generations/xxx.png",
+  "error": null
 }
 ```
 
@@ -120,7 +157,12 @@ Poll this endpoint to check if your image is ready.
 
 ```json
 {
+  "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "failed",
+  "imageUrl": null,
+  "videoUrl": null,
+  "mediaType": "image",
+  "r2Key": null,
   "error": "Content policy violation"
 }
 ```
