@@ -1,0 +1,56 @@
+---
+title: "MCP Plugin"
+description: "Use MeiGen image generation directly in your AI coding tools"
+---
+
+**LibreArt** is the official MeiGen MCP (Model Context Protocol) plugin. It lets you generate images directly from AI coding tools like Claude Code, Cursor, and Windsurf — without leaving your editor.
+
+<Card title="GitHub Repository" icon="github" href="https://github.com/jau123/MeiGen-AI-Design-MCP">
+  View source code, report issues, and contribute.
+</Card>
+
+## What is MCP?
+
+Model Context Protocol (MCP) is an open standard that allows AI assistants to use external tools. When you install LibreArt as an MCP server, your AI assistant gains the ability to generate images, search the gallery, and enhance prompts — all through natural language.
+
+## Features
+
+| Tool | Description |
+| --- | --- |
+| **generate_image** | Generate images using any MeiGen model |
+| **enhance_prompt** | AI-powered prompt enhancement for better results |
+| **search_gallery** | Search the MeiGen gallery for inspiration |
+| **list_models** | Browse available models and their capabilities |
+| **get_inspiration** | Get random prompts and ideas for image creation |
+
+## Free vs. Paid Features
+
+| Feature | API Key Required? |
+| --- | --- |
+| search_gallery | No |
+| get_inspiration | No |
+| enhance_prompt | No |
+| list_models | No |
+| **generate_image** | **Yes** (requires `meigen_sk_` token) |
+
+You can explore the gallery, get inspiration, and enhance prompts for free. Only actual image generation requires an API key with purchased credits.
+
+## Supported Editors
+
+<CardGroup cols={3}>
+  <Card title="Claude Code" icon="terminal">
+    Works natively as an MCP server.
+  </Card>
+  <Card title="Cursor" icon="code">
+    Supported via MCP configuration.
+  </Card>
+  <Card title="Windsurf" icon="wind">
+    Supported via MCP configuration.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<Card title="Setup Guide" icon="wrench" href="/mcp/setup">
+  Step-by-step installation instructions for each editor.
+</Card>

@@ -1,80 +1,120 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: "Quick Start"
+description: "Get your API key and generate your first image"
 ---
 
-## Get started in three steps
+## Step 1: Create an Account
 
-Get your documentation site running locally and make your first customization.
+Go to [meigen.ai](https://www.meigen.ai) and sign in with your Google account.
 
-### Step 1: Set up your local environment
+New users receive free credits to get started. You can also purchase additional credits from the billing page.
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+## Step 2: Get an API Key
 
-### Step 2: Deploy your changes
+<Steps>
+  <Step title="Open API Keys page">
+    Click your avatar in the top-right corner, then select **API Keys** from the dropdown menu.
+  </Step>
+  <Step title="Create a new key">
+    Click **Create New Key**, give it a name (e.g. "My App"), and click **Create**.
+  </Step>
+  <Step title="Copy the key">
+    Copy the key immediately — it starts with `meigen_sk_` and won't be shown again.
+  </Step>
+</Steps>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+<Warning>
+  API calls can only use **purchased credits**, not daily free credits. Make sure your account has purchased credits before making API calls.
+</Warning>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+## Step 3: Generate Your First Image
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+<CodeGroup>
+```bash cURL
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "A serene Japanese garden with cherry blossoms, soft morning light",
+    "modelId": "nanobanana-2",
+    "aspectRatio": "16:9"
+  }'
+```
 
-### Step 3: Go live
+```javascript Node.js
+const response = await fetch('https://www.meigen.ai/api/generate/v2', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer meigen_sk_YOUR_API_KEY',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    prompt: 'A serene Japanese garden with cherry blossoms, soft morning light',
+    modelId: 'nanobanana-2',
+    aspectRatio: '16:9',
+  }),
+});
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+const data = await response.json();
+console.log('Generation ID:', data.generationId);
+```
 
-## Next steps
+```python Python
+import requests
 
-Now that you have your docs running, explore these key features:
+response = requests.post(
+    'https://www.meigen.ai/api/generate/v2',
+    headers={
+        'Authorization': 'Bearer meigen_sk_YOUR_API_KEY',
+        'Content-Type': 'application/json',
+    },
+    json={
+        'prompt': 'A serene Japanese garden with cherry blossoms, soft morning light',
+        'modelId': 'nanobanana-2',
+        'aspectRatio': '16:9',
+    },
+)
+
+data = response.json()
+print('Generation ID:', data['generationId'])
+```
+</CodeGroup>
+
+The API returns a `generationId` immediately. The image is generated asynchronously — poll the status endpoint to check when it's ready.
+
+## Step 4: Check Generation Status
+
+```bash
+curl https://www.meigen.ai/api/generate/v2/status/GENERATION_ID \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY"
+```
+
+Response when complete:
+
+```json
+{
+  "status": "completed",
+  "imageUrl": "https://images.meigen.art/generations/xxx.png",
+  "prompt": "A serene Japanese garden with cherry blossoms, soft morning light",
+  "model": "nanobanana-2",
+  "aspectRatio": "16:9",
+  "createdAt": "2025-03-01T12:00:00Z"
+}
+```
+
+## Next Steps
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Explore Models" icon="robot" href="/features/models">
+    Learn about each model's strengths, limitations, and pricing.
+  </Card>
+  <Card title="MCP Plugin" icon="puzzle-piece" href="/mcp/overview">
+    Generate images directly from Claude Code or Cursor.
+  </Card>
+  <Card title="Prompt Enhancement" icon="wand-magic-sparkles" href="/features/prompt-enhance">
+    Let AI improve your prompts for better results.
+  </Card>
+  <Card title="API Reference" icon="book" href="/api-reference/introduction">
+    Full API documentation with all parameters.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

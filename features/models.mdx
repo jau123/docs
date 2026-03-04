@@ -1,0 +1,191 @@
+---
+title: "Models"
+description: "Compare AI image and video models — features, pricing, and limitations"
+---
+
+MeiGen supports multiple AI models for image and video generation. Each model has different strengths, costs, and limitations. This page helps you choose the right model for your use case.
+
+## Image Models
+
+### Nanobanana 2
+
+| | |
+| --- | --- |
+| **Provider** | Google (Gemini) |
+| **Credits** | 5 per image |
+| **Prompt length** | 5–4,000 characters |
+| **Reference images** | Up to 5 |
+| **Resolutions** | 2K |
+| **Aspect ratios** | 1:1, 3:4, 4:5, 2:3, 9:16, 1:4, 1:8, 4:3, 5:4, 3:2, 16:9, 21:9, 4:1, 8:1 |
+
+The most affordable Gemini model with the widest range of aspect ratios, including ultra-wide (8:1) and ultra-tall (1:8) options. Good for quick iterations and exploration.
+
+<Warning>
+  **Content moderation**: Nanobanana 2 has stricter content filtering than other models. Prompts that mention **celebrities, brand names, real people, or face-swap scenarios** are more likely to be rejected. If your prompt is flagged, try rephrasing to avoid specific names or use a different model.
+</Warning>
+
+---
+
+### Nanobanana Pro
+
+| | |
+| --- | --- |
+| **Provider** | Google (Gemini) |
+| **Credits** | 10 per image |
+| **Prompt length** | 5–4,000 characters |
+| **Reference images** | Up to 5 |
+| **Resolutions** | 2K |
+| **Aspect ratios** | 1:1, 3:4, 4:5, 2:3, 9:16, 4:3, 5:4, 3:2, 16:9, 21:9 |
+
+The premium Gemini model with higher image quality. Better at complex scenes, fine details, and text rendering. Choose this when quality matters more than cost.
+
+---
+
+### Seedream 5.0 Lite
+
+| | |
+| --- | --- |
+| **Provider** | ByteDance |
+| **Credits** | 5 per image |
+| **Prompt length** | 5–2,000 characters |
+| **Reference images** | Up to 5 |
+| **Resolutions** | 2K, 3K |
+| **Aspect ratios** | 1:1, 3:4, 4:3, 16:9, 9:16, 3:2, 2:3 |
+
+ByteDance's latest lightweight model. Offers good quality at low cost with optional 3K resolution output. Strong at photorealistic content and Chinese-style aesthetics.
+
+---
+
+### Seedream 4.5
+
+| | |
+| --- | --- |
+| **Provider** | ByteDance |
+| **Credits** | 5 per image |
+| **Prompt length** | 5–2,000 characters |
+| **Reference images** | Up to 5 |
+| **Resolutions** | 2K |
+| **Aspect ratios** | 1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3, 21:9, 9:21 |
+
+The previous generation Seedream model. Still produces solid results, particularly good for product photography and marketing visuals.
+
+---
+
+### Midjourney Niji 7
+
+| | |
+| --- | --- |
+| **Provider** | Midjourney |
+| **Credits** | 15 per image |
+| **Prompt length** | 1–8,192 characters |
+| **Reference images** | 1 (content or style reference) |
+| **Resolutions** | — |
+| **Aspect ratios** | 1:1, 4:3, 3:2, 16:9, 3:4, 2:3, 9:16 |
+
+Midjourney's anime and illustration-focused model. Produces the highest quality artistic illustrations. Supports advanced parameters like stylize, chaos, weird, and style references.
+
+**Unique features:**
+- Content and style reference modes
+- Auto-translates non-English prompts to English
+- Advanced Niji 7 parameters (stylize, chaos, weird, raw, etc.)
+- Prompt [Expand mode](/features/prompt-enhance) optimized for Midjourney syntax
+
+**Trade-offs:**
+- Most expensive image model (15 credits)
+- Only 1 reference image supported
+- Slower generation (~60 seconds)
+
+---
+
+### Z Image Turbo
+
+| | |
+| --- | --- |
+| **Provider** | Alibaba (Qwen) |
+| **Credits** | 2 per image |
+| **Prompt length** | 5–4,000 characters |
+| **Reference images** | Not supported |
+| **Resolutions** | Fixed |
+| **Aspect ratios** | 1:1, 2:3, 3:2, 3:4, 4:3, 7:9, 9:7, 9:16, 9:21, 16:9, 21:9 |
+
+The fastest and cheapest model. Great for rapid prototyping and quick iterations when you need results in seconds.
+
+<Warning>
+  **No reference image support.** Z Image Turbo generates images from text only — you cannot upload reference images with this model. If you need to use reference images, choose a different model.
+</Warning>
+
+---
+
+### GPT image1.5
+
+| | |
+| --- | --- |
+| **Provider** | RunningHub |
+| **Credits** | 2 per image |
+| **Prompt length** | 5–800 characters |
+| **Reference images** | Up to 2 |
+| **Resolutions** | — |
+| **Aspect ratios** | 1:1, 3:2, 2:3 |
+
+An affordable model based on GPT image generation technology. Good balance of quality and cost with limited aspect ratio options.
+
+**Limitations:**
+- Shorter prompt length limit (800 characters)
+- Only 3 aspect ratios
+- Max 2 reference images
+
+---
+
+## Video Model
+
+### Veo 3.1
+
+| | |
+| --- | --- |
+| **Provider** | Google |
+| **Credits** | 20 per video |
+| **Reference images** | Up to 2 (as first/last frame) |
+| **Resolutions** | 720p |
+| **Aspect ratios** | 16:9, 9:16 |
+| **Audio** | Yes (generated audio) |
+
+Google's video generation model. Creates short video clips with AI-generated audio. Supports speed control (Auto / Slow / Fast) and style presets (Auto / Realistic / Anime / Cinematic).
+
+---
+
+## Model Comparison
+
+| Model | Credits | Speed | Ref Images | Best For |
+| --- | --- | --- | --- | --- |
+| **Z Image Turbo** | 2 | Fastest (~5s) | None | Quick drafts, prototyping |
+| **GPT image1.5** | 2 | Fast (~20s) | 2 | Budget generation with references |
+| **Nanobanana 2** | 5 | Fast (~15s) | 5 | General use, wide ratio support |
+| **Seedream 5.0 Lite** | 5 | Fast (~15s) | 5 | Photorealism, 3K output |
+| **Seedream 4.5** | 5 | Fast (~15s) | 5 | Product photos, marketing |
+| **Nanobanana Pro** | 10 | Fast (~15s) | 5 | High quality, complex scenes |
+| **Niji 7** | 15 | Slow (~60s) | 1 | Anime, illustration, artistic |
+| **Veo 3.1** | 20 | Slowest (2-6min) | 2 | Video with audio |
+
+## Known Limitations
+
+<AccordionGroup>
+  <Accordion title="Nanobanana 2 — Stricter content filtering" icon="triangle-exclamation">
+    This model is more sensitive to content involving real people, celebrities, brand logos, and face-swap requests. Prompts that work on other models may be rejected here. If you get a content violation error, rephrase your prompt to remove specific names or try a different model.
+  </Accordion>
+
+  <Accordion title="Z Image Turbo — No reference images" icon="triangle-exclamation">
+    This model does not support reference images at all. The reference image upload section will be hidden when Z Image Turbo is selected. If you need to use reference images, switch to any other model.
+  </Accordion>
+
+  <Accordion title="Niji 7 — Single reference image only" icon="triangle-exclamation">
+    Unlike other models that support up to 5 reference images, Niji 7 only accepts 1 reference image. However, it offers more control over how the reference is used (content vs. style reference).
+  </Accordion>
+
+  <Accordion title="GPT image1.5 — Limited ratios and prompt length" icon="triangle-exclamation">
+    Only supports 3 aspect ratios (1:1, 3:2, 2:3) and has a 800-character prompt limit. Keep prompts concise with this model.
+  </Accordion>
+
+  <Accordion title="Seedream — 2,000 character prompt limit" icon="triangle-exclamation">
+    Both Seedream models cap prompts at 2,000 characters, shorter than the 4,000-character limit of Gemini models. Plan accordingly for very detailed prompts.
+  </Accordion>
+</AccordionGroup>

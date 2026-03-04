@@ -1,0 +1,133 @@
+---
+title: "Image Generation"
+description: "Create images with multiple AI models, reference images, and advanced options"
+---
+
+MeiGen lets you generate images using multiple AI models from a unified interface. Open the generation sidebar from the right side of the screen to get started.
+
+## Prompt
+
+The prompt editor is where you describe what you want to generate. Tips for writing effective prompts:
+
+- **Be specific** — describe composition, lighting, colors, textures, and perspective
+- **Short prompts work too** — use [Prompt Enhance](/features/prompt-enhance) to expand brief descriptions into detailed prompts
+- **Language** — most models accept English prompts. Niji 7 will auto-translate non-English prompts
+
+<Tip>
+  You can drag an image from the gallery into the prompt area to trigger **Reverse Prompt** — AI will analyze the image and generate a descriptive prompt for you.
+</Tip>
+
+## Reference Images
+
+Upload up to 5 reference images to guide the generation. The AI will use these as visual context to influence the output.
+
+- **Supported formats**: JPG, PNG, WebP
+- **Auto-compression**: Images are automatically compressed to max 2MB / 2048px
+- **Upload method**: Drag-and-drop or click to browse
+
+<Note>
+  The maximum number of reference images varies by model. See the [Models](/features/models) page for details.
+</Note>
+
+### Reference Types (Niji 7 only)
+
+When using Midjourney Niji 7 with a reference image, you can choose between two reference types:
+
+| Type | Description |
+| --- | --- |
+| **Content Reference** | The AI uses the image as subject matter — it tries to recreate the content. Control influence with the **Image Weight** (iw) parameter (0–3). |
+| **Style Reference** | The AI extracts the visual style (colors, mood, technique) without copying the content. Control with **Style Weight** (sw, 0–1000). |
+
+## Generation Options
+
+### Count
+
+Choose how many images to generate per request (1–4). Free users can generate 1 image at a time; paid users can generate up to 4.
+
+### Aspect Ratio
+
+Select from a wide range of aspect ratios. Available ratios depend on the selected model:
+
+| Ratio | Orientation | Common Use |
+| --- | --- | --- |
+| 1:1 | Square | Social media profile, icons |
+| 3:4, 4:5, 2:3 | Portrait | Phone wallpaper, posters |
+| 9:16 | Tall portrait | Stories, Reels |
+| 1:4, 1:8 | Ultra tall | Scrolling banners |
+| 4:3, 3:2 | Landscape | Desktop wallpaper |
+| 16:9, 21:9 | Wide | Cinematic, ultrawide displays |
+| 4:1, 8:1 | Ultra wide | Panoramic banners |
+
+<Warning>
+  Not all models support all ratios. The selector automatically filters to show only ratios supported by the current model.
+</Warning>
+
+### Resolution
+
+Choose the output resolution when available:
+
+| Resolution | Description |
+| --- | --- |
+| **2K** | Standard quality, available to all users |
+| **3K** | Higher detail (some models only) |
+| **4K** | Highest detail, paid users only |
+
+## Niji 7 Advanced Options
+
+When using Midjourney Niji 7, additional parameters are available:
+
+| Parameter | Range | Default | Description |
+| --- | --- | --- | --- |
+| **Stylize** | 0–1000 | 150 | Controls how strongly Midjourney's aesthetic is applied. Lower = more literal, higher = more artistic. |
+| **Chaos** | 0–100 | 0 | Adds variation between runs. Higher values produce more unexpected results. |
+| **Weird** | 0–3000 | 0 | Introduces unusual, experimental qualities. |
+| **Raw Mode** | on/off | on | Produces images with a raw, less processed aesthetic. |
+| **Image Weight** | 0–3 | 1.5 | How much influence the content reference image has. Only available with a content reference. |
+| **Style Reference** | URL/text | — | Provide a URL to an image whose style you want to mimic. |
+| **Style Weight** | 0–1000 | 100 | How strongly the style reference is applied. |
+| **Style Version** | 1–4 | 4 | Which style algorithm version to use. |
+
+## Reverse Prompt
+
+See an image you like but don't know how to describe it? **Reverse Prompt** uses AI vision to analyze an image and generate a detailed text prompt that captures its content, style, and composition.
+
+### How to use
+
+There are two ways to trigger Reverse Prompt:
+
+1. **Drag and drop** — drag any image from the gallery directly onto the prompt editor area. The AI will analyze the image and fill in a descriptive prompt automatically.
+2. **Image detail dialog** — open any image's detail view and click the **Reverse Prompt** button.
+
+### What it generates
+
+The AI examines the image and produces a prompt describing:
+
+- Subject matter and scene composition
+- Art style and technique (photorealistic, illustration, watercolor, etc.)
+- Lighting, color palette, and mood
+- Camera angle and perspective
+
+You can use the generated prompt as-is, or edit it to create variations of the original image.
+
+<Tip>
+  Reverse Prompt works well as a starting point. Try combining it with [Prompt Enhance](/features/prompt-enhance) — first reverse-prompt an image you like, then enhance the result for even more detail.
+</Tip>
+
+## Background Removal (Cutout)
+
+After generating an image, hover over it and click the **Cutout** button to remove the background. This creates a transparent PNG — useful for logos, stickers, or compositing.
+
+## Generation Status
+
+After submitting, your image appears as a pending card with a progress indicator. Generation times vary by model:
+
+| Model | Typical Time |
+| --- | --- |
+| Z Image Turbo | ~5 seconds |
+| Nanobanana 2, Seedream | ~15 seconds |
+| Nanobanana Pro | ~15 seconds |
+| GPT image1.5 | ~20 seconds |
+| Niji 7 | ~60 seconds |
+| Veo 3.1 (video) | 2–6 minutes |
+
+If generation fails, credits are automatically refunded.

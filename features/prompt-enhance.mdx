@@ -1,0 +1,92 @@
+---
+title: "Prompt Enhancement"
+description: "Let AI improve your prompts for better image generation results"
+---
+
+MeiGen provides built-in AI-powered prompt enhancement to help you get better results from your prompts. This feature is especially useful when you have a **brief idea** but aren't sure how to describe it in detail.
+
+<Tip>
+  Prompt enhancement works best with **short, simple prompts** (under 30 words). If you already have a detailed prompt with specific visual descriptions, you probably don't need it — the AI may over-process your carefully crafted instructions.
+</Tip>
+
+## How It Works
+
+Click the **magic wand** button in the prompt editor to enhance your prompt. The system automatically detects which model you're using and applies the appropriate enhancement strategy.
+
+There are **two different enhancement modes**, applied automatically based on the selected model:
+
+## Polish (Non-Niji 7 Models)
+
+Used for: **Nanobanana**, **Seedream**, **Z Image Turbo**, **GPT image1.5**
+
+When you click enhance with a non-Niji 7 model selected, MeiGen calls the **Polish** API. This mode:
+
+- Adds visual details: composition, lighting, color palette, textures
+- Improves grammar and structure
+- Keeps your original intent intact
+- Optimizes the prompt format for the selected model
+
+### Example
+
+<CodeGroup>
+```text Before
+a cat sitting on a windowsill
+```
+
+```text After (Polished)
+A fluffy orange tabby cat sitting gracefully on a sunlit windowsill,
+warm golden hour light streaming through sheer curtains, soft bokeh
+of a garden visible outside, cozy interior with houseplants, photorealistic
+style with shallow depth of field
+```
+</CodeGroup>
+
+## Expand (Niji 7 / Midjourney)
+
+Used for: **Midjourney Niji 7**
+
+When Niji 7 is selected, MeiGen uses a different **Expand** API specifically optimized for Midjourney's prompt syntax. This mode:
+
+- Expands your idea into Midjourney-optimized language
+- Adds style descriptors and composition hints that Niji 7 responds well to
+- May suggest Midjourney-specific keywords (anime styles, artistic techniques)
+- Structures the prompt for Midjourney's interpretation engine
+
+### Example
+
+<CodeGroup>
+```text Before
+a girl in a flower field
+```
+
+```text After (Expanded for Niji 7)
+a young girl standing in a vast field of wildflowers, wind gently
+blowing through her hair, golden sunset casting long shadows,
+watercolor-inspired soft edges, dreamy pastel color palette,
+Studio Ghibli atmosphere, delicate linework
+```
+</CodeGroup>
+
+<Note>
+  Niji 7 also auto-translates non-English prompts to English before generation. You can write your prompt in any language — the system handles translation automatically.
+</Note>
+
+## Reverse Prompt
+
+In addition to enhancement, MeiGen offers **Reverse Prompt** — the ability to extract a prompt from an existing image.
+
+**How to use it:**
+1. Drag any image from the gallery onto the prompt area
+2. Or click **Reverse Prompt** in the image detail dialog
+
+The AI analyzes the image and generates a detailed prompt describing what it sees. You can then use this as a starting point, edit it, and generate new variations.
+
+## When to Use Enhancement
+
+| Scenario | Recommendation |
+| --- | --- |
+| You have a vague idea ("a sunset") | Use enhance — it will add the details you need |
+| Short description under 30 words | Use enhance — best results in this range |
+| Detailed prompt with specific visual instructions | Skip enhance — generate directly |
+| Want Midjourney-style results | Select Niji 7 first, then enhance for optimized expansion |
+| You found an image you like | Use Reverse Prompt to extract and modify the prompt |

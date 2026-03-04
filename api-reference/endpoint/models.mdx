@@ -1,0 +1,84 @@
+---
+title: "List Models"
+description: "Get available AI models and their configurations"
+---
+
+```
+GET /api/models
+```
+
+Returns a list of all active AI models available for generation. This is a public endpoint — no authentication required.
+
+The response is cached for 5 minutes.
+
+## Response
+
+Returns an array of model objects:
+
+<ResponseField name="id" type="string">
+  The unique model identifier. Use this as `modelId` when generating.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  The display name of the model.
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  The model provider (e.g., "Google", "ByteDance", "Midjourney").
+</ResponseField>
+
+<ResponseField name="credits_per_generation" type="number">
+  Base credits consumed per generation.
+</ResponseField>
+
+<ResponseField name="supported_ratios" type="string[]">
+  Array of supported aspect ratios (e.g., `["1:1", "3:4", "16:9"]`).
+</ResponseField>
+
+<ResponseField name="max_reference_images" type="number">
+  Maximum number of reference images accepted (0 = not supported).
+</ResponseField>
+
+<ResponseField name="media_type" type="string">
+  Output type: `"image"` or `"video"`.
+</ResponseField>
+
+<ResponseField name="extra_config" type="object">
+  Additional model-specific configuration (resolutions, pricing tiers, tags, etc.).
+</ResponseField>
+
+## Example
+
+```bash
+curl https://www.meigen.ai/api/models
+```
+
+```json
+[
+  {
+    "id": "nanobanana-2",
+    "name": "Nanobanana 2",
+    "provider": "Google",
+    "credits_per_generation": 5,
+    "supported_ratios": ["1:1", "3:4", "4:5", "2:3", "9:16", "4:3", "5:4", "3:2", "16:9", "21:9"],
+    "max_reference_images": 5,
+    "media_type": "image",
+    "extra_config": {
+      "tags": ["New"]
+    }
+  },
+  {
+    "id": "seedream-5.0-lite",
+    "name": "Seedream 5.0 Lite",
+    "provider": "ByteDance",
+    "credits_per_generation": 5,
+    "supported_ratios": ["1:1", "3:4", "4:3", "16:9", "9:16", "3:2", "2:3"],
+    "max_reference_images": 5,
+    "media_type": "image",
+    "extra_config": {
+      "tags": ["New"],
+      "resolutions": ["2K", "3K"]
+    }
+  }
+]
+```

@@ -1,33 +1,87 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "API Overview"
+description: "Integrate MeiGen image generation into your applications"
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
-
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+The MeiGen API allows you to generate images programmatically. All endpoints are available at `https://www.meigen.ai/api/`.
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+API requests require a Bearer token. There are two authentication methods:
+
+### API Token (Recommended)
+
+Use an API key that starts with `meigen_sk_`. Create one from your [account settings](https://www.meigen.ai) under **API Keys**.
+
+```bash
+Authorization: Bearer meigen_sk_YOUR_API_KEY
+```
+
+<Warning>
+  API tokens can only use **purchased credits**. Daily free credits are not available for API calls. Ensure your account has purchased credits before making API requests.
+</Warning>
+
+### Session Token
+
+For browser-based integrations, you can use a Supabase session access token. This method uses both daily and purchased credits.
+
+## Base URL
+
+```
+https://www.meigen.ai/api
+```
+
+## Rate Limits
+
+API requests are subject to rate limiting. If you receive a `429 Too Many Requests` response, wait before retrying.
+
+## Credits
+
+Each generation consumes credits based on the model used. Check the [Models](/features/models) page for per-model pricing.
+
+| Model | Credits per Generation |
+| --- | --- |
+| Z Image Turbo | 2 |
+| GPT image1.5 | 2 |
+| Nanobanana 2 | 5 |
+| Seedream 5.0 Lite | 5 |
+| Seedream 4.5 | 5 |
+| Nanobanana Pro | 10 |
+| Niji 7 | 15 |
+| Veo 3.1 | 20 |
+
+## Error Responses
+
+All error responses follow this format:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{
+  "error": "Error description"
+}
 ```
+
+| Status Code | Meaning |
+| --- | --- |
+| 400 | Bad request — invalid parameters |
+| 401 | Unauthorized — invalid or missing token |
+| 402 | Payment required — insufficient credits |
+| 404 | Not found |
+| 429 | Rate limited |
+| 500 | Server error |
+
+## Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Generate Image" icon="wand-magic-sparkles" href="/api-reference/endpoint/generate">
+    POST /api/generate/v2
+  </Card>
+  <Card title="List Models" icon="robot" href="/api-reference/endpoint/models">
+    GET /api/models
+  </Card>
+  <Card title="Get Image" icon="image" href="/api-reference/endpoint/images">
+    GET /api/images/:id
+  </Card>
+  <Card title="Manage Tokens" icon="key" href="/api-reference/endpoint/tokens">
+    POST/GET/DELETE /api/tokens
+  </Card>
+</CardGroup>

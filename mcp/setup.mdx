@@ -1,0 +1,145 @@
+---
+title: "Setup"
+description: "Install and configure the LibreArt MCP plugin"
+---
+
+## Prerequisites
+
+1. **Node.js 18+** installed
+2. A MeiGen account at [meigen.ai](https://www.meigen.ai)
+3. An API key (for image generation — [get one here](/quickstart#step-2-get-an-api-key))
+
+## Installation
+
+### Claude Code
+
+<Steps>
+  <Step title="Install the plugin">
+    Run this command in your terminal:
+
+    ```bash
+    claude mcp add libreart -- npx -y libreart
+    ```
+  </Step>
+  <Step title="Configure your API key">
+    When prompted by the plugin, run `/meigen:setup` and paste your API key.
+
+    Alternatively, set it as an environment variable:
+
+    ```bash
+    export MEIGEN_API_KEY=meigen_sk_YOUR_API_KEY
+    ```
+  </Step>
+  <Step title="Start using it">
+    Just ask Claude to generate images naturally:
+
+    - "Generate a logo for my app"
+    - "Search the gallery for landscape photography"
+    - "Enhance this prompt: a cat in space"
+  </Step>
+</Steps>
+
+### Cursor
+
+<Steps>
+  <Step title="Open MCP settings">
+    Go to **Cursor Settings** → **MCP** → **Add new MCP server**.
+  </Step>
+  <Step title="Add configuration">
+    Add the following to your MCP configuration:
+
+    ```json
+    {
+      "mcpServers": {
+        "libreart": {
+          "command": "npx",
+          "args": ["-y", "libreart"],
+          "env": {
+            "MEIGEN_API_KEY": "meigen_sk_YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Restart Cursor">
+    Restart the editor for the changes to take effect.
+  </Step>
+</Steps>
+
+### Windsurf
+
+<Steps>
+  <Step title="Open MCP settings">
+    Go to **Windsurf Settings** → **MCP** → **Add Server**.
+  </Step>
+  <Step title="Add configuration">
+    Use the same JSON configuration as Cursor:
+
+    ```json
+    {
+      "mcpServers": {
+        "libreart": {
+          "command": "npx",
+          "args": ["-y", "libreart"],
+          "env": {
+            "MEIGEN_API_KEY": "meigen_sk_YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Restart Windsurf">
+    Restart the editor for the changes to take effect.
+  </Step>
+</Steps>
+
+## Verify Installation
+
+After setup, ask your AI assistant:
+
+> "List the available MeiGen models"
+
+If configured correctly, it will call the `list_models` tool and show you the available models with their pricing.
+
+## Usage Examples
+
+### Generate an image
+
+> "Generate a minimalist tech logo using Nanobanana 2, square format"
+
+### Search for inspiration
+
+> "Search the MeiGen gallery for cyberpunk cityscapes"
+
+### Enhance a prompt
+
+> "Enhance this prompt for image generation: a sunset over mountains"
+
+### Get random inspiration
+
+> "Give me some inspiration for AI art"
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="'No image generation providers configured'" icon="circle-exclamation">
+    Your API key is not set. Run `/meigen:setup` in Claude Code, or add the `MEIGEN_API_KEY` environment variable to your MCP configuration.
+  </Accordion>
+
+  <Accordion title="'Insufficient credits'" icon="circle-exclamation">
+    API keys can only use purchased credits, not daily free credits. Purchase credits at [meigen.ai](https://www.meigen.ai).
+  </Accordion>
+
+  <Accordion title="Plugin not showing in tool list" icon="circle-exclamation">
+    1. Make sure Node.js 18+ is installed
+    2. Try running `npx -y libreart` directly to check for errors
+    3. Restart your editor
+    4. Check that the MCP configuration JSON is valid
+  </Accordion>
+
+  <Accordion title="Generation timeout" icon="circle-exclamation">
+    Some models take longer to generate. Niji 7 can take up to 60 seconds, and Veo 3.1 (video) can take several minutes. The plugin will wait automatically.
+  </Accordion>
+</AccordionGroup>
