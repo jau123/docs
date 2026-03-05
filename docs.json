@@ -35,7 +35,8 @@
                 "group": "MCP Plugin",
                 "pages": [
                   "en/mcp/overview",
-                  "en/mcp/setup"
+                  "en/mcp/setup",
+                  "en/mcp/comfyui"
                 ]
               }
             ]
@@ -87,7 +88,8 @@
                 "group": "MCP 插件",
                 "pages": [
                   "zh/mcp/overview",
-                  "zh/mcp/setup"
+                  "zh/mcp/setup",
+                  "zh/mcp/comfyui"
                 ]
               }
             ]

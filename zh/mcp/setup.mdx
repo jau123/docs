@@ -1,13 +1,21 @@
 ---
 title: "安装配置"
-description: "安装和配置 LibreArt MCP 插件"
+description: "为你的编辑器和提供商安装并配置 MeiGen MCP 插件"
 ---
 
 ## 前提条件
 
-1. 已安装 **Node.js 18+**
-2. 在 [meigen.ai](https://www.meigen.ai) 注册 MeiGen 账户
-3. 一个 API Key（用于图片生成 — [在此获取](/zh/quickstart#step-2-get-an-api-key)）
+- 已安装 **Node.js 18+**
+- 至少一个图片生成提供商：
+  - **MeiGen Cloud** — 从 [meigen.ai](https://www.meigen.ai) 获取 API Key（设置 → API Keys）
+  - **ComfyUI** — 运行中的 ComfyUI 服务器（[安装指南](https://github.com/comfyanonymous/ComfyUI)）
+  - **OpenAI** — 从 [platform.openai.com](https://platform.openai.com) 获取 API Key
+
+<Tip>
+  无需提供商即可开始使用。画廊搜索、提示词增强和灵感工具无需任何 API Key 即可运行。
+</Tip>
+
+---
 
 ## 安装
 
@@ -15,27 +23,21 @@ description: "安装和配置 LibreArt MCP 插件"
 
 <Steps>
   <Step title="安装插件">
-    在终端中运行以下命令：
-
     ```bash
-    claude mcp add libreart -- npx -y libreart
+    claude mcp add meigen -- npx -y meigen
     ```
   </Step>
-  <Step title="配置 API Key">
-    当插件提示时，运行 `/meigen:setup` 并粘贴你的 API Key。
+  <Step title="配置提供商">
+    启动一个新的 Claude Code 会话并运行 `/meigen:setup`。安装向导将引导你完成提供商选择和 API Key 配置。
 
-    或者，设置为环境变量：
-
-    ```bash
-    export MEIGEN_API_KEY=meigen_sk_YOUR_API_KEY
-    ```
+    或者，你也可以直接设置环境变量（参见下方[提供商配置](#提供商配置)）。
   </Step>
   <Step title="开始使用">
-    直接用自然语言让 Claude 生成图片：
+    用自然语言让 Claude 生成图片：
 
-    - "为我的应用生成一个 Logo"
-    - "在画廊中搜索风景摄影"
-    - "增强这个提示词：一只猫在太空中"
+    - *"生成一个咖啡店的极简 Logo"*
+    - *"在画廊中搜索赛博朋克城市风景"*
+    - *"增强这个提示词：一只猫在太空中"*
   </Step>
 </Steps>
 
@@ -46,21 +48,25 @@ description: "安装和配置 LibreArt MCP 插件"
     前往 **Cursor Settings** → **MCP** → **Add new MCP server**。
   </Step>
   <Step title="添加配置">
-    将以下内容添加到你的 MCP 配置中：
+    将以下内容添加到你的 MCP 配置中。包含你选择的提供商所需的环境变量：
 
     ```json
     {
       "mcpServers": {
-        "libreart": {
+        "meigen": {
           "command": "npx",
-          "args": ["-y", "libreart"],
+          "args": ["-y", "meigen"],
           "env": {
-            "MEIGEN_API_KEY": "meigen_sk_YOUR_API_KEY"
+            "MEIGEN_API_TOKEN": "meigen_sk_YOUR_KEY",
+            "OPENAI_API_KEY": "sk-YOUR_KEY",
+            "COMFYUI_URL": "http://127.0.0.1:8188"
           }
         }
       }
     }
     ```
+
+    只需包含你要使用的提供商对应的环境变量，不需要全部三个。
   </Step>
   <Step title="重启 Cursor">
     重启编辑器使更改生效。
@@ -74,72 +80,137 @@ description: "安装和配置 LibreArt MCP 插件"
     前往 **Windsurf Settings** → **MCP** → **Add Server**。
   </Step>
   <Step title="添加配置">
-    使用与 Cursor 相同的 JSON 配置：
-
-    ```json
-    {
-      "mcpServers": {
-        "libreart": {
-          "command": "npx",
-          "args": ["-y", "libreart"],
-          "env": {
-            "MEIGEN_API_KEY": "meigen_sk_YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
+    使用与 Cursor 相同的 JSON 配置格式。
   </Step>
   <Step title="重启 Windsurf">
     重启编辑器使更改生效。
   </Step>
 </Steps>
 
+---
+
+## 提供商配置
+
+配置一个或多个提供商。当多个提供商可用时，插件按以下顺序选择：MeiGen → ComfyUI → OpenAI。你可以在每次请求时覆盖此设置。
+
+### MeiGen Cloud
+
+最简单的入门方式。通过 MeiGen 的托管 API 访问多个 AI 模型（Nanobanana、Seedream、GPT image、Niji 7 等）。
+
+| 变量 | 值 |
+| --- | --- |
+| `MEIGEN_API_TOKEN` | 以 `meigen_sk_` 开头的 API Key |
+
+获取 API Key：在 [meigen.ai](https://www.meigen.ai) 登录 → 点击头像 → **设置** → **API Keys** → 创建新 Key。
+
+<Warning>
+  API Key 只能使用**购买积分**，不能使用每日免费积分。在通过插件生成前，请确保你的账户有购买积分。
+</Warning>
+
+### OpenAI 兼容
+
+使用 OpenAI 的图片模型或任何 OpenAI 兼容 API 服务。
+
+| 变量 | 值 |
+| --- | --- |
+| `OPENAI_API_KEY` | 以 `sk-` 开头的 API Key |
+| `OPENAI_BASE_URL` | *（可选）* 兼容服务的自定义端点 |
+
+**支持的模型**：gpt-image-1.5, dall-e-3
+
+**兼容服务**：设置 `OPENAI_BASE_URL` 以使用 Together AI、Fireworks AI 等第三方服务，或任何遵循 OpenAI 图片生成 API 格式的端点。
+
+### ComfyUI（本地）
+
+在你自己的 GPU 上运行图片生成，完全控制模型、采样器和工作流。免费使用 — 无需 API Key。
+
+| 变量 | 值 |
+| --- | --- |
+| `COMFYUI_URL` | ComfyUI 服务器地址（默认：`http://127.0.0.1:8188`） |
+
+**要求**：
+1. ComfyUI 必须正在运行且可通过配置的 URL 访问
+2. 你需要至少导入一个工作流模板 — 参见 [ComfyUI 指南](/zh/mcp/comfyui)
+
+<Note>
+  ComfyUI 每次只能生成一张图片（串行处理）。云端提供商最多可并行生成 4 张图片。
+</Note>
+
+---
+
 ## 验证安装
 
 安装完成后，向你的 AI 助手提问：
 
-> "列出可用的 MeiGen 模型"
+> "列出可用的模型"
 
-如果配置正确，它会调用 `list_models` 工具并显示可用模型及其定价。
+如果配置正确，它会调用 `list_models` 工具并显示你所有已配置提供商的可用模型。
+
+---
 
 ## 使用示例
 
 ### 生成图片
 
-> "使用 Nanobanana 2 生成一个极简科技风格的 Logo，正方形格式"
+> "生成一幅水彩风景画，16:9 宽高比"
+
+### 使用参考图
+
+> "生成一张类似这张图片的产品照：[拖入文件或粘贴 URL]"
 
 ### 搜索灵感
 
-> "在 MeiGen 画廊中搜索赛博朋克城市风景"
+> "在画廊中搜索美食摄影"
 
 ### 增强提示词
 
-> "增强这个图片生成提示词：山上的日落"
+> "增强这个提示词：山上的日落"
 
-### 获取随机灵感
+### 管理默认设置
 
-> "给我一些 AI 艺术的灵感"
+> "将我的默认风格设为极简摄影"
+
+---
 
 ## 故障排除
 
 <AccordionGroup>
   <Accordion title="'No image generation providers configured'" icon="circle-exclamation">
-    你的 API Key 未设置。在 Claude Code 中运行 `/meigen:setup`，或在 MCP 配置中添加 `MEIGEN_API_KEY` 环境变量。
+    未设置任何提供商。在 Claude Code 中运行 `/meigen:setup`，或在 MCP 配置中添加相应的环境变量：
+    - MeiGen：`MEIGEN_API_TOKEN`
+    - OpenAI：`OPENAI_API_KEY`
+    - ComfyUI：`COMFYUI_URL`（并导入一个工作流）
   </Accordion>
 
-  <Accordion title="'Insufficient credits'" icon="circle-exclamation">
+  <Accordion title="'Insufficient credits'（MeiGen）" icon="circle-exclamation">
     API Key 只能使用购买积分，不能使用每日免费积分。请在 [meigen.ai](https://www.meigen.ai) 购买积分。
+  </Accordion>
+
+  <Accordion title="ComfyUI 连接被拒绝" icon="circle-exclamation">
+    1. 确保 ComfyUI 正在运行（在 ComfyUI 目录中执行 `python main.py`）
+    2. 检查 `COMFYUI_URL` 是否与 ComfyUI 启动时显示的地址一致（默认：`http://127.0.0.1:8188`）
+    3. 如果在其他机器上运行，确保端口可访问
+  </Accordion>
+
+  <Accordion title="ComfyUI 生成失败" icon="circle-exclamation">
+    1. 打开 ComfyUI Web UI 检查错误信息
+    2. 使用 `comfyui_workflow view` 检查工作流节点
+    3. 确保工作流中引用的检查点模型已下载
+    4. 先尝试在 ComfyUI 中手动运行工作流
   </Accordion>
 
   <Accordion title="插件未出现在工具列表中" icon="circle-exclamation">
     1. 确保已安装 Node.js 18+
-    2. 尝试直接运行 `npx -y libreart` 检查是否有错误
+    2. 尝试直接运行 `npx -y meigen` 检查是否有错误
     3. 重启编辑器
     4. 检查 MCP 配置 JSON 是否有效
   </Accordion>
 
   <Accordion title="生成超时" icon="circle-exclamation">
-    某些模型生成时间较长。Niji 7 最多可能需要 60 秒，Veo 3.1（视频）可能需要几分钟。插件会自动等待。
+    生成时间因模型和提供商而异。MeiGen Cloud 模型的生成时间在 5-60 秒之间。ComfyUI 取决于你的 GPU 性能。插件最多等待 5 分钟后超时。
+  </Accordion>
+
+  <Accordion title="配置修改未生效" icon="circle-exclamation">
+    修改 `~/.config/meigen/config.json` 或环境变量后，你必须重启编辑器（或启动新的 Claude Code 会话）才能使更改生效。
   </Accordion>
 </AccordionGroup>

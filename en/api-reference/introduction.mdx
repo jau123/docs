@@ -31,9 +31,79 @@ For browser-based integrations, you can use a Supabase session access token. Thi
 https://www.meigen.ai/api
 ```
 
+## Request Format
+
+All request bodies must be sent as JSON with the `Content-Type: application/json` header.
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a minimalist logo", "modelId": "gemini-3-pro-image-preview"}'
+```
+
+## Response Format
+
+All responses return JSON. Successful responses include a `success: true` field:
+
+```json
+{
+  "success": true,
+  "generationId": "abc-123",
+  "status": "processing"
+}
+```
+
+Error responses include an `error` field:
+
+```json
+{
+  "error": "Error description"
+}
+```
+
+## Asynchronous Generation
+
+Image generation is **asynchronous**. The flow is:
+
+1. **Submit** a generation request → `POST /api/generate/v2`
+2. **Poll** the status endpoint → `GET /api/generate/v2/status/:id`
+3. **Retrieve** the completed image → `GET /api/images/:id`
+
+### Polling Best Practices
+
+- **Recommended interval**: 3 seconds between status checks
+- **Stop when**: `status` is `completed` or `failed`
+- **Timeout**: consider giving up after 5 minutes for image models, 10 minutes for video
+
+### Typical Generation Times
+
+| Model | Typical Time |
+| --- | --- |
+| Z Image Turbo | ~5 seconds |
+| Nanobanana 2, Seedream | ~15 seconds |
+| Nanobanana Pro | ~15 seconds |
+| GPT image1.5 | ~20 seconds |
+| Niji 7 | ~60 seconds |
+| Veo 3.1 (video) | 2–6 minutes |
+
 ## Rate Limits
 
-API requests are subject to rate limiting. If you receive a `429 Too Many Requests` response, wait before retrying.
+API requests are subject to rate limiting. If you receive a `429 Too Many Requests` response:
+
+- Wait 10–30 seconds before retrying
+- Implement exponential backoff for repeated failures
+- Specific rate limits may vary based on server load
+
+## Caching
+
+Some GET endpoints return cached responses:
+
+| Endpoint | Cache Duration |
+| --- | --- |
+| `GET /api/models` | 5 minutes |
+| `GET /api/images/:id` | 1 hour |
+| `POST` endpoints | No caching |
 
 ## Credits
 
@@ -52,21 +122,13 @@ Each generation consumes credits based on the model used. Check the [Models](/en
 
 ## Error Responses
 
-All error responses follow this format:
-
-```json
-{
-  "error": "Error description"
-}
-```
-
 | Status Code | Meaning |
 | --- | --- |
 | 400 | Bad request — invalid parameters |
 | 401 | Unauthorized — invalid or missing token |
 | 402 | Payment required — insufficient credits |
 | 404 | Not found |
-| 429 | Rate limited |
+| 429 | Rate limited — wait and retry |
 | 500 | Server error |
 
 ## Endpoints

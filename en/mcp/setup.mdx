@@ -1,13 +1,21 @@
 ---
 title: "Setup"
-description: "Install and configure the LibreArt MCP plugin"
+description: "Install and configure the MeiGen MCP plugin for your editor and provider"
 ---
 
 ## Prerequisites
 
-1. **Node.js 18+** installed
-2. A MeiGen account at [meigen.ai](https://www.meigen.ai)
-3. An API key (for image generation — [get one here](https://www.meigen.ai))
+- **Node.js 18+** installed
+- At least one image generation provider:
+  - **MeiGen Cloud** — an API key from [meigen.ai](https://www.meigen.ai) (Settings → API Keys)
+  - **ComfyUI** — a running ComfyUI server ([installation guide](https://github.com/comfyanonymous/ComfyUI))
+  - **OpenAI** — an API key from [platform.openai.com](https://platform.openai.com)
+
+<Tip>
+  You don't need a provider to get started. Gallery search, prompt enhancement, and inspiration tools work without any API key.
+</Tip>
+
+---
 
 ## Installation
 
@@ -15,27 +23,21 @@ description: "Install and configure the LibreArt MCP plugin"
 
 <Steps>
   <Step title="Install the plugin">
-    Run this command in your terminal:
-
     ```bash
-    claude mcp add libreart -- npx -y libreart
+    claude mcp add meigen -- npx -y meigen
     ```
   </Step>
-  <Step title="Configure your API key">
-    When prompted by the plugin, run `/meigen:setup` and paste your API key.
+  <Step title="Configure a provider">
+    Start a new Claude Code session and run `/meigen:setup`. The setup wizard will guide you through provider selection and API key configuration.
 
-    Alternatively, set it as an environment variable:
-
-    ```bash
-    export MEIGEN_API_KEY=meigen_sk_YOUR_API_KEY
-    ```
+    Alternatively, set environment variables directly (see [Provider Configuration](#provider-configuration) below).
   </Step>
   <Step title="Start using it">
-    Just ask Claude to generate images naturally:
+    Ask Claude to generate images naturally:
 
-    - "Generate a logo for my app"
-    - "Search the gallery for landscape photography"
-    - "Enhance this prompt: a cat in space"
+    - *"Generate a minimalist logo for a coffee shop"*
+    - *"Search the gallery for cyberpunk cityscapes"*
+    - *"Enhance this prompt: a cat in space"*
   </Step>
 </Steps>
 
@@ -46,21 +48,25 @@ description: "Install and configure the LibreArt MCP plugin"
     Go to **Cursor Settings** → **MCP** → **Add new MCP server**.
   </Step>
   <Step title="Add configuration">
-    Add the following to your MCP configuration:
+    Add the following to your MCP configuration. Include the environment variables for your chosen provider(s):
 
     ```json
     {
       "mcpServers": {
-        "libreart": {
+        "meigen": {
           "command": "npx",
-          "args": ["-y", "libreart"],
+          "args": ["-y", "meigen"],
           "env": {
-            "MEIGEN_API_KEY": "meigen_sk_YOUR_API_KEY"
+            "MEIGEN_API_TOKEN": "meigen_sk_YOUR_KEY",
+            "OPENAI_API_KEY": "sk-YOUR_KEY",
+            "COMFYUI_URL": "http://127.0.0.1:8188"
           }
         }
       }
     }
     ```
+
+    Only include the env vars for the providers you want to use. You don't need all three.
   </Step>
   <Step title="Restart Cursor">
     Restart the editor for the changes to take effect.
@@ -74,72 +80,137 @@ description: "Install and configure the LibreArt MCP plugin"
     Go to **Windsurf Settings** → **MCP** → **Add Server**.
   </Step>
   <Step title="Add configuration">
-    Use the same JSON configuration as Cursor:
-
-    ```json
-    {
-      "mcpServers": {
-        "libreart": {
-          "command": "npx",
-          "args": ["-y", "libreart"],
-          "env": {
-            "MEIGEN_API_KEY": "meigen_sk_YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
+    Use the same JSON format as Cursor above.
   </Step>
   <Step title="Restart Windsurf">
     Restart the editor for the changes to take effect.
   </Step>
 </Steps>
 
+---
+
+## Provider Configuration
+
+Configure one or more providers. When multiple are available, the plugin selects in order: MeiGen → ComfyUI → OpenAI. You can override this per-request.
+
+### MeiGen Cloud
+
+The easiest way to get started. Access multiple AI models (Nanobanana, Seedream, GPT image, Niji 7, and more) through MeiGen's hosted API.
+
+| Variable | Value |
+| --- | --- |
+| `MEIGEN_API_TOKEN` | Your API key starting with `meigen_sk_` |
+
+Get your API key: sign in at [meigen.ai](https://www.meigen.ai) → click your avatar → **Settings** → **API Keys** → create a new key.
+
+<Warning>
+  API keys can only use **purchased credits**, not daily free credits. Ensure your account has purchased credits before generating via the plugin.
+</Warning>
+
+### OpenAI-Compatible
+
+Use OpenAI's image models or any OpenAI-compatible API service.
+
+| Variable | Value |
+| --- | --- |
+| `OPENAI_API_KEY` | Your API key starting with `sk-` |
+| `OPENAI_BASE_URL` | *(Optional)* Custom endpoint for compatible services |
+
+**Supported models**: gpt-image-1.5, dall-e-3
+
+**Compatible services**: Set `OPENAI_BASE_URL` to use third-party services like Together AI, Fireworks AI, or any endpoint that follows the OpenAI image generation API format.
+
+### ComfyUI (Local)
+
+Run image generation on your own GPU with full control over models, samplers, and workflows. Free to use — no API key needed.
+
+| Variable | Value |
+| --- | --- |
+| `COMFYUI_URL` | ComfyUI server address (default: `http://127.0.0.1:8188`) |
+
+**Requirements**:
+1. ComfyUI must be running and accessible at the configured URL
+2. You need at least one imported workflow template — see the [ComfyUI Guide](/en/mcp/comfyui)
+
+<Note>
+  ComfyUI generates images one at a time (serial processing). Cloud providers can run up to 4 images in parallel.
+</Note>
+
+---
+
 ## Verify Installation
 
 After setup, ask your AI assistant:
 
-> "List the available MeiGen models"
+> "List the available models"
 
-If configured correctly, it will call the `list_models` tool and show you the available models with their pricing.
+If configured correctly, it will call the `list_models` tool and show models from all your configured providers.
+
+---
 
 ## Usage Examples
 
 ### Generate an image
 
-> "Generate a minimalist tech logo using Nanobanana 2, square format"
+> "Generate a watercolor landscape, 16:9 aspect ratio"
+
+### Use a reference image
+
+> "Generate a product photo similar to this image: [drag a file or paste a URL]"
 
 ### Search for inspiration
 
-> "Search the MeiGen gallery for cyberpunk cityscapes"
+> "Search the gallery for food photography"
 
 ### Enhance a prompt
 
-> "Enhance this prompt for image generation: a sunset over mountains"
+> "Enhance this prompt: a sunset over mountains"
 
-### Get random inspiration
+### Manage your defaults
 
-> "Give me some inspiration for AI art"
+> "Set my default style to minimalist photography"
+
+---
 
 ## Troubleshooting
 
 <AccordionGroup>
   <Accordion title="'No image generation providers configured'" icon="circle-exclamation">
-    Your API key is not set. Run `/meigen:setup` in Claude Code, or add the `MEIGEN_API_KEY` environment variable to your MCP configuration.
+    No provider is set up. Run `/meigen:setup` in Claude Code, or add the appropriate environment variable to your MCP configuration:
+    - MeiGen: `MEIGEN_API_TOKEN`
+    - OpenAI: `OPENAI_API_KEY`
+    - ComfyUI: `COMFYUI_URL` (and import a workflow)
   </Accordion>
 
-  <Accordion title="'Insufficient credits'" icon="circle-exclamation">
+  <Accordion title="'Insufficient credits' (MeiGen)" icon="circle-exclamation">
     API keys can only use purchased credits, not daily free credits. Purchase credits at [meigen.ai](https://www.meigen.ai).
+  </Accordion>
+
+  <Accordion title="ComfyUI connection refused" icon="circle-exclamation">
+    1. Make sure ComfyUI is running (`python main.py` in the ComfyUI directory)
+    2. Check that `COMFYUI_URL` matches the address shown when ComfyUI starts (default: `http://127.0.0.1:8188`)
+    3. If running on a different machine, ensure the port is accessible
+  </Accordion>
+
+  <Accordion title="ComfyUI generation fails" icon="circle-exclamation">
+    1. Open the ComfyUI web UI and check for error messages
+    2. Use `comfyui_workflow view` to inspect the workflow nodes
+    3. Ensure the checkpoint model referenced in the workflow is actually downloaded
+    4. Try running the workflow manually in ComfyUI first
   </Accordion>
 
   <Accordion title="Plugin not showing in tool list" icon="circle-exclamation">
     1. Make sure Node.js 18+ is installed
-    2. Try running `npx -y libreart` directly to check for errors
+    2. Try running `npx -y meigen` directly to check for errors
     3. Restart your editor
     4. Check that the MCP configuration JSON is valid
   </Accordion>
 
   <Accordion title="Generation timeout" icon="circle-exclamation">
-    Some models take longer to generate. Niji 7 can take up to 60 seconds, and Veo 3.1 (video) can take several minutes. The plugin will wait automatically.
+    Generation times vary by model and provider. MeiGen Cloud models range from 5–60 seconds. ComfyUI depends on your GPU. The plugin waits up to 5 minutes before timing out.
+  </Accordion>
+
+  <Accordion title="Changes to config not taking effect" icon="circle-exclamation">
+    After modifying `~/.config/meigen/config.json` or environment variables, you must restart your editor (or start a new Claude Code session) for changes to take effect.
   </Accordion>
 </AccordionGroup>

@@ -1,0 +1,152 @@
+---
+title: "ComfyUI Guide"
+description: "Use your local ComfyUI server with the MeiGen MCP plugin for free, private image generation"
+---
+
+ComfyUI is a node-based UI for Stable Diffusion and other image generation models. The MeiGen MCP plugin can connect to your local ComfyUI server, giving your AI assistant the ability to generate images on your own GPU — for free, with full privacy.
+
+## Prerequisites
+
+- **ComfyUI** installed and running ([installation guide](https://github.com/comfyanonymous/ComfyUI))
+- At least one **checkpoint model** downloaded (e.g., SDXL, Flux, or Stable Diffusion 1.5)
+- The MeiGen MCP plugin installed ([Setup Guide](/en/mcp/setup))
+- `COMFYUI_URL` configured (default: `http://127.0.0.1:8188`)
+
+---
+
+## Exporting a Workflow from ComfyUI
+
+The plugin uses ComfyUI's **API format** — a JSON file that describes the workflow as a graph of nodes. This is different from the standard ComfyUI save format.
+
+<Steps>
+  <Step title="Enable Dev Mode">
+    In ComfyUI, go to **Settings** → enable **Dev Mode Options**. This adds the API format save button to the menu.
+  </Step>
+  <Step title="Build or load your workflow">
+    Set up the workflow you want to use — choose your checkpoint, sampler, prompt nodes, and any other processing steps.
+  </Step>
+  <Step title="Save as API format">
+    Click **Save (API Format)** in the menu. This exports a `.json` file in the node-graph format the plugin expects.
+
+    <Warning>
+      The regular **Save** button exports a different format that the plugin cannot use. You must use **Save (API Format)**.
+    </Warning>
+  </Step>
+</Steps>
+
+---
+
+## Importing Workflows
+
+After exporting from ComfyUI, import the workflow into the plugin:
+
+```
+comfyui_workflow import ~/path/to/my-workflow.json
+```
+
+The plugin will:
+1. Parse the workflow JSON
+2. Auto-detect key nodes:
+   - **KSampler** — sampler, steps, CFG, scheduler
+   - **CLIPTextEncode** — positive and negative prompt
+   - **EmptyLatentImage** — image width and height
+   - **CheckpointLoader** — model checkpoint
+   - **LoadImage** — reference image input
+   - **SaveImage** — output node
+3. Save the template to `~/.config/meigen/workflows/`
+4. Report which nodes were detected and which parameters can be controlled
+
+You can import multiple workflows and switch between them when generating.
+
+---
+
+## Managing Workflows
+
+Use the `comfyui_workflow` tool to manage your imported templates:
+
+| Action | Description |
+| --- | --- |
+| **list** | Show all imported workflows with a summary (model, sampler, steps) |
+| **view** | Inspect a workflow's full node graph, parameters, and editable fields |
+| **modify** | Change workflow parameters — steps, CFG, sampler, scheduler, checkpoint, etc. |
+| **delete** | Remove a workflow template |
+
+### Viewing a Workflow
+
+```
+comfyui_workflow view my-workflow
+```
+
+Shows all nodes with their parameters. Editable nodes (prompt, sampler, size, model) are highlighted so the AI assistant knows what it can change.
+
+### Modifying Parameters
+
+```
+comfyui_workflow modify my-workflow --node "3" --input "steps" --value "30"
+```
+
+Changes are saved to the template file. The original ComfyUI workflow is not affected.
+
+---
+
+## How Generation Works
+
+When you ask the AI to generate an image using ComfyUI:
+
+1. **Prompt injection** — your prompt text is inserted into the positive `CLIPTextEncode` node
+2. **Size calculation** — the requested aspect ratio is converted to pixel dimensions (rounded to multiples of 8 for Stable Diffusion compatibility)
+3. **Reference images** — if you provided reference image URLs, the plugin downloads them and uploads to ComfyUI's `input/` directory, then injects them into `LoadImage` nodes
+4. **Workflow submission** — the modified workflow is submitted to ComfyUI's API
+5. **Status polling** — the plugin polls every 2 seconds until generation completes (5-minute timeout)
+6. **Result retrieval** — the generated image is downloaded from ComfyUI and returned
+
+---
+
+## Reference Images
+
+To use reference images with ComfyUI, your workflow must include at least one **LoadImage** node.
+
+- The plugin automatically detects `LoadImage` nodes in your workflow
+- When you provide reference image URLs, the plugin downloads and uploads them to ComfyUI
+- If your workflow has no `LoadImage` nodes, reference images are ignored (with a warning)
+
+<Tip>
+  For image-to-image (img2img) workflows, make sure your workflow includes a LoadImage node connected to the appropriate processing chain. Standard text-to-image workflows typically don't include this node.
+</Tip>
+
+---
+
+## Performance Notes
+
+| Aspect | Detail |
+| --- | --- |
+| **Concurrency** | Serial only — one image at a time. Your local GPU can't run multiple generations in parallel. |
+| **Timeout** | 5 minutes maximum per generation |
+| **Poll interval** | 2 seconds |
+| **Size rounding** | Dimensions are rounded to multiples of 8 for Stable Diffusion compatibility |
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="'Connection refused' error" icon="circle-exclamation">
+    ComfyUI is not running or the URL is wrong. Start ComfyUI and check that `COMFYUI_URL` matches the address shown in the ComfyUI terminal output (default: `http://127.0.0.1:8188`).
+  </Accordion>
+
+  <Accordion title="No workflows found" icon="circle-exclamation">
+    You need to import at least one workflow before generating. Export a workflow from ComfyUI using **Save (API Format)**, then import it with `comfyui_workflow import`.
+  </Accordion>
+
+  <Accordion title="Node detection missed a node" icon="circle-exclamation">
+    The plugin uses class-type matching to detect nodes. If detection fails for a custom node, use `comfyui_workflow view` to see all nodes, then `comfyui_workflow modify` to manually set parameters.
+  </Accordion>
+
+  <Accordion title="Checkpoint not found" icon="circle-exclamation">
+    The workflow references a checkpoint model that isn't downloaded. Check ComfyUI's `models/checkpoints/` directory and ensure the filename matches what the workflow expects.
+  </Accordion>
+
+  <Accordion title="Reference images not working" icon="circle-exclamation">
+    Your workflow must include a `LoadImage` node. Standard text-to-image workflows don't have this. Create or use an img2img workflow instead.
+  </Accordion>
+</AccordionGroup>

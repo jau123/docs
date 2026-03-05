@@ -31,9 +31,79 @@ Authorization: Bearer meigen_sk_YOUR_API_KEY
 https://www.meigen.ai/api
 ```
 
+## 请求格式
+
+所有请求体必须以 JSON 格式发送，并设置 `Content-Type: application/json` 请求头。
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a minimalist logo", "modelId": "gemini-3-pro-image-preview"}'
+```
+
+## 响应格式
+
+所有响应返回 JSON。成功响应包含 `success: true` 字段：
+
+```json
+{
+  "success": true,
+  "generationId": "abc-123",
+  "status": "processing"
+}
+```
+
+错误响应包含 `error` 字段：
+
+```json
+{
+  "error": "Error description"
+}
+```
+
+## 异步生成
+
+图片生成是**异步**的。流程如下：
+
+1. **提交**生成请求 → `POST /api/generate/v2`
+2. **轮询**状态端点 → `GET /api/generate/v2/status/:id`
+3. **获取**生成完成的图片 → `GET /api/images/:id`
+
+### 轮询最佳实践
+
+- **推荐间隔**：每 3 秒检查一次状态
+- **停止条件**：当 `status` 为 `completed` 或 `failed` 时
+- **超时建议**：图片模型建议 5 分钟后放弃，视频建议 10 分钟
+
+### 典型生成时间
+
+| 模型 | 典型时间 |
+| --- | --- |
+| Z Image Turbo | ~5 秒 |
+| Nanobanana 2, Seedream | ~15 秒 |
+| Nanobanana Pro | ~15 秒 |
+| GPT image1.5 | ~20 秒 |
+| Niji 7 | ~60 秒 |
+| Veo 3.1（视频） | 2-6 分钟 |
+
 ## 速率限制
 
-API 请求受速率限制约束。如果你收到 `429 Too Many Requests` 响应，请等待后再重试。
+API 请求受速率限制约束。如果你收到 `429 Too Many Requests` 响应：
+
+- 等待 10-30 秒后重试
+- 对重复失败实施指数退避策略
+- 具体速率限制可能因服务器负载而异
+
+## 缓存
+
+部分 GET 端点返回缓存响应：
+
+| 端点 | 缓存时长 |
+| --- | --- |
+| `GET /api/models` | 5 分钟 |
+| `GET /api/images/:id` | 1 小时 |
+| `POST` 端点 | 无缓存 |
 
 ## 积分
 
@@ -52,21 +122,13 @@ API 请求受速率限制约束。如果你收到 `429 Too Many Requests` 响应
 
 ## 错误响应
 
-所有错误响应遵循以下格式：
-
-```json
-{
-  "error": "Error description"
-}
-```
-
 | 状态码 | 含义 |
 | --- | --- |
 | 400 | 请求无效 — 参数错误 |
 | 401 | 未授权 — token 无效或缺失 |
 | 402 | 需要付费 — 积分不足 |
 | 404 | 未找到 |
-| 429 | 请求过于频繁 |
+| 429 | 请求过于频繁 — 等待后重试 |
 | 500 | 服务器错误 |
 
 ## 端点

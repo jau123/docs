@@ -1,9 +1,9 @@
 ---
 title: "Overview"
-description: "Use MeiGen image generation directly in your AI coding tools"
+description: "Open-source MCP server for AI image generation — MeiGen Cloud, ComfyUI, and OpenAI-compatible APIs"
 ---
 
-**LibreArt** is the official MeiGen MCP (Model Context Protocol) plugin. It lets you generate images directly from AI coding tools like Claude Code, Cursor, and Windsurf — without leaving your editor.
+**MeiGen** is an open-source MCP (Model Context Protocol) server that gives AI coding assistants the ability to generate images. It supports multiple generation backends — use MeiGen's cloud models, your local ComfyUI server, or any OpenAI-compatible API.
 
 <Card title="GitHub Repository" icon="github" href="https://github.com/jau123/MeiGen-AI-Design-MCP">
   View source code, report issues, and contribute.
@@ -11,29 +11,52 @@ description: "Use MeiGen image generation directly in your AI coding tools"
 
 ## What is MCP?
 
-Model Context Protocol (MCP) is an open standard that allows AI assistants to use external tools. When you install LibreArt as an MCP server, your AI assistant gains the ability to generate images, search the gallery, and enhance prompts — all through natural language.
+Model Context Protocol (MCP) is an open standard that allows AI assistants to use external tools. When you install MeiGen as an MCP server, your AI assistant gains the ability to generate images, search a curated prompt gallery, and enhance prompts — all through natural language.
 
-## Features
+---
 
-| Tool | Description |
-| --- | --- |
-| **generate_image** | Generate images using any MeiGen model |
-| **enhance_prompt** | AI-powered prompt enhancement for better results |
-| **search_gallery** | Search the MeiGen gallery for inspiration |
-| **list_models** | Browse available models and their capabilities |
-| **get_inspiration** | Get random prompts and ideas for image creation |
+## Providers
 
-## Free vs. Paid Features
+MeiGen supports three image generation backends. You can configure one or more — the plugin automatically selects the best available provider, or you can specify one explicitly.
 
-| Feature | API Key Required? |
-| --- | --- |
-| search_gallery | No |
-| get_inspiration | No |
-| enhance_prompt | No |
-| list_models | No |
-| **generate_image** | **Yes** (requires `meigen_sk_` token) |
+<CardGroup cols={3}>
+  <Card title="MeiGen Cloud" icon="cloud">
+    **Hosted multi-model API**. Access Nanobanana, Seedream, GPT image, Niji 7, and more. No GPU required — just an API key.
+  </Card>
+  <Card title="ComfyUI" icon="server">
+    **Local GPU generation**. Run any Stable Diffusion, SDXL, or Flux model on your own hardware. Full control over workflows and parameters.
+  </Card>
+  <Card title="OpenAI-Compatible" icon="plug">
+    **Third-party APIs**. Works with OpenAI (gpt-image-1.5, DALL-E 3), Together AI, Fireworks AI, and any OpenAI-compatible endpoint.
+  </Card>
+</CardGroup>
 
-You can explore the gallery, get inspiration, and enhance prompts for free. Only actual image generation requires an API key with purchased credits.
+| Provider | Type | Cost | Best For |
+| --- | --- | --- | --- |
+| MeiGen Cloud | Hosted API | Credits ([pricing](/en/features/models)) | Multi-model access, zero setup |
+| ComfyUI | Local GPU | Free (your hardware) | Full control, custom workflows, privacy |
+| OpenAI-Compatible | Third-party API | Varies by service | OpenAI models, existing API keys |
+
+**Provider priority**: When multiple providers are configured, MeiGen selects in this order: MeiGen Cloud → ComfyUI → OpenAI. You can override this per-request.
+
+---
+
+## Tools
+
+| Tool | Description | Requires Provider? |
+| --- | --- | --- |
+| **generate_image** | Generate images using any configured provider | Yes |
+| **enhance_prompt** | Transform a brief idea into a detailed, professional prompt | No |
+| **search_gallery** | Search 1,500+ curated AI art prompts from the community | No |
+| **get_inspiration** | Get the full prompt and images for any gallery entry | No |
+| **list_models** | List available models across all configured providers | No |
+| **manage_preferences** | Save default style, aspect ratio, and favorite prompts | No |
+| **upload_reference_image** | Compress and upload a local image for use as a reference | No |
+| **comfyui_workflow** | Import, view, modify, and delete ComfyUI workflow templates | No |
+
+Gallery search, prompt enhancement, inspiration, and preference management work **without any API key or provider setup** — they run entirely locally or use bundled data.
+
+---
 
 ## Supported Editors
 
@@ -49,8 +72,17 @@ You can explore the gallery, get inspiration, and enhance prompts for free. Only
   </Card>
 </CardGroup>
 
+Any editor or AI tool that supports the MCP protocol can use MeiGen.
+
+---
+
 ## Next Steps
 
-<Card title="Setup Guide" icon="wrench" href="/en/mcp/setup">
-  Step-by-step installation instructions for each editor.
-</Card>
+<CardGroup cols={2}>
+  <Card title="Setup Guide" icon="wrench" href="/en/mcp/setup">
+    Install the plugin and configure your preferred provider.
+  </Card>
+  <Card title="ComfyUI Guide" icon="server" href="/en/mcp/comfyui">
+    Set up local ComfyUI generation with custom workflows.
+  </Card>
+</CardGroup>

@@ -1,0 +1,152 @@
+---
+title: "ComfyUI 指南"
+description: "使用本地 ComfyUI 服务器配合 MeiGen MCP 插件，实现免费、私密的图片生成"
+---
+
+ComfyUI 是一个基于节点的 Stable Diffusion 及其他图片生成模型的 UI。MeiGen MCP 插件可以连接到你本地的 ComfyUI 服务器，让你的 AI 助手能够在你自己的 GPU 上生成图片 — 完全免费，充分保护隐私。
+
+## 前提条件
+
+- **ComfyUI** 已安装并运行（[安装指南](https://github.com/comfyanonymous/ComfyUI)）
+- 至少下载了一个**检查点模型**（如 SDXL、Flux 或 Stable Diffusion 1.5）
+- MeiGen MCP 插件已安装（[安装指南](/zh/mcp/setup)）
+- `COMFYUI_URL` 已配置（默认：`http://127.0.0.1:8188`）
+
+---
+
+## 从 ComfyUI 导出工作流
+
+插件使用 ComfyUI 的 **API 格式** — 一个将工作流描述为节点图的 JSON 文件。这与 ComfyUI 的标准保存格式不同。
+
+<Steps>
+  <Step title="启用开发者模式">
+    在 ComfyUI 中，前往 **Settings** → 启用 **Dev Mode Options**。这会在菜单中添加 API 格式保存按钮。
+  </Step>
+  <Step title="构建或加载你的工作流">
+    设置你要使用的工作流 — 选择检查点、采样器、提示词节点以及其他处理步骤。
+  </Step>
+  <Step title="保存为 API 格式">
+    点击菜单中的 **Save (API Format)**。这会导出一个插件所需的节点图格式 `.json` 文件。
+
+    <Warning>
+      普通的 **Save** 按钮导出的是另一种格式，插件无法使用。你必须使用 **Save (API Format)**。
+    </Warning>
+  </Step>
+</Steps>
+
+---
+
+## 导入工作流
+
+从 ComfyUI 导出后，将工作流导入插件：
+
+```
+comfyui_workflow import ~/path/to/my-workflow.json
+```
+
+插件会：
+1. 解析工作流 JSON
+2. 自动检测关键节点：
+   - **KSampler** — 采样器、步数、CFG、调度器
+   - **CLIPTextEncode** — 正面和负面提示词
+   - **EmptyLatentImage** — 图片宽度和高度
+   - **CheckpointLoader** — 模型检查点
+   - **LoadImage** — 参考图输入
+   - **SaveImage** — 输出节点
+3. 将模板保存到 `~/.config/meigen/workflows/`
+4. 报告检测到的节点和可控制的参数
+
+你可以导入多个工作流，并在生成时切换使用。
+
+---
+
+## 管理工作流
+
+使用 `comfyui_workflow` 工具管理你导入的模板：
+
+| 操作 | 描述 |
+| --- | --- |
+| **list** | 显示所有已导入的工作流及摘要信息（模型、采样器、步数） |
+| **view** | 查看工作流的完整节点图、参数和可编辑字段 |
+| **modify** | 修改工作流参数 — 步数、CFG、采样器、调度器、检查点等 |
+| **delete** | 删除工作流模板 |
+
+### 查看工作流
+
+```
+comfyui_workflow view my-workflow
+```
+
+显示所有节点及其参数。可编辑的节点（提示词、采样器、尺寸、模型）会被高亮显示，以便 AI 助手知道它可以修改哪些内容。
+
+### 修改参数
+
+```
+comfyui_workflow modify my-workflow --node "3" --input "steps" --value "30"
+```
+
+修改会保存到模板文件。原始 ComfyUI 工作流不受影响。
+
+---
+
+## 生成工作原理
+
+当你让 AI 使用 ComfyUI 生成图片时：
+
+1. **提示词注入** — 你的提示词文本被插入到正面 `CLIPTextEncode` 节点中
+2. **尺寸计算** — 请求的宽高比被转换为像素尺寸（取整到 8 的倍数以兼容 Stable Diffusion）
+3. **参考图** — 如果你提供了参考图 URL，插件会下载并上传到 ComfyUI 的 `input/` 目录，然后注入到 `LoadImage` 节点中
+4. **工作流提交** — 修改后的工作流被提交到 ComfyUI 的 API
+5. **状态轮询** — 插件每 2 秒轮询一次，直到生成完成（5 分钟超时）
+6. **结果获取** — 生成的图片从 ComfyUI 下载并返回
+
+---
+
+## 参考图
+
+要在 ComfyUI 中使用参考图，你的工作流必须包含至少一个 **LoadImage** 节点。
+
+- 插件会自动检测工作流中的 `LoadImage` 节点
+- 当你提供参考图 URL 时，插件会下载并上传到 ComfyUI
+- 如果你的工作流没有 `LoadImage` 节点，参考图将被忽略（并显示警告）
+
+<Tip>
+  对于图生图（img2img）工作流，确保你的工作流包含一个连接到相应处理链的 LoadImage 节点。标准的文生图工作流通常不包含此节点。
+</Tip>
+
+---
+
+## 性能说明
+
+| 方面 | 详情 |
+| --- | --- |
+| **并发** | 仅支持串行 — 每次一张图片。你的本地 GPU 无法并行运行多个生成任务。 |
+| **超时** | 每次生成最长 5 分钟 |
+| **轮询间隔** | 2 秒 |
+| **尺寸取整** | 尺寸取整到 8 的倍数以兼容 Stable Diffusion |
+
+---
+
+## 故障排除
+
+<AccordionGroup>
+  <Accordion title="'Connection refused' 错误" icon="circle-exclamation">
+    ComfyUI 未运行或 URL 配置错误。启动 ComfyUI 并检查 `COMFYUI_URL` 是否与 ComfyUI 终端输出中显示的地址一致（默认：`http://127.0.0.1:8188`）。
+  </Accordion>
+
+  <Accordion title="未找到工作流" icon="circle-exclamation">
+    你需要在生成前至少导入一个工作流。在 ComfyUI 中使用 **Save (API Format)** 导出工作流，然后用 `comfyui_workflow import` 导入。
+  </Accordion>
+
+  <Accordion title="节点检测遗漏了某个节点" icon="circle-exclamation">
+    插件使用类类型匹配来检测节点。如果自定义节点的检测失败，使用 `comfyui_workflow view` 查看所有节点，然后使用 `comfyui_workflow modify` 手动设置参数。
+  </Accordion>
+
+  <Accordion title="检查点未找到" icon="circle-exclamation">
+    工作流引用的检查点模型未下载。检查 ComfyUI 的 `models/checkpoints/` 目录，确保文件名与工作流中的引用一致。
+  </Accordion>
+
+  <Accordion title="参考图不起作用" icon="circle-exclamation">
+    你的工作流必须包含一个 `LoadImage` 节点。标准的文生图工作流没有此节点。请创建或使用图生图工作流。
+  </Accordion>
+</AccordionGroup>
