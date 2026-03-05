@@ -124,7 +124,8 @@
   "navbar": {
     "links": [
       {
-        "label": "𝕏",
+        "label": "X",
+        "icon": "x-twitter",
         "href": "https://x.com/meigen7982"
       },
       {
