@@ -115,26 +115,24 @@
         ]
       }
     ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Gallery",
-          "href": "https://www.meigen.ai",
-          "icon": "images"
-        },
-        {
-          "anchor": "GitHub",
-          "href": "https://github.com/jau123/MeiGen-AI-Design-MCP",
-          "icon": "github"
-        }
-      ]
-    }
+    "global": {}
   },
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
   },
   "navbar": {
+    "links": [
+      {
+        "icon": "x-twitter",
+        "iconType": "brands",
+        "href": "https://x.com/meigen7982"
+      },
+      {
+        "type": "github",
+        "href": "https://github.com/jau123/MeiGen-AI-Design-MCP"
+      }
+    ],
     "primary": {
       "type": "button",
       "label": "Back Home",
