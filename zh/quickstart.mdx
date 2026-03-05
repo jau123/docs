@@ -1,0 +1,92 @@
+---
+title: "MeiGen"
+description: "AI 图片和视频生成平台 — 浏览精选艺术作品、使用多种模型生成图片、通过 API 集成"
+---
+
+MeiGen 是一个 AI 驱动的创意平台，你可以在这里浏览社区精选的 AI 生成艺术作品，使用多种 AI 模型生成自己的图片和视频，并通过 API 或 MCP 插件将图片生成集成到你的工作流程中。
+
+<CardGroup cols={2}>
+  <Card title="画廊" icon="images" href="/zh/features/gallery">
+    浏览社区精选的 AI 艺术作品。搜索、筛选，将提示词作为创作起点。
+  </Card>
+  <Card title="图片与视频生成" icon="sparkles" href="/zh/features/generate">
+    使用 8 种 AI 模型创建图片和视频。支持参考图片、提示词增强和高级选项。
+  </Card>
+  <Card title="MCP 插件" icon="puzzle-piece" href="/zh/mcp/overview">
+    通过 LibreArt MCP 插件，直接在 Claude Code、Cursor 或 Windsurf 中生成图片。
+  </Card>
+  <Card title="API 参考" icon="code" href="/zh/api-reference/introduction">
+    通过 REST API 将 MeiGen 集成到你的应用中。基于 Token 的身份认证。
+  </Card>
+</CardGroup>
+
+---
+
+## 浏览画廊
+
+MeiGen 的画廊展示了来自社区的精选 AI 生成艺术作品，每周更新新内容。图片以响应式瀑布流网格布局展示。
+
+**按分类筛选** — 使用侧边栏标签缩小浏览范围：
+
+- **产品与品牌** — 产品摄影、Logo、包装、营销视觉素材
+- **摄影** — 人像、风景、街头摄影、微距
+- **插画与 3D** — 数字艺术、概念设计、3D 渲染、角色设计
+- **美食** — 美食摄影、食谱视觉、餐厅场景
+- **女孩** — 角色肖像、时尚、生活方式
+
+**与卡片互动** — 将鼠标悬停在任意图片上查看操作：
+
+- **使用创意** — 将原始提示词复制到生成编辑器中，随时可以自定义并生成
+- **收藏** — 将图片保存到你的个人收藏夹，跨设备同步
+- **在 X 上查看** — 在 X (Twitter) 上打开原始帖子
+
+**搜索** — 按 `Cmd+K`（Mac）或 `Ctrl+K`（Windows）打开搜索对话框。支持混合文本和向量搜索浏览所有画廊帖子，也可按模型、分类以及是否有提示词进行筛选。
+
+<Card title="完整画廊指南" icon="arrow-right" href="/zh/features/gallery">
+  了解图片详情、拖拽引用、搜索标签等更多功能
+</Card>
+
+---
+
+## 生成图片
+
+开始生成的最快方式是在画廊中找到你喜欢的图片，然后点击**用作提示词**。这会将提示词复制到生成编辑器中，你可以自由修改。
+
+**编辑变量** — 某些提示词中包含蓝色的 `[placeholder]` 标签，例如 `[style]` 或 `[subject]`。点击任意标签即可替换为你自己的文字。这些是可编辑的模板变量，方便你快速创建变体。
+
+**添加参考图片** — 上传你自己的图片，或将任意画廊卡片直接拖入参考区域。使用多张参考图片时，在提示词编辑器中输入 `@` 来引用特定图片（例如"使用 @image1 作为背景，@image2 的风格作为角色风格"）。
+
+**增强提示词** — 点击魔法棒按钮，自动优化简短或简单的提示词。AI 会添加构图、光线、色彩和质感等视觉细节。
+
+**选择模型** — 从 8 种 AI 模型中选择，每种模型各有所长。选择宽高比、分辨率，然后生成。积分消耗会在你点击之前显示在生成按钮上。
+
+<Card title="完整生成指南" icon="arrow-right" href="/zh/features/generate">
+  了解模型选择、视频生成、高级选项等更多功能
+</Card>
+
+---
+
+## 免费积分
+
+<Tip>
+  每个新账户都会获得初始积分，每 24 小时还会刷新免费的每日积分 — 足够你探索所有模型，每天免费生成多张图片。
+</Tip>
+
+---
+
+## 下一步
+
+<CardGroup cols={2}>
+  <Card title="提示词增强" icon="wand-magic-sparkles" href="/zh/features/prompt-enhance">
+    润色和扩展两种模式，助你写出更好的提示词
+  </Card>
+  <Card title="模型对比" icon="scale-balanced" href="/zh/features/models">
+    对比全部 8 种模型 — 功能、定价和限制
+  </Card>
+  <Card title="MCP 插件安装" icon="plug" href="/zh/mcp/setup">
+    为 Claude Code、Cursor 或 Windsurf 安装 LibreArt
+  </Card>
+  <Card title="API 参考" icon="code" href="/zh/api-reference/introduction">
+    REST API 文档，支持编程方式访问
+  </Card>
+</CardGroup>

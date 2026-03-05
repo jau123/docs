@@ -1,0 +1,56 @@
+---
+title: "MCP 插件"
+description: "在你的 AI 编程工具中直接使用 MeiGen 图片生成"
+---
+
+**LibreArt** 是 MeiGen 官方的 MCP (Model Context Protocol) 插件。它让你能直接在 Claude Code、Cursor 和 Windsurf 等 AI 编程工具中生成图片 — 无需离开编辑器。
+
+<Card title="GitHub 仓库" icon="github" href="https://github.com/jau123/MeiGen-AI-Design-MCP">
+  查看源代码、报告问题和贡献代码。
+</Card>
+
+## 什么是 MCP？
+
+Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外部工具。当你将 LibreArt 安装为 MCP 服务器后，你的 AI 助手就能通过自然语言生成图片、搜索画廊和增强提示词。
+
+## 功能
+
+| 工具 | 描述 |
+| --- | --- |
+| **generate_image** | 使用任意 MeiGen 模型生成图片 |
+| **enhance_prompt** | AI 驱动的提示词增强，获得更好的效果 |
+| **search_gallery** | 搜索 MeiGen 画廊获取灵感 |
+| **list_models** | 浏览可用模型及其能力 |
+| **get_inspiration** | 获取随机提示词和图片创作灵感 |
+
+## 免费 vs 付费功能
+
+| 功能 | 需要 API Key？ |
+| --- | --- |
+| search_gallery | 否 |
+| get_inspiration | 否 |
+| enhance_prompt | 否 |
+| list_models | 否 |
+| **generate_image** | **是**（需要 `meigen_sk_` token） |
+
+你可以免费探索画廊、获取灵感和增强提示词。只有实际的图片生成需要带有购买积分的 API Key。
+
+## 支持的编辑器
+
+<CardGroup cols={3}>
+  <Card title="Claude Code" icon="terminal">
+    原生支持作为 MCP 服务器运行。
+  </Card>
+  <Card title="Cursor" icon="code">
+    通过 MCP 配置支持。
+  </Card>
+  <Card title="Windsurf" icon="wind">
+    通过 MCP 配置支持。
+  </Card>
+</CardGroup>
+
+## 下一步
+
+<Card title="安装指南" icon="wrench" href="/zh/mcp/setup">
+  各编辑器的分步安装说明。
+</Card>

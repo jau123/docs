@@ -1,0 +1,87 @@
+---
+title: "API 概览"
+description: "将 MeiGen 图片生成集成到你的应用中"
+---
+
+MeiGen API 允许你以编程方式生成图片。所有端点均可通过 `https://www.meigen.ai/api/` 访问。
+
+## 认证
+
+API 请求需要 Bearer token。有两种认证方式：
+
+### API Token（推荐）
+
+使用以 `meigen_sk_` 开头的 API Key。在你的[账户设置](https://www.meigen.ai)中的 **API Keys** 下创建。
+
+```bash
+Authorization: Bearer meigen_sk_YOUR_API_KEY
+```
+
+<Warning>
+  API Token 只能使用**购买积分**。每日免费积分不可用于 API 调用。在发起 API 请求前，请确保你的账户有购买积分。
+</Warning>
+
+### Session Token
+
+对于基于浏览器的集成，你可以使用 Supabase session access token。此方式同时使用每日积分和购买积分。
+
+## 基础 URL
+
+```
+https://www.meigen.ai/api
+```
+
+## 速率限制
+
+API 请求受速率限制约束。如果你收到 `429 Too Many Requests` 响应，请等待后再重试。
+
+## 积分
+
+每次生成根据使用的模型消耗积分。查看[模型](/zh/features/models)页面了解各模型定价。
+
+| 模型 | 每次生成积分 |
+| --- | --- |
+| Z Image Turbo | 2 |
+| GPT image1.5 | 2 |
+| Nanobanana 2 | 5 |
+| Seedream 5.0 Lite | 5 |
+| Seedream 4.5 | 5 |
+| Nanobanana Pro | 10 |
+| Niji 7 | 15 |
+| Veo 3.1 | 20 |
+
+## 错误响应
+
+所有错误响应遵循以下格式：
+
+```json
+{
+  "error": "Error description"
+}
+```
+
+| 状态码 | 含义 |
+| --- | --- |
+| 400 | 请求无效 — 参数错误 |
+| 401 | 未授权 — token 无效或缺失 |
+| 402 | 需要付费 — 积分不足 |
+| 404 | 未找到 |
+| 429 | 请求过于频繁 |
+| 500 | 服务器错误 |
+
+## 端点
+
+<CardGroup cols={2}>
+  <Card title="生成图片" icon="wand-magic-sparkles" href="/zh/api-reference/endpoint/generate">
+    POST /api/generate/v2
+  </Card>
+  <Card title="模型列表" icon="robot" href="/zh/api-reference/endpoint/models">
+    GET /api/models
+  </Card>
+  <Card title="图片详情" icon="image" href="/zh/api-reference/endpoint/images">
+    GET /api/images/:id
+  </Card>
+  <Card title="Token 管理" icon="key" href="/zh/api-reference/endpoint/tokens">
+    POST/GET/DELETE /api/tokens
+  </Card>
+</CardGroup>

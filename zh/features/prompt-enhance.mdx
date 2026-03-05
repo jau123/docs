@@ -1,0 +1,92 @@
+---
+title: "提示词增强"
+description: "让 AI 优化你的提示词，获得更好的图片生成效果"
+---
+
+MeiGen 提供内置的 AI 驱动提示词增强功能，帮助你从提示词中获得更好的结果。当你有一个**简短的想法**但不确定如何详细描述时，这个功能尤其有用。
+
+<Tip>
+  提示词增强最适合**简短、简单的提示词**（30 词以下）。如果你已经有了包含具体视觉描述的详细提示词，可能就不需要它了 — AI 可能会过度处理你精心编写的指令。
+</Tip>
+
+## 工作原理
+
+在提示词编辑器中点击**魔法棒**按钮来增强你的提示词。系统会自动检测你使用的模型，并应用相应的增强策略。
+
+有**两种不同的增强模式**，根据所选模型自动应用：
+
+## 润色（非 Niji 7 模型）
+
+适用于：**Nanobanana**、**Seedream**、**Z Image Turbo**、**GPT image1.5**
+
+当选择非 Niji 7 模型时点击增强，MeiGen 会调用**润色** API。此模式：
+
+- 添加视觉细节：构图、光线、配色方案、质感
+- 改善语法和结构
+- 保持你的原始意图不变
+- 优化提示词格式以适应所选模型
+
+### 示例
+
+<CodeGroup>
+```text 增强前
+a cat sitting on a windowsill
+```
+
+```text 增强后（润色）
+A fluffy orange tabby cat sitting gracefully on a sunlit windowsill,
+warm golden hour light streaming through sheer curtains, soft bokeh
+of a garden visible outside, cozy interior with houseplants, photorealistic
+style with shallow depth of field
+```
+</CodeGroup>
+
+## 扩展（Niji 7 / Midjourney）
+
+适用于：**Midjourney Niji 7**
+
+当选择 Niji 7 时，MeiGen 使用专门为 Midjourney 提示词语法优化的**扩展** API。此模式：
+
+- 将你的想法扩展为 Midjourney 优化的语言
+- 添加 Niji 7 响应良好的风格描述符和构图提示
+- 可能建议 Midjourney 特有的关键词（动漫风格、艺术技法）
+- 按 Midjourney 的解析引擎需求构建提示词
+
+### 示例
+
+<CodeGroup>
+```text 增强前
+a girl in a flower field
+```
+
+```text 增强后（为 Niji 7 扩展）
+a young girl standing in a vast field of wildflowers, wind gently
+blowing through her hair, golden sunset casting long shadows,
+watercolor-inspired soft edges, dreamy pastel color palette,
+Studio Ghibli atmosphere, delicate linework
+```
+</CodeGroup>
+
+<Note>
+  Niji 7 还会在生成前自动将非英文提示词翻译为英文。你可以用任何语言编写提示词 — 系统会自动处理翻译。
+</Note>
+
+## 反向提示词
+
+除了增强功能，MeiGen 还提供**反向提示词** — 从现有图片中提取提示词的能力。
+
+**使用方法：**
+1. 将画廊中的任意图片拖到提示词区域
+2. 或在图片详情对话框中点击**反向提示词**
+
+AI 会分析图片并生成详细的提示词，描述它所看到的内容。然后你可以将此作为起点，编辑并生成新的变体。
+
+## 何时使用增强
+
+| 场景 | 建议 |
+| --- | --- |
+| 你有一个模糊的想法（如"一个日落"） | 使用增强 — 它会添加你需要的细节 |
+| 30 词以下的简短描述 | 使用增强 — 在此范围内效果最佳 |
+| 包含具体视觉指令的详细提示词 | 跳过增强 — 直接生成 |
+| 想要 Midjourney 风格的结果 | 先选择 Niji 7，然后增强以获得优化的扩展 |
+| 你找到了一张喜欢的图片 | 使用反向提示词提取并修改提示词 |

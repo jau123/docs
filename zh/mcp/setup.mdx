@@ -1,0 +1,145 @@
+---
+title: "安装配置"
+description: "安装和配置 LibreArt MCP 插件"
+---
+
+## 前提条件
+
+1. 已安装 **Node.js 18+**
+2. 在 [meigen.ai](https://www.meigen.ai) 注册 MeiGen 账户
+3. 一个 API Key（用于图片生成 — [在此获取](/zh/quickstart#step-2-get-an-api-key)）
+
+## 安装
+
+### Claude Code
+
+<Steps>
+  <Step title="安装插件">
+    在终端中运行以下命令：
+
+    ```bash
+    claude mcp add libreart -- npx -y libreart
+    ```
+  </Step>
+  <Step title="配置 API Key">
+    当插件提示时，运行 `/meigen:setup` 并粘贴你的 API Key。
+
+    或者，设置为环境变量：
+
+    ```bash
+    export MEIGEN_API_KEY=meigen_sk_YOUR_API_KEY
+    ```
+  </Step>
+  <Step title="开始使用">
+    直接用自然语言让 Claude 生成图片：
+
+    - "为我的应用生成一个 Logo"
+    - "在画廊中搜索风景摄影"
+    - "增强这个提示词：一只猫在太空中"
+  </Step>
+</Steps>
+
+### Cursor
+
+<Steps>
+  <Step title="打开 MCP 设置">
+    前往 **Cursor Settings** → **MCP** → **Add new MCP server**。
+  </Step>
+  <Step title="添加配置">
+    将以下内容添加到你的 MCP 配置中：
+
+    ```json
+    {
+      "mcpServers": {
+        "libreart": {
+          "command": "npx",
+          "args": ["-y", "libreart"],
+          "env": {
+            "MEIGEN_API_KEY": "meigen_sk_YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="重启 Cursor">
+    重启编辑器使更改生效。
+  </Step>
+</Steps>
+
+### Windsurf
+
+<Steps>
+  <Step title="打开 MCP 设置">
+    前往 **Windsurf Settings** → **MCP** → **Add Server**。
+  </Step>
+  <Step title="添加配置">
+    使用与 Cursor 相同的 JSON 配置：
+
+    ```json
+    {
+      "mcpServers": {
+        "libreart": {
+          "command": "npx",
+          "args": ["-y", "libreart"],
+          "env": {
+            "MEIGEN_API_KEY": "meigen_sk_YOUR_API_KEY"
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="重启 Windsurf">
+    重启编辑器使更改生效。
+  </Step>
+</Steps>
+
+## 验证安装
+
+安装完成后，向你的 AI 助手提问：
+
+> "列出可用的 MeiGen 模型"
+
+如果配置正确，它会调用 `list_models` 工具并显示可用模型及其定价。
+
+## 使用示例
+
+### 生成图片
+
+> "使用 Nanobanana 2 生成一个极简科技风格的 Logo，正方形格式"
+
+### 搜索灵感
+
+> "在 MeiGen 画廊中搜索赛博朋克城市风景"
+
+### 增强提示词
+
+> "增强这个图片生成提示词：山上的日落"
+
+### 获取随机灵感
+
+> "给我一些 AI 艺术的灵感"
+
+## 故障排除
+
+<AccordionGroup>
+  <Accordion title="'No image generation providers configured'" icon="circle-exclamation">
+    你的 API Key 未设置。在 Claude Code 中运行 `/meigen:setup`，或在 MCP 配置中添加 `MEIGEN_API_KEY` 环境变量。
+  </Accordion>
+
+  <Accordion title="'Insufficient credits'" icon="circle-exclamation">
+    API Key 只能使用购买积分，不能使用每日免费积分。请在 [meigen.ai](https://www.meigen.ai) 购买积分。
+  </Accordion>
+
+  <Accordion title="插件未出现在工具列表中" icon="circle-exclamation">
+    1. 确保已安装 Node.js 18+
+    2. 尝试直接运行 `npx -y libreart` 检查是否有错误
+    3. 重启编辑器
+    4. 检查 MCP 配置 JSON 是否有效
+  </Accordion>
+
+  <Accordion title="生成超时" icon="circle-exclamation">
+    某些模型生成时间较长。Niji 7 最多可能需要 60 秒，Veo 3.1（视频）可能需要几分钟。插件会自动等待。
+  </Accordion>
+</AccordionGroup>

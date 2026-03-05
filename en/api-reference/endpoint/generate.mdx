@@ -1,0 +1,219 @@
+---
+title: "Generate Image"
+description: "Generate an image using an AI model"
+---
+
+```
+POST /api/generate/v2
+```
+
+Submits an image generation request. The image is generated asynchronously — use the [status endpoint](#check-generation-status) to poll for completion.
+
+## Request
+
+### Headers
+
+| Header | Value |
+| --- | --- |
+| Authorization | `Bearer meigen_sk_YOUR_API_KEY` |
+| Content-Type | `application/json` |
+
+### Body Parameters
+
+<ParamField body="prompt" type="string" required>
+  The text description of the image to generate. Length limits vary by model (see [Models](/en/features/models)).
+</ParamField>
+
+<ParamField body="modelId" type="string" default="gemini-3-pro-image-preview">
+  The model to use for generation. Get available models from the [List Models](/en/api-reference/endpoint/models) endpoint.
+
+  Available values: `nanobanana-2`, `gemini-3-pro-image-preview`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-niji7`, `z-image-turbo`, `rhart-1.5`, `veo-3.1`
+</ParamField>
+
+<ParamField body="aspectRatio" type="string" default="1:1">
+  The aspect ratio for the generated image. Must be one of the ratios supported by the selected model.
+
+  Common values: `1:1`, `3:4`, `4:3`, `16:9`, `9:16`
+</ParamField>
+
+<ParamField body="resolution" type="string" default="2K">
+  The output resolution. Availability depends on the model.
+
+  Available values: `2K`, `3K`, `4K`, `720p`
+</ParamField>
+
+<ParamField body="referenceImages" type="string[]">
+  Array of image URLs to use as references. Must be publicly accessible HTTPS URLs.
+
+  Maximum number of reference images depends on the model (0–5).
+</ParamField>
+
+<ParamField body="niji7Options" type="object">
+  Advanced parameters for Midjourney Niji 7 model only. Ignored for other models.
+
+  | Field | Type | Default | Range |
+  | --- | --- | --- | --- |
+  | stylize | number | 150 | 0–1000 |
+  | chaos | number | 0 | 0–100 |
+  | weird | number | 0 | 0–3000 |
+  | raw | boolean | true | — |
+  | iw | number | 1.5 | 0–3 |
+  | sref | string | — | URL or text |
+  | sw | number | 100 | 0–1000 |
+  | sv | number | 4 | 1–4 |
+</ParamField>
+
+<ParamField body="referenceType" type="string" default="content">
+  For Niji 7 only. How to interpret the reference image.
+
+  - `content` — use as subject matter reference
+  - `style` — extract visual style only
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the request was accepted.
+</ResponseField>
+
+<ResponseField name="generationId" type="string">
+  The unique ID of the generation request. Use this to poll for status.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Initial status, always `"processing"`.
+</ResponseField>
+
+<ResponseField name="creditsUsed" type="number">
+  The number of credits deducted for this generation.
+</ResponseField>
+
+<ResponseField name="modelId" type="string">
+  The model used for this generation.
+</ResponseField>
+
+<ResponseField name="credits" type="object">
+  Updated credit balances after deduction.
+
+  | Field | Type | Description |
+  | --- | --- | --- |
+  | daily | number | Remaining daily free credits |
+  | purchased | number | Remaining purchased credits |
+  | unlimited | boolean | Whether user has unlimited credits |
+</ResponseField>
+
+```json
+{
+  "success": true,
+  "generationId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "processing",
+  "creditsUsed": 5,
+  "modelId": "gemini-3-pro-image-preview",
+  "credits": {
+    "daily": 10,
+    "purchased": 50,
+    "unlimited": false
+  }
+}
+```
+
+## Check Generation Status
+
+```
+GET /api/generate/v2/status/:generationId
+```
+
+Poll this endpoint to check if your image is ready.
+
+### Response (Processing)
+
+```json
+{
+  "jobId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "processing",
+  "imageUrl": null,
+  "videoUrl": null,
+  "mediaType": "image",
+  "r2Key": null,
+  "error": null
+}
+```
+
+### Response (Completed)
+
+```json
+{
+  "jobId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "completed",
+  "imageUrl": "https://images.meigen.art/generations/xxx.png",
+  "videoUrl": null,
+  "mediaType": "image",
+  "r2Key": "generations/xxx.png",
+  "error": null
+}
+```
+
+### Response (Failed)
+
+```json
+{
+  "jobId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "failed",
+  "imageUrl": null,
+  "videoUrl": null,
+  "mediaType": "image",
+  "r2Key": null,
+  "error": "Content policy violation"
+}
+```
+
+When a generation fails, credits are automatically refunded.
+
+## Examples
+
+### Basic generation
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "A minimalist logo of a mountain, vector style, blue gradient",
+    "modelId": "nanobanana-2",
+    "aspectRatio": "1:1"
+  }'
+```
+
+### With reference image
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Similar style landscape but with autumn colors",
+    "modelId": "seedream-5.0-lite",
+    "aspectRatio": "16:9",
+    "referenceImages": ["https://example.com/reference.jpg"]
+  }'
+```
+
+### Niji 7 with style reference
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "a warrior princess in an enchanted forest",
+    "modelId": "midjourney-niji7",
+    "aspectRatio": "3:4",
+    "referenceImages": ["https://example.com/style-ref.jpg"],
+    "referenceType": "style",
+    "niji7Options": {
+      "stylize": 300,
+      "sw": 500,
+      "sv": 4
+    }
+  }'
+```

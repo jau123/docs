@@ -1,0 +1,331 @@
+---
+title: "Image & Video Generation"
+description: "Generate images and videos with multiple AI models — prompt editor, reference images, model options, video generation, and generation history"
+---
+
+MeiGen lets you generate images and videos using multiple AI models from a unified interface. Open the generation sidebar by clicking the sparkle icon in the floating dock (desktop) or through the navigation menu.
+
+## Model Selector
+
+At the top of the generation sidebar, the model selector dropdown lets you choose which AI model to use.
+
+Each option shows:
+- **Provider icon** — visual indicator of the model provider (Google, ByteDance, Midjourney, etc.)
+- **Model name** — the display name of the model
+- **Credit cost** — how many credits this model uses per generation
+
+When a new model is added to MeiGen, a blue dot badge appears on models you haven't tried yet. The dot disappears once you select the model.
+
+Selecting a different model automatically updates the available aspect ratios, resolution options, and advanced settings to match that model's capabilities.
+
+<Card title="Model Comparison" icon="scale-balanced" href="/en/features/models">
+  Compare all 8 models — features, pricing, strengths, and limitations
+</Card>
+
+---
+
+## Prompt Editor
+
+The prompt editor is built on a rich text editor and supports several features beyond plain text input.
+
+### Writing Effective Prompts
+
+- **Be specific** — describe composition, lighting, colors, textures, and perspective for the best results
+- **Short prompts work too** — use the Enhance button to expand brief descriptions into detailed prompts automatically
+- **Language** — most models accept English prompts. Niji 7 will auto-translate non-English prompts to English
+
+### Variable Tags
+
+Some prompts from the gallery contain blue `[placeholder]` tags — for example, `[style]`, `[subject]`, or `[color palette]`. These are **editable template variables**.
+
+Click any blue tag to select it, then type your replacement text. This makes it easy to create variations of a prompt without rewriting the whole thing.
+
+### @ Image Mentions
+
+When you have multiple reference images uploaded, you can mention specific images inline in your prompt:
+
+1. Type `@` in the prompt editor
+2. A popup appears showing thumbnails of your uploaded reference images
+3. Select an image to insert a mention tag (e.g., `@image1`, `@image2`)
+4. Write instructions around the mentions: *"Use @image1 as the background scenery and apply the color palette from @image2"*
+
+This gives you precise control over how each reference image influences the generation.
+
+### Translate Button
+
+Click the translate icon (top right of the prompt editor) to translate your prompt into English. This is useful when writing prompts in another language, as most models produce the best results with English input.
+
+### Prompt Enhancement
+
+Click the **magic wand button** to automatically enhance your prompt. The AI adds visual details like composition, lighting, atmosphere, and style cues.
+
+Two modes are available depending on the selected model:
+- **Polish** (non-Niji 7 models) — refines and enriches your prompt while preserving intent
+- **Expand** (Niji 7) — transforms a brief description into Midjourney-optimized language with anime/illustration style cues
+
+<Card title="Prompt Enhancement Details" icon="wand-magic-sparkles" href="/en/features/prompt-enhance">
+  Learn about Polish vs. Expand modes, before/after examples, and when to use enhancement
+</Card>
+
+### Keyboard Shortcuts
+
+| Shortcut | Action |
+| --- | --- |
+| `Cmd+Enter` / `Ctrl+Enter` | Trigger generation |
+
+---
+
+## Reference Images
+
+Upload reference images to guide the AI's output. The AI uses these as visual context — for style matching, composition guidance, or subject reference.
+
+- **Upload methods** — drag-and-drop files onto the reference area, or click to browse
+- **Supported formats** — JPG, PNG, WebP
+- **Auto-compression** — images are automatically compressed to max 2MB / 2048px before upload
+- **Thumbnail grid** — uploaded images appear as thumbnails with an × button to remove each one
+- **Per-model limits** — the maximum number of reference images varies by model (0–5). Models that don't support references (like Z Image Turbo) hide this section entirely.
+
+<Note>
+  See the [Models](/en/features/models) page for the exact reference image limit of each model.
+</Note>
+
+### Adding References from the Gallery
+
+You don't need to download images first. Drag any gallery card directly into the reference image area — the image URL is used automatically.
+
+<Tip>
+  Combine gallery references with @ mentions for powerful multi-reference workflows. For example, drag two gallery cards as references, then write: "Combine the composition of @image1 with the color palette of @image2."
+</Tip>
+
+### Reference Types (Niji 7 Only)
+
+When using Midjourney Niji 7 with a reference image, a dropdown appears to choose how the reference is interpreted:
+
+| Type | Description |
+| --- | --- |
+| **Content Reference** | The AI uses the image as subject matter — it tries to recreate similar content. Control influence with the **Image Weight** (iw) parameter (0–3). |
+| **Style Reference** | The AI extracts the visual style (colors, mood, technique) without copying the content. Control with **Style Weight** (sw, 0–1000). |
+
+---
+
+## Generation Options
+
+### Count
+
+Choose how many images to generate per request (1–4).
+
+- **Free users** — limited to 1 image per request. A lock icon appears on the + button.
+- **Paid users** — can generate up to 4 images in parallel per request.
+
+### Aspect Ratio
+
+Select from a range of aspect ratios. The selector automatically filters to show only ratios supported by the current model.
+
+| Ratio | Orientation | Common Use |
+| --- | --- | --- |
+| 1:1 | Square | Social media profile, icons |
+| 3:4, 4:5, 2:3 | Portrait | Phone wallpaper, posters |
+| 9:16 | Tall portrait | Stories, Reels |
+| 1:4, 1:8 | Ultra tall | Scrolling banners (Nanobanana 2 only) |
+| 4:3, 3:2 | Landscape | Desktop wallpaper |
+| 16:9, 21:9 | Wide | Cinematic, ultrawide displays |
+| 4:1, 8:1 | Ultra wide | Panoramic banners (Nanobanana 2 only) |
+
+<Warning>
+  Not all models support all ratios. The selector automatically filters to show only ratios supported by the current model. See the [Models](/en/features/models) page for each model's supported ratios.
+</Warning>
+
+### Resolution
+
+Choose the output resolution when available:
+
+| Resolution | Availability |
+| --- | --- |
+| **2K** | Available to all users (default) |
+| **3K** | Select models only (e.g., Seedream 5.0 Lite) |
+| **4K** | Paid users only — a lock icon appears for free users |
+
+---
+
+## Niji 7 Advanced Options
+
+When using Midjourney Niji 7, a gear icon appears next to the model selector. Click it to open a popover with advanced parameters:
+
+| Parameter | Range | Default | Description |
+| --- | --- | --- | --- |
+| **Stylize** | 0–1000 | 150 | Controls how strongly Midjourney's aesthetic is applied. Lower = more literal, higher = more artistic. |
+| **Chaos** | 0–100 | 0 | Adds variation between runs. Higher values produce more unexpected results. |
+| **Weird** | 0–3000 | 0 | Introduces unusual, experimental qualities. |
+| **Raw Mode** | on/off | on | Produces images with a raw, less processed aesthetic. |
+| **Image Weight (iw)** | 0–3 | 1.5 | How much influence the content reference image has. Only visible when a content reference is set. |
+| **Style Reference (sref)** | URL/text | — | Provide a URL to an image whose style you want to mimic. Disabled when reference images are set to Style mode. |
+| **Style Weight (sw)** | 0–1000 | 100 | How strongly the style reference is applied. Only visible when sref or style reference images are present. |
+| **Style Version (sv)** | 1–4 | 4 | Which style algorithm version to use. |
+
+The gear icon turns blue when any parameter has been changed from its default value.
+
+---
+
+## Reverse Prompt
+
+See an image you like but don't know how to describe it? **Reverse Prompt** uses AI vision to analyze an image and generate a detailed text prompt that captures its content, style, and composition.
+
+### How to Use
+
+1. **Image detail dialog** — open any image's detail view and click the **Reverse Prompt** button. The AI analyzes the image and generates a descriptive prompt.
+2. **Drag and drop** — drag any external image (or a gallery card) onto the **Reverse Prompt dropzone** above the prompt editor in the generation sidebar.
+
+### What It Generates
+
+The AI examines the image and produces a prompt describing:
+
+- Subject matter and scene composition
+- Art style and technique (photorealistic, illustration, watercolor, etc.)
+- Lighting, color palette, and mood
+- Camera angle and perspective
+
+You can use the generated prompt as-is, or edit it to create variations of the original image.
+
+<Tip>
+  Reverse Prompt works well as a starting point. Try combining it with [Prompt Enhancement](/en/features/prompt-enhance) — first reverse-prompt an image you like, then enhance the result for even more detail.
+</Tip>
+
+---
+
+## Video Generation
+
+MeiGen also supports AI video generation. Click the **clapperboard icon** in the floating dock to open the video generation sidebar.
+
+### Frame Images
+
+Upload up to 2 frame images to control the video's composition:
+
+- **First Frame** — sets the starting composition of the video
+- **Last Frame** — sets the ending composition
+
+Both are optional. You can also drag gallery cards directly as frame images.
+
+### Video Options
+
+| Option | Values | Description |
+| --- | --- | --- |
+| **Aspect Ratio** | 16:9, 9:16 | Landscape or portrait video |
+| **Resolution** | 720p | Output resolution (varies by model) |
+| **Style** | Auto / Realistic / Anime / Cinematic | Visual style preset |
+| **Speed** | Auto / Slow / Fast | Playback speed control |
+
+<Note>
+  Veo 3.1 automatically generates AI audio for your video — no separate audio input is needed. See the [Models](/en/features/models) page for full video model specs.
+</Note>
+
+### Converting Images to Video
+
+After generating an image, hover over the completed card and click the **Animate** button (clapperboard icon). This sends your generated image to the video sidebar as the first frame, making it easy to turn a still image into a short video clip.
+
+---
+
+## Generation History
+
+After submitting a generation request, your images appear as cards in the generation history panel (accessible via the floating dock's History button or the sidebar).
+
+### Pending State
+
+While your image is being generated, the card shows:
+
+- **Animated gradient background** with a subtle pulse effect
+- **Circular progress bar** — uses an exponential decay curve that progresses quickly at first and slows as it approaches the estimated completion time
+- **Estimated time** — video generations show time estimates (e.g., "2–5 min" for 720p)
+
+Generation times vary by model:
+
+| Model | Typical Time |
+| --- | --- |
+| Z Image Turbo | ~5 seconds |
+| Nanobanana 2, Seedream | ~15 seconds |
+| Nanobanana Pro | ~15 seconds |
+| GPT image1.5 | ~20 seconds |
+| Niji 7 | ~60 seconds |
+| Veo 3.1 (video) | 2–6 minutes |
+
+### Failed State
+
+If a generation fails, the card shows:
+
+- A user-friendly error message explaining what went wrong
+- **"Credits refunded"** note — credits are automatically returned when a generation fails
+- **Retry button** — click to resubmit the same request with the original prompt and settings
+
+### Completed State
+
+Hover over a completed generation card to reveal action buttons:
+
+| Action | Description |
+| --- | --- |
+| **Edit** | Adds the generated image as a reference for a new generation |
+| **Cutout** | Removes the background, creating a transparent PNG |
+| **Animate** | Converts the still image into a video (image-to-video) |
+| **Delete** | Removes the card from your history |
+| **Use Idea** | Copies the prompt back to the editor for reuse |
+| **Favorite** | Saves to your favorites collection |
+| **Download** | Saves the image to your device |
+| **Share to X** | Opens a pre-filled tweet with your generated image |
+
+The card also shows the aspect ratio and resolution labels in the bottom-left corner.
+
+---
+
+## Background Removal (Cutout)
+
+After generating an image, hover over it and click the **Cutout** button to remove the background. This creates a transparent PNG — useful for logos, stickers, product shots, or compositing.
+
+The cutout process creates a new card in your generation history. The original image is preserved.
+
+---
+
+## Credits and Billing
+
+### How Credits Work
+
+MeiGen uses a dual credit system:
+
+- **Daily credits** — free credits that refresh every 24 hours. Available to all users.
+- **Purchased credits** — credits you buy that never expire. Used when daily credits run out.
+
+When generating via the website, **daily credits are used first**, then purchased credits. The credit cost is shown on the Generate button before you click.
+
+You can check your credit balance by hovering over the credits card in the bottom of the left sidebar. The hover card shows a breakdown of daily and purchased credits with a dual-color progress bar.
+
+### Free vs Paid
+
+| Feature | Free | Paid |
+| --- | --- | --- |
+| Daily credits | Yes (reset every 24 hours) | Yes + purchased credits |
+| 4K resolution | Locked | Available |
+| Images per request | 1 | Up to 4 |
+| API access | Not available | Available (purchased credits only) |
+
+---
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Why is my generation taking longer than expected?" icon="clock">
+    Generation times vary by model and server load. Niji 7 typically takes ~60 seconds, and Veo 3.1 video generation takes 2–6 minutes. The progress bar uses an estimate — actual time may vary during peak hours.
+  </Accordion>
+
+  <Accordion title="My generation failed — what happened to my credits?" icon="coins">
+    Credits are automatically refunded when a generation fails. The refund is reflected immediately in your balance. You can use the Retry button to try again.
+  </Accordion>
+
+  <Accordion title="Can I generate the same image again?" icon="repeat">
+    Use the **Retry** button on a failed card, or click **Use Idea** on a completed card to copy its prompt back to the editor. Note that AI generation is non-deterministic — even with the same prompt, results will vary.
+  </Accordion>
+
+  <Accordion title="What's the difference between Cutout and Animate?" icon="scissors">
+    **Cutout** removes the background from a still image, creating a transparent PNG. **Animate** converts the still image into a short video clip using the video generation model.
+  </Accordion>
+
+  <Accordion title="Why does the resolution selector show a lock icon?" icon="lock">
+    4K resolution is available to paid users only. Free users can generate at 2K resolution. Upgrade your account to unlock higher resolutions.
+  </Accordion>
+</AccordionGroup>

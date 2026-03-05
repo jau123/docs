@@ -1,0 +1,66 @@
+---
+title: "图片详情"
+description: "获取生成图片的详细信息"
+---
+
+```
+GET /api/images/:id
+```
+
+返回特定生成图片的详细信息。这是一个公开端点 — 无需认证。
+
+响应缓存 1 小时。
+
+## 路径参数
+
+<ParamField path="id" type="string" required>
+  [生成](/zh/api-reference/endpoint/generate)端点返回的生成 ID。
+</ParamField>
+
+## 响应
+
+<ResponseField name="id" type="string">
+  生成 ID。
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  生成状态：`"pending"`、`"completed"` 或 `"failed"`。
+</ResponseField>
+
+<ResponseField name="imageUrl" type="string">
+  生成图片的 URL（仅在状态为 `"completed"` 时存在）。
+</ResponseField>
+
+<ResponseField name="prompt" type="string">
+  用于生成的提示词。
+</ResponseField>
+
+<ResponseField name="model" type="string">
+  使用的模型 ID。
+</ResponseField>
+
+<ResponseField name="aspectRatio" type="string">
+  生成图片的宽高比。
+</ResponseField>
+
+<ResponseField name="createdAt" type="string">
+  生成创建时间的 ISO 8601 时间戳。
+</ResponseField>
+
+## 示例
+
+```bash
+curl https://www.meigen.ai/api/images/550e8400-e29b-41d4-a716-446655440000
+```
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "completed",
+  "imageUrl": "https://images.meigen.art/generations/550e8400.png",
+  "prompt": "A serene Japanese garden with cherry blossoms",
+  "model": "nanobanana-2",
+  "aspectRatio": "16:9",
+  "createdAt": "2025-03-01T12:00:00Z"
+}
+```

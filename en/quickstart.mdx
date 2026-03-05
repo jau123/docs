@@ -1,0 +1,92 @@
+---
+title: "MeiGen"
+description: "AI image and video generation platform — browse curated artwork, generate with multiple models, and integrate via API"
+---
+
+MeiGen is an AI-powered creative platform where you can browse a curated gallery of AI-generated artwork, generate your own images and videos using multiple AI models, and integrate image generation into your workflow via API or MCP plugin.
+
+<CardGroup cols={2}>
+  <Card title="Gallery" icon="images" href="/en/features/gallery">
+    Browse curated AI artwork from the community. Search, filter, and use prompts as starting points.
+  </Card>
+  <Card title="Image & Video Generation" icon="sparkles" href="/en/features/generate">
+    Create images and videos with 8 AI models. Reference images, prompt enhancement, and advanced options.
+  </Card>
+  <Card title="MCP Plugin" icon="puzzle-piece" href="/en/mcp/overview">
+    Generate images directly from Claude Code, Cursor, or Windsurf using the LibreArt MCP plugin.
+  </Card>
+  <Card title="API Reference" icon="code" href="/en/api-reference/introduction">
+    Integrate MeiGen into your applications with our REST API. Token-based authentication.
+  </Card>
+</CardGroup>
+
+---
+
+## Browse the Gallery
+
+MeiGen's gallery features a curated collection of AI-generated artwork sourced from the community, updated weekly with fresh content. Images are displayed in a responsive masonry grid layout.
+
+**Filter by category** — use the sidebar tags to narrow down what you see:
+
+- **Product & Brand** — product photography, logos, packaging, marketing visuals
+- **Photography** — portraits, landscapes, street photography, macro
+- **Illustration & 3D** — digital art, concept art, 3D renders, character design
+- **Food & Drink** — food photography, recipe visuals, restaurant scenes
+- **Girl** — character portraits, fashion, lifestyle
+
+**Interact with cards** — hover over any image to reveal actions:
+
+- **Use Idea** — copies the original prompt into the generation editor, ready to customize and generate
+- **Favorite** — saves the image to your personal collection, synced across devices
+- **View on X** — opens the original post on X (Twitter)
+
+**Search** — press `Cmd+K` (Mac) or `Ctrl+K` (Windows) to open the search dialog. Search across all gallery posts with hybrid text and vector search, or filter by model, category, and whether a prompt is available.
+
+<Card title="Full Gallery Guide" icon="arrow-right" href="/en/features/gallery">
+  Learn about image details, drag-to-reference, search tabs, and more
+</Card>
+
+---
+
+## Generate Images
+
+The fastest way to start generating is to find an image you like in the gallery and click **Use As Prompt**. This copies the prompt into the generation editor where you can customize it.
+
+**Edit variables** — some prompts contain blue `[placeholder]` tags like `[style]` or `[subject]`. Click any tag to replace it with your own text. These are editable template variables that make it easy to create variations.
+
+**Add reference images** — upload your own images or drag any gallery card directly into the reference area. When using multiple references, type `@` in the prompt editor to mention specific images (e.g., "Use @image1 as the background and @image2 for the character style").
+
+**Enhance your prompt** — click the magic wand button to automatically improve short or simple prompts. The AI adds visual details like composition, lighting, colors, and textures.
+
+**Choose your model** — select from 8 AI models, each with different strengths. Pick an aspect ratio, resolution, and generate. Credits are shown on the generate button before you click.
+
+<Card title="Full Generation Guide" icon="arrow-right" href="/en/features/generate">
+  Learn about model selection, video generation, advanced options, and more
+</Card>
+
+---
+
+## Free Credits
+
+<Tip>
+  Every new account receives starter credits, and free daily credits are refreshed every 24 hours — enough to explore all models and generate multiple images each day at no cost.
+</Tip>
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Prompt Enhancement" icon="wand-magic-sparkles" href="/en/features/prompt-enhance">
+    Polish and Expand modes for better prompts
+  </Card>
+  <Card title="Model Comparison" icon="scale-balanced" href="/en/features/models">
+    Compare all 8 models — features, pricing, and limitations
+  </Card>
+  <Card title="MCP Plugin Setup" icon="plug" href="/en/mcp/setup">
+    Install LibreArt for Claude Code, Cursor, or Windsurf
+  </Card>
+  <Card title="API Reference" icon="code" href="/en/api-reference/introduction">
+    REST API documentation for programmatic access
+  </Card>
+</CardGroup>

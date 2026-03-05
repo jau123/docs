@@ -1,105 +1,105 @@
 ---
-title: "Generate Image"
-description: "Generate an image using an AI model"
+title: "生成图片"
+description: "使用 AI 模型生成图片"
 ---
 
 ```
 POST /api/generate/v2
 ```
 
-Submits an image generation request. The image is generated asynchronously — use the [status endpoint](#check-generation-status) to poll for completion.
+提交图片生成请求。图片异步生成 — 使用[状态查询端点](#查询生成状态)轮询完成情况。
 
-## Request
+## 请求
 
-### Headers
+### 请求头
 
-| Header | Value |
+| Header | 值 |
 | --- | --- |
 | Authorization | `Bearer meigen_sk_YOUR_API_KEY` |
 | Content-Type | `application/json` |
 
-### Body Parameters
+### 请求体参数
 
 <ParamField body="prompt" type="string" required>
-  The text description of the image to generate. Length limits vary by model (see [Models](/features/models)).
+  要生成的图片的文本描述。长度限制因模型而异（参见[模型](/zh/features/models)）。
 </ParamField>
 
 <ParamField body="modelId" type="string" default="gemini-3-pro-image-preview">
-  The model to use for generation. Get available models from the [List Models](/api-reference/endpoint/models) endpoint.
+  用于生成的模型。从[模型列表](/zh/api-reference/endpoint/models)端点获取可用模型。
 
-  Available values: `nanobanana-2`, `gemini-3-pro-image-preview`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-niji7`, `z-image-turbo`, `rhart-1.5`, `veo-3.1`
+  可选值：`nanobanana-2`, `gemini-3-pro-image-preview`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-niji7`, `z-image-turbo`, `rhart-1.5`, `veo-3.1`
 </ParamField>
 
 <ParamField body="aspectRatio" type="string" default="1:1">
-  The aspect ratio for the generated image. Must be one of the ratios supported by the selected model.
+  生成图片的宽高比。必须是所选模型支持的比例之一。
 
-  Common values: `1:1`, `3:4`, `4:3`, `16:9`, `9:16`
+  常用值：`1:1`, `3:4`, `4:3`, `16:9`, `9:16`
 </ParamField>
 
 <ParamField body="resolution" type="string" default="2K">
-  The output resolution. Availability depends on the model.
+  输出分辨率。可用性取决于模型。
 
-  Available values: `2K`, `3K`, `4K`, `720p`
+  可选值：`2K`, `3K`, `4K`, `720p`
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">
-  Array of image URLs to use as references. Must be publicly accessible HTTPS URLs.
+  用作参考的图片 URL 数组。必须是可公开访问的 HTTPS URL。
 
-  Maximum number of reference images depends on the model (0–5).
+  参考图片的最大数量取决于模型（0-5 张）。
 </ParamField>
 
 <ParamField body="niji7Options" type="object">
-  Advanced parameters for Midjourney Niji 7 model only. Ignored for other models.
+  仅用于 Midjourney Niji 7 模型的高级参数。对其他模型无效。
 
-  | Field | Type | Default | Range |
+  | 字段 | 类型 | 默认值 | 范围 |
   | --- | --- | --- | --- |
-  | stylize | number | 150 | 0–1000 |
-  | chaos | number | 0 | 0–100 |
-  | weird | number | 0 | 0–3000 |
+  | stylize | number | 150 | 0-1000 |
+  | chaos | number | 0 | 0-100 |
+  | weird | number | 0 | 0-3000 |
   | raw | boolean | true | — |
-  | iw | number | 1.5 | 0–3 |
-  | sref | string | — | URL or text |
-  | sw | number | 100 | 0–1000 |
-  | sv | number | 4 | 1–4 |
+  | iw | number | 1.5 | 0-3 |
+  | sref | string | — | URL 或文本 |
+  | sw | number | 100 | 0-1000 |
+  | sv | number | 4 | 1-4 |
 </ParamField>
 
 <ParamField body="referenceType" type="string" default="content">
-  For Niji 7 only. How to interpret the reference image.
+  仅用于 Niji 7。参考图片的解读方式。
 
-  - `content` — use as subject matter reference
-  - `style` — extract visual style only
+  - `content` — 用作主题素材参考
+  - `style` — 仅提取视觉风格
 </ParamField>
 
-## Response
+## 响应
 
 <ResponseField name="success" type="boolean">
-  Whether the request was accepted.
+  请求是否被接受。
 </ResponseField>
 
 <ResponseField name="generationId" type="string">
-  The unique ID of the generation request. Use this to poll for status.
+  生成请求的唯一 ID。用此 ID 轮询状态。
 </ResponseField>
 
 <ResponseField name="status" type="string">
-  Initial status, always `"processing"`.
+  初始状态，始终为 `"processing"`。
 </ResponseField>
 
 <ResponseField name="creditsUsed" type="number">
-  The number of credits deducted for this generation.
+  本次生成扣除的积分数。
 </ResponseField>
 
 <ResponseField name="modelId" type="string">
-  The model used for this generation.
+  本次生成使用的模型。
 </ResponseField>
 
 <ResponseField name="credits" type="object">
-  Updated credit balances after deduction.
+  扣除后更新的积分余额。
 
-  | Field | Type | Description |
+  | 字段 | 类型 | 描述 |
   | --- | --- | --- |
-  | daily | number | Remaining daily free credits |
-  | purchased | number | Remaining purchased credits |
-  | unlimited | boolean | Whether user has unlimited credits |
+  | daily | number | 剩余每日免费积分 |
+  | purchased | number | 剩余购买积分 |
+  | unlimited | boolean | 用户是否拥有无限积分 |
 </ResponseField>
 
 ```json
@@ -117,15 +117,15 @@ Submits an image generation request. The image is generated asynchronously — u
 }
 ```
 
-## Check Generation Status
+## 查询生成状态
 
 ```
 GET /api/generate/v2/status/:generationId
 ```
 
-Poll this endpoint to check if your image is ready.
+轮询此端点以检查图片是否就绪。
 
-### Response (Processing)
+### 响应（处理中）
 
 ```json
 {
@@ -139,7 +139,7 @@ Poll this endpoint to check if your image is ready.
 }
 ```
 
-### Response (Completed)
+### 响应（已完成）
 
 ```json
 {
@@ -153,7 +153,7 @@ Poll this endpoint to check if your image is ready.
 }
 ```
 
-### Response (Failed)
+### 响应（失败）
 
 ```json
 {
@@ -167,11 +167,11 @@ Poll this endpoint to check if your image is ready.
 }
 ```
 
-When a generation fails, credits are automatically refunded.
+生成失败时，积分会自动退还。
 
-## Examples
+## 示例
 
-### Basic generation
+### 基本生成
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \
@@ -184,7 +184,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-### With reference image
+### 带参考图片
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \
@@ -198,7 +198,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-### Niji 7 with style reference
+### Niji 7 风格参考
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \

@@ -1,0 +1,179 @@
+---
+title: "Gallery"
+description: "Browse, search, and interact with curated AI-generated artwork — card actions, image details, search, and favorites"
+---
+
+The gallery is MeiGen's home screen — a curated collection of AI-generated artwork sourced from the community on X (Twitter). New content is added weekly, showcasing diverse styles, techniques, and creative directions across multiple AI models.
+
+## Browsing the Gallery
+
+Images are displayed in a responsive **masonry grid** that adapts to your screen size. Each card shows the image at its original aspect ratio, creating a visually dense and easy-to-scan layout.
+
+### Category Filters
+
+Use the category tags in the left sidebar to filter the gallery:
+
+| Category | Content |
+| --- | --- |
+| **Product & Brand** | Product photography, logos, packaging, marketing materials |
+| **Photography** | Portraits, landscapes, street photography, macro shots |
+| **Illustration & 3D** | Digital art, concept art, 3D renders, character design |
+| **Food & Drink** | Food photography, recipe visuals, restaurant scenes |
+| **Girl** | Character portraits, fashion, lifestyle imagery |
+
+You can also switch to **Recent** view to see the latest additions in chronological order.
+
+### Floating Dock (Desktop)
+
+At the bottom of the screen, a floating dock provides quick access to key areas:
+
+| Button | Action |
+| --- | --- |
+| **Home** | Return to the gallery |
+| **History** | View your generation history |
+| **Favorites** | Open your saved collection |
+| **Generate Video** | Open the video generation sidebar |
+| **Generate Image** | Open the image generation sidebar |
+| **Back to Top** | Scroll to the top (appears after scrolling) |
+
+---
+
+## Gallery Cards
+
+Each gallery card displays the image along with contextual information visible on hover (desktop) or in the detail view (mobile).
+
+**Card information includes:**
+- Author avatar, display name, and @username (with verified badge when applicable)
+- Like count and view count
+- Time posted (e.g., "2h ago", "3d ago")
+- Model badge showing which AI model was used
+
+### Hover Actions (Desktop)
+
+When you hover over a card, an overlay appears with three actions:
+
+<AccordionGroup>
+  <Accordion title="Use Idea" icon="repeat">
+    Copies the image's original prompt into the generation editor and opens the generation sidebar. The prompt is ready to edit and regenerate.
+
+    This button only appears when the prompt has been extracted and is available. Some newer posts may show "Prompt Pending" while the prompt is being processed.
+  </Accordion>
+
+  <Accordion title="Favorite" icon="layer-group">
+    Saves the image to your personal favorites collection. Click again to remove it. Requires sign-in.
+
+    Favorites are synced across all your devices — save on desktop, access on mobile.
+  </Accordion>
+
+  <Accordion title="View on X" icon="arrow-up-right">
+    Opens the original X (Twitter) post in a new tab, so you can see the full context, replies, and the creator's other work.
+  </Accordion>
+</AccordionGroup>
+
+### Dragging Cards
+
+Gallery cards are draggable — you can grab any card and drag it to different areas of the generation sidebar:
+
+- **Drag to the Reverse Prompt zone** (above the prompt editor) — the AI will analyze the image and automatically generate a detailed text prompt describing the content, style, composition, and mood.
+- **Drag to the Reference Images area** — the image is added as a reference for your next generation. No download needed — the image URL is used directly.
+
+<Tip>
+  Dragging is a power-user shortcut. You can also accomplish the same things through the image detail dialog using the "Use as Prompt" and "Use as Reference" buttons.
+</Tip>
+
+### Mobile
+
+On mobile devices, there are no hover actions. Tapping a card opens the full image detail view directly, where all actions are accessible.
+
+---
+
+## Image Detail
+
+Click any gallery card to open the full-screen **Image Detail Dialog**. This provides a complete view of the image and all available actions.
+
+### Image Viewer
+
+- **Full resolution** — the image is displayed at its original quality with a smooth fade-in animation
+- **Multi-image navigation** — when a post contains multiple images, you'll see:
+  - An image counter (e.g., "2 / 4") in the corner
+  - A thumbnail strip on the right (desktop) for quick switching
+  - Previous/Next arrow buttons
+- **Download** — click the download button (top right) to save the full-resolution image to your device
+- **Close** — click the X button or press `Esc` to close the dialog
+
+### Info Panel
+
+The right side (desktop) or bottom section (mobile) shows detailed information:
+
+**Author info:**
+- Avatar, display name, @username with link to their X profile
+- Verified badge when applicable
+
+**Stats:**
+- Like count, view count, and time posted
+- Model badge showing which AI model generated the image
+
+**Prompt section:**
+- The full prompt text used to generate the image (preserves original formatting)
+- **Copy button** — appears on hover, copies the prompt to your clipboard
+- **Translate button** — translates the prompt into your language using AI. Click again to show the original text
+
+**Action buttons:**
+- **Use as Prompt** — closes the dialog, opens the generation sidebar, and fills in the prompt. Ready to edit and generate.
+- **Use as Reference** — adds the current image as a reference image in the generation sidebar. Useful for style transfer or composition guidance.
+
+<Note>
+  If a prompt hasn't been extracted yet, the "Use as Prompt" button will appear grayed out with a "Prompt Pending" label. Check back later — prompts are usually available within a few hours.
+</Note>
+
+### Video Content
+
+The gallery also includes video content:
+
+- **Self-generated videos** (created on MeiGen) — auto-play directly in the dialog with playback controls and looping
+- **Videos from X** — due to cross-origin restrictions, these cannot play directly. A "View on Twitter" link is shown instead, opening the original post where you can watch the video.
+
+---
+
+## Search
+
+Open the search dialog by pressing `Cmd+K` (Mac) or `Ctrl+K` (Windows), or by clicking the search icon in the left sidebar. The dialog has two tabs:
+
+### Posts Tab
+
+Search across the entire gallery of community artwork.
+
+- **Hybrid search** — combines text matching with vector (semantic) search. Searches across prompts, descriptions, and visual content.
+- **Filters** — narrow results by:
+  - **Model** — filter to images from a specific AI model
+  - **Category** — filter by content category (Product, Photography, etc.)
+  - **Has Prompt** — only show images where the prompt is available
+- **Empty query** — when you haven't typed anything, the search shows **Recent Posts** as default content
+- **Infinite scroll** — results load progressively as you scroll down
+- **Real-time** — search fires automatically after you stop typing (300ms debounce)
+
+### Generations Tab
+
+Search your own generated images. Requires sign-in.
+
+- Search by prompt text across all your past generations
+- Navigate results with keyboard: `↑` / `↓` arrow keys to move, `Enter` to open
+- Shows pending, completed, and failed generations
+
+---
+
+## Favorites
+
+Access your favorites from the sidebar or the floating dock. Your favorites collection stores two types of content:
+
+- **Gallery posts** — community artwork you've saved from the gallery
+- **Your generations** — images you've generated and favorited
+
+### Managing Favorites
+
+- **Add** — click the Favorite button (layer icon) on any gallery card or generation card
+- **Remove** — click the Favorite button again, or use the remove button in the favorites grid
+- **Filter** — switch between All / Posts / Generations tabs to view specific content types
+- **Sync** — favorites are tied to your account and synced across all devices
+
+Favorited cards in the favorites grid also support hover actions: **Use Idea** (if prompt available) and **Remove from Favorites**.
