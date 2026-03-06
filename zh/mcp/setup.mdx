@@ -9,7 +9,7 @@ description: "为你的编辑器和提供商安装并配置 MeiGen MCP 插件"
 - 至少一个图片生成提供商：
   - **MeiGen Cloud** — 从 [meigen.ai](https://www.meigen.ai) 获取 API Key（设置 → API Keys）
   - **ComfyUI** — 运行中的 ComfyUI 服务器（[安装指南](https://github.com/comfyanonymous/ComfyUI)）
-  - **OpenAI** — 从 [platform.openai.com](https://platform.openai.com) 获取 API Key
+  - **OpenAI 兼容 API** — 自带 Key，支持 Together AI、Fireworks AI、OpenAI 等任意供应商
 
 <Tip>
   无需提供商即可开始使用。画廊搜索、提示词增强和灵感工具无需任何 API Key 即可运行。
@@ -58,7 +58,7 @@ description: "为你的编辑器和提供商安装并配置 MeiGen MCP 插件"
           "args": ["-y", "meigen"],
           "env": {
             "MEIGEN_API_TOKEN": "meigen_sk_YOUR_KEY",
-            "OPENAI_API_KEY": "sk-YOUR_KEY",
+            "OPENAI_API_KEY": "YOUR_API_KEY",
             "COMFYUI_URL": "http://127.0.0.1:8188"
           }
         }
@@ -91,7 +91,7 @@ description: "为你的编辑器和提供商安装并配置 MeiGen MCP 插件"
 
 ## 提供商配置
 
-配置一个或多个提供商。当多个提供商可用时，插件按以下顺序选择：MeiGen → ComfyUI → OpenAI。你可以在每次请求时覆盖此设置。
+配置一个或多个提供商。当多个提供商可用时，插件按以下顺序选择：MeiGen → ComfyUI → OpenAI 兼容。你可以在每次请求时覆盖此设置。
 
 ### MeiGen Cloud
 
@@ -107,18 +107,17 @@ description: "为你的编辑器和提供商安装并配置 MeiGen MCP 插件"
   API Key 只能使用**购买积分**，不能使用每日免费积分。在通过插件生成前，请确保你的账户有购买积分。
 </Warning>
 
-### OpenAI 兼容
+### 自带 API（OpenAI 兼容）
 
-使用 OpenAI 的图片模型或任何 OpenAI 兼容 API 服务。
+接入**任意**符合 OpenAI 接口规范的生图 API — Together AI、Fireworks AI、DeepInfra、硅基流动、OpenAI，或你自己的端点。
 
 | 变量 | 值 |
 | --- | --- |
-| `OPENAI_API_KEY` | 以 `sk-` 开头的 API Key |
-| `OPENAI_BASE_URL` | *（可选）* 兼容服务的自定义端点 |
+| `OPENAI_API_KEY` | 你的供应商 API Key |
+| `OPENAI_BASE_URL` | API 端点（如 `https://api.together.xyz/v1`） |
+| `OPENAI_MODEL` | *（可选）* 供应商的模型名 |
 
-**支持的模型**：gpt-image-1.5, dall-e-3
-
-**兼容服务**：设置 `OPENAI_BASE_URL` 以使用 Together AI、Fireworks AI 等第三方服务，或任何遵循 OpenAI 图片生成 API 格式的端点。
+设置 `OPENAI_BASE_URL` 指向你的供应商端点。如果省略，默认使用 OpenAI 的 API。
 
 ### ComfyUI（本地）
 
@@ -178,7 +177,7 @@ description: "为你的编辑器和提供商安装并配置 MeiGen MCP 插件"
   <Accordion title="'No image generation providers configured'" icon="circle-exclamation">
     未设置任何提供商。在 Claude Code 中运行 `/meigen:setup`，或在 MCP 配置中添加相应的环境变量：
     - MeiGen：`MEIGEN_API_TOKEN`
-    - OpenAI：`OPENAI_API_KEY`
+    - OpenAI 兼容：`OPENAI_API_KEY`
     - ComfyUI：`COMFYUI_URL`（并导入一个工作流）
   </Accordion>
 

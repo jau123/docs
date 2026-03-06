@@ -9,7 +9,7 @@ description: "Install and configure the MeiGen MCP plugin for your editor and pr
 - At least one image generation provider:
   - **MeiGen Cloud** — an API key from [meigen.ai](https://www.meigen.ai) (Settings → API Keys)
   - **ComfyUI** — a running ComfyUI server ([installation guide](https://github.com/comfyanonymous/ComfyUI))
-  - **OpenAI** — an API key from [platform.openai.com](https://platform.openai.com)
+  - **OpenAI-Compatible API** — your own key from any provider (Together AI, Fireworks AI, OpenAI, etc.)
 
 <Tip>
   You don't need a provider to get started. Gallery search, prompt enhancement, and inspiration tools work without any API key.
@@ -58,7 +58,7 @@ description: "Install and configure the MeiGen MCP plugin for your editor and pr
           "args": ["-y", "meigen"],
           "env": {
             "MEIGEN_API_TOKEN": "meigen_sk_YOUR_KEY",
-            "OPENAI_API_KEY": "sk-YOUR_KEY",
+            "OPENAI_API_KEY": "YOUR_API_KEY",
             "COMFYUI_URL": "http://127.0.0.1:8188"
           }
         }
@@ -91,7 +91,7 @@ description: "Install and configure the MeiGen MCP plugin for your editor and pr
 
 ## Provider Configuration
 
-Configure one or more providers. When multiple are available, the plugin selects in order: MeiGen → ComfyUI → OpenAI. You can override this per-request.
+Configure one or more providers. When multiple are available, the plugin selects in order: MeiGen → ComfyUI → OpenAI-compatible. You can override this per-request.
 
 ### MeiGen Cloud
 
@@ -107,18 +107,17 @@ Get your API key: sign in at [meigen.ai](https://www.meigen.ai) → click your a
   API keys can only use **purchased credits**, not daily free credits. Ensure your account has purchased credits before generating via the plugin.
 </Warning>
 
-### OpenAI-Compatible
+### Bring Your Own API (OpenAI-Compatible)
 
-Use OpenAI's image models or any OpenAI-compatible API service.
+Connect **any** image generation API that follows the OpenAI format — Together AI, Fireworks AI, DeepInfra, SiliconFlow, OpenAI, or your own endpoint.
 
 | Variable | Value |
 | --- | --- |
-| `OPENAI_API_KEY` | Your API key starting with `sk-` |
-| `OPENAI_BASE_URL` | *(Optional)* Custom endpoint for compatible services |
+| `OPENAI_API_KEY` | Your API key from the provider |
+| `OPENAI_BASE_URL` | API endpoint (e.g., `https://api.together.xyz/v1`) |
+| `OPENAI_MODEL` | *(Optional)* Model name at your provider |
 
-**Supported models**: gpt-image-1.5, dall-e-3
-
-**Compatible services**: Set `OPENAI_BASE_URL` to use third-party services like Together AI, Fireworks AI, or any endpoint that follows the OpenAI image generation API format.
+Set `OPENAI_BASE_URL` to point to your provider's endpoint. If omitted, defaults to OpenAI's API.
 
 ### ComfyUI (Local)
 
@@ -178,7 +177,7 @@ If configured correctly, it will call the `list_models` tool and show models fro
   <Accordion title="'No image generation providers configured'" icon="circle-exclamation">
     No provider is set up. Run `/meigen:setup` in Claude Code, or add the appropriate environment variable to your MCP configuration:
     - MeiGen: `MEIGEN_API_TOKEN`
-    - OpenAI: `OPENAI_API_KEY`
+    - OpenAI-compatible: `OPENAI_API_KEY`
     - ComfyUI: `COMFYUI_URL` (and import a workflow)
   </Accordion>
 

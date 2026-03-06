@@ -26,8 +26,8 @@ MeiGen supports three image generation backends. You can configure one or more �
   <Card title="ComfyUI" icon="server">
     **Local GPU generation**. Run any Stable Diffusion, SDXL, or Flux model on your own hardware. Full control over workflows and parameters.
   </Card>
-  <Card title="OpenAI-Compatible" icon="plug">
-    **Third-party APIs**. Works with OpenAI (gpt-image-1.5, DALL-E 3), Together AI, Fireworks AI, and any OpenAI-compatible endpoint.
+  <Card title="Bring Your Own API" icon="plug">
+    **Any OpenAI-compatible API**. Connect Together AI, Fireworks AI, DeepInfra, SiliconFlow, OpenAI, or your own endpoint.
   </Card>
 </CardGroup>
 
@@ -35,9 +35,9 @@ MeiGen supports three image generation backends. You can configure one or more �
 | --- | --- | --- | --- |
 | MeiGen Cloud | Hosted API | Credits ([pricing](/en/features/models)) | Multi-model access, zero setup |
 | ComfyUI | Local GPU | Free (your hardware) | Full control, custom workflows, privacy |
-| OpenAI-Compatible | Third-party API | Varies by service | OpenAI models, existing API keys |
+| Bring Your Own API | OpenAI-compatible | Varies by service | Existing API keys, any provider |
 
-**Provider priority**: When multiple providers are configured, MeiGen selects in this order: MeiGen Cloud → ComfyUI → OpenAI. You can override this per-request.
+**Provider priority**: When multiple providers are configured, MeiGen selects in this order: MeiGen Cloud → ComfyUI → OpenAI-compatible. You can override this per-request.
 
 ---
 
@@ -73,6 +73,16 @@ Gallery search, prompt enhancement, inspiration, and preference management work 
 </CardGroup>
 
 Any editor or AI tool that supports the MCP protocol can use MeiGen.
+
+---
+
+## OpenClaw
+
+MeiGen is also available as an [Agent Skill](https://agentskills.io) on [ClawHub](https://clawhub.ai/jau123/creative-toolkit). If you use OpenClaw, install directly from the marketplace — no MCP configuration needed.
+
+<Card title="Install from ClawHub" icon="puzzle-piece" href="https://clawhub.ai/jau123/creative-toolkit">
+  AI Image Generation & Editor — Nanobanana, GPT Image, ComfyUI
+</Card>
 
 ---
 
