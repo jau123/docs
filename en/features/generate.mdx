@@ -106,6 +106,23 @@ When using Midjourney Niji 7 with a reference image, a dropdown appears to choos
 | **Content Reference** | The AI uses the image as subject matter — it tries to recreate similar content. Control influence with the **Image Weight** (iw) parameter (0–3). |
 | **Style Reference** | The AI extracts the visual style (colors, mood, technique) without copying the content. Control with **Style Weight** (sw, 0–1000). |
 
+### When to Use Reference Images
+
+Some prompts work best — or only make sense — with a reference image attached. MeiGen automatically detects keywords like "reference image" or "uploaded image" in your prompt and shows a hint if no reference is uploaded.
+
+**Common patterns that need reference images:**
+
+| Prompt Pattern | Why Reference Needed |
+| --- | --- |
+| "Transform this reference image into..." | The AI needs a source image to transform |
+| "Based on the uploaded image, create..." | Explicitly references an uploaded image |
+| "Keep the composition of @image1 but change..." | Uses @ mention syntax to reference uploads |
+| "Redraw / reimagine the reference photo in..." | Requires a source to redraw from |
+
+<Tip>
+  If your prompt describes transforming, redrawing, or referencing a specific image, always upload that image as a reference first. Without it, the AI will generate something unrelated to your intent.
+</Tip>
+
 ---
 
 ## Generation Options
