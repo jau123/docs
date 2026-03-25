@@ -56,7 +56,7 @@ Submits an image generation request. The image is generated asynchronously — u
   | stylize | number | 150 | 0–1000 |
   | chaos | number | 0 | 0–100 |
   | weird | number | 0 | 0–3000 |
-  | raw | boolean | true | — |
+  | raw | boolean | false | — |
   | iw | number | 1.5 | 0–3 |
   | sref | string | — | URL or text |
   | sw | number | 100 | 0–1000 |
@@ -132,6 +132,7 @@ Poll this endpoint to check if your image is ready.
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "processing",
   "imageUrl": null,
+  "imageUrls": null,
   "videoUrl": null,
   "mediaType": "image",
   "r2Key": null,
@@ -146,12 +147,17 @@ Poll this endpoint to check if your image is ready.
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "completed",
   "imageUrl": "https://images.meigen.art/generations/xxx.png",
+  "imageUrls": ["https://images.meigen.art/generations/xxx.png"],
   "videoUrl": null,
   "mediaType": "image",
   "r2Key": "generations/xxx.png",
   "error": null
 }
 ```
+
+<Note>
+  Midjourney Niji 7 returns 4 candidate images per generation. The `imageUrls` array will contain all candidates, while `imageUrl` always points to the first one. Other models return a single image.
+</Note>
 
 ### Response (Failed)
 
@@ -160,6 +166,7 @@ Poll this endpoint to check if your image is ready.
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "failed",
   "imageUrl": null,
+  "imageUrls": null,
   "videoUrl": null,
   "mediaType": "image",
   "r2Key": null,

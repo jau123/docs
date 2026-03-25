@@ -19,13 +19,27 @@ description: "Install and configure the MeiGen MCP plugin for your editor and pr
 
 ## Installation
 
-### Claude Code
+### Claude Code Plugin (Recommended)
 
 <Steps>
   <Step title="Install the plugin">
     ```bash
-    claude mcp add meigen -- npx -y meigen
+    # Add the plugin marketplace
+    /plugin marketplace add jau123/MeiGen-AI-Design-MCP
+
+    # Install
+    /plugin install meigen@meigen-marketplace
     ```
+
+    **Restart Claude Code** after installation (close and reopen, or open a new terminal tab).
+
+    <Accordion title="Alternative: manual MCP setup" icon="terminal">
+      If you prefer not to use the plugin system, add the MCP server directly:
+
+      ```bash
+      claude mcp add meigen -- npx -y meigen
+      ```
+    </Accordion>
   </Step>
   <Step title="Configure a provider">
     Start a new Claude Code session and run `/meigen:setup`. The setup wizard will guide you through provider selection and API key configuration.
@@ -41,51 +55,23 @@ description: "Install and configure the MeiGen MCP plugin for your editor and pr
   </Step>
 </Steps>
 
-### Cursor
+### OpenClaw
 
-<Steps>
-  <Step title="Open MCP settings">
-    Go to **Cursor Settings** → **MCP** → **Add new MCP server**.
-  </Step>
-  <Step title="Add configuration">
-    Add the following to your MCP configuration. Include the environment variables for your chosen provider(s):
+Install the skill from [ClawHub](https://clawhub.ai/jau123/creative-toolkit):
 
-    ```json
-    {
-      "mcpServers": {
-        "meigen": {
-          "command": "npx",
-          "args": ["-y", "meigen"],
-          "env": {
-            "MEIGEN_API_TOKEN": "meigen_sk_YOUR_KEY",
-            "OPENAI_API_KEY": "YOUR_API_KEY",
-            "COMFYUI_URL": "http://127.0.0.1:8188"
-          }
-        }
-      }
-    }
-    ```
+```bash
+npx clawhub@latest install creative-toolkit
+```
 
-    Only include the env vars for the providers you want to use. You don't need all three.
-  </Step>
-  <Step title="Restart Cursor">
-    Restart the editor for the changes to take effect.
-  </Step>
-</Steps>
+Or install the full plugin (includes commands, skills, and MCP server):
 
-### Windsurf
+```bash
+openclaw plugins install meigen-ai-design
+```
 
-<Steps>
-  <Step title="Open MCP settings">
-    Go to **Windsurf Settings** → **MCP** → **Add Server**.
-  </Step>
-  <Step title="Add configuration">
-    Use the same JSON format as Cursor above.
-  </Step>
-  <Step title="Restart Windsurf">
-    Restart the editor for the changes to take effect.
-  </Step>
-</Steps>
+<Note>
+  OpenClaw uses the [Agent Skills](https://agentskills.io) open standard. No MCP configuration needed — the skill handles everything.
+</Note>
 
 ---
 

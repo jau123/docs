@@ -19,13 +19,27 @@ description: "为你的编辑器和提供商安装并配置 MeiGen MCP 插件"
 
 ## 安装
 
-### Claude Code
+### Claude Code 插件（推荐）
 
 <Steps>
   <Step title="安装插件">
     ```bash
-    claude mcp add meigen -- npx -y meigen
+    # 添加插件市场
+    /plugin marketplace add jau123/MeiGen-AI-Design-MCP
+
+    # 安装
+    /plugin install meigen@meigen-marketplace
     ```
+
+    安装后**重启 Claude Code**（关闭并重新打开，或打开一个新的终端标签页）。
+
+    <Accordion title="替代方案：手动 MCP 配置" icon="terminal">
+      如果你不想使用插件系统，可以直接添加 MCP 服务器：
+
+      ```bash
+      claude mcp add meigen -- npx -y meigen
+      ```
+    </Accordion>
   </Step>
   <Step title="配置提供商">
     启动一个新的 Claude Code 会话并运行 `/meigen:setup`。安装向导将引导你完成提供商选择和 API Key 配置。
@@ -41,51 +55,23 @@ description: "为你的编辑器和提供商安装并配置 MeiGen MCP 插件"
   </Step>
 </Steps>
 
-### Cursor
+### OpenClaw
 
-<Steps>
-  <Step title="打开 MCP 设置">
-    前往 **Cursor Settings** → **MCP** → **Add new MCP server**。
-  </Step>
-  <Step title="添加配置">
-    将以下内容添加到你的 MCP 配置中。包含你选择的提供商所需的环境变量：
+从 [ClawHub](https://clawhub.ai/jau123/creative-toolkit) 安装 Skill：
 
-    ```json
-    {
-      "mcpServers": {
-        "meigen": {
-          "command": "npx",
-          "args": ["-y", "meigen"],
-          "env": {
-            "MEIGEN_API_TOKEN": "meigen_sk_YOUR_KEY",
-            "OPENAI_API_KEY": "YOUR_API_KEY",
-            "COMFYUI_URL": "http://127.0.0.1:8188"
-          }
-        }
-      }
-    }
-    ```
+```bash
+npx clawhub@latest install creative-toolkit
+```
 
-    只需包含你要使用的提供商对应的环境变量，不需要全部三个。
-  </Step>
-  <Step title="重启 Cursor">
-    重启编辑器使更改生效。
-  </Step>
-</Steps>
+或安装完整插件（包含命令、技能和 MCP 服务器）：
 
-### Windsurf
+```bash
+openclaw plugins install meigen-ai-design
+```
 
-<Steps>
-  <Step title="打开 MCP 设置">
-    前往 **Windsurf Settings** → **MCP** → **Add Server**。
-  </Step>
-  <Step title="添加配置">
-    使用与 Cursor 相同的 JSON 配置格式。
-  </Step>
-  <Step title="重启 Windsurf">
-    重启编辑器使更改生效。
-  </Step>
-</Steps>
+<Note>
+  OpenClaw 使用 [Agent Skills](https://agentskills.io) 开放标准。无需配置 MCP — Skill 会处理一切。
+</Note>
 
 ---
 

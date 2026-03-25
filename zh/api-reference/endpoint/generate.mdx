@@ -56,7 +56,7 @@ POST /api/generate/v2
   | stylize | number | 150 | 0-1000 |
   | chaos | number | 0 | 0-100 |
   | weird | number | 0 | 0-3000 |
-  | raw | boolean | true | — |
+  | raw | boolean | false | — |
   | iw | number | 1.5 | 0-3 |
   | sref | string | — | URL 或文本 |
   | sw | number | 100 | 0-1000 |
@@ -132,6 +132,7 @@ GET /api/generate/v2/status/:generationId
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "processing",
   "imageUrl": null,
+  "imageUrls": null,
   "videoUrl": null,
   "mediaType": "image",
   "r2Key": null,
@@ -146,12 +147,17 @@ GET /api/generate/v2/status/:generationId
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "completed",
   "imageUrl": "https://images.meigen.art/generations/xxx.png",
+  "imageUrls": ["https://images.meigen.art/generations/xxx.png"],
   "videoUrl": null,
   "mediaType": "image",
   "r2Key": "generations/xxx.png",
   "error": null
 }
 ```
+
+<Note>
+  Midjourney Niji 7 每次生成返回 4 张候选图片。`imageUrls` 数组包含所有候选图，而 `imageUrl` 始终指向第一张。其他模型返回单张图片。
+</Note>
 
 ### 响应（失败）
 
@@ -160,6 +166,7 @@ GET /api/generate/v2/status/:generationId
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "failed",
   "imageUrl": null,
+  "imageUrls": null,
   "videoUrl": null,
   "mediaType": "image",
   "r2Key": null,
