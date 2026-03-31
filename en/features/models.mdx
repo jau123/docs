@@ -98,6 +98,33 @@ Midjourney's anime and illustration-focused model. Produces the highest quality 
 
 ---
 
+### Midjourney V7
+
+| | |
+| --- | --- |
+| **Provider** | Midjourney |
+| **Credits** | 15 per image |
+| **Prompt length** | 1–8,192 characters |
+| **Reference images** | 1 (content or style reference) |
+| **Resolutions** | — |
+| **Aspect ratios** | 1:1, 4:3, 3:2, 16:9, 3:4, 2:3, 9:16 |
+
+Midjourney's general-purpose photorealistic model. Shares the same advanced parameters and reference image features as Niji 7, but targets universal aesthetics rather than anime style. Ideal for realistic photography, product shots, landscapes, portraits, and more.
+
+**Same as Niji 7:**
+- Content and style reference modes
+- Advanced parameters (stylize, chaos, weird, raw, etc.)
+- Auto-translates non-English prompts to English
+- Returns 4 candidate images per generation
+- Only 1 reference image supported
+
+**Different from Niji 7:**
+- Default stylize is 0 (Niji 7 defaults to 100) — output stays closer to your prompt
+- Does not auto-append anime style keywords
+- Prompt enhance uses general polish mode (not Niji 7's anime-specific expand)
+
+---
+
 ### Z Image Turbo
 
 | | |
@@ -165,6 +192,7 @@ Google's video generation model. Creates short video clips with AI-generated aud
 | **Seedream 4.5** | 5 | Fast (~15s) | 5 | Product photos, marketing |
 | **Nanobanana Pro** | 10 | Fast (~15s) | 5 | High quality, complex scenes |
 | **Niji 7** | 15 | Slow (~60s) | 1 | Anime, illustration, artistic |
+| **Midjourney V7** | 15 | Slow (~60s) | 1 | Photorealistic, universal aesthetics |
 | **Veo 3.1** | 20 | Slowest (2-6min) | 2 | Video with audio |
 
 ## Known Limitations
@@ -178,12 +206,12 @@ Google's video generation model. Creates short video clips with AI-generated aud
     This model does not support reference images at all. The reference image upload section will be hidden when Z Image Turbo is selected. If you need to use reference images, switch to any other model.
   </Accordion>
 
-  <Accordion title="Niji 7 — Single reference image only" icon="triangle-exclamation">
-    Unlike other models that support up to 5 reference images, Niji 7 only accepts 1 reference image. However, it offers more control over how the reference is used (content vs. style reference).
+  <Accordion title="Niji 7 / Midjourney V7 — Single reference image only" icon="triangle-exclamation">
+    Unlike other models that support up to 5 reference images, Midjourney models only accept 1 reference image. However, they offer more control over how the reference is used (content vs. style reference).
   </Accordion>
 
-  <Accordion title="Niji 7 — Returns 4 candidate images" icon="info-circle">
-    Unlike other models that return a single image, Niji 7 returns 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (15 credits) for all 4 images.
+  <Accordion title="Niji 7 / Midjourney V7 — Returns 4 candidate images" icon="info-circle">
+    Unlike other models that return a single image, Midjourney models return 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (15 credits) for all 4 images.
   </Accordion>
 
   <Accordion title="GPT image1.5 — Limited ratios and prompt length" icon="triangle-exclamation">
