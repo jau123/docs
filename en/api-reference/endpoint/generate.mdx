@@ -1,13 +1,13 @@
 ---
-title: "Generate Image"
-description: "Generate an image using an AI model"
+title: "Generate Image or Video"
+description: "Generate an image or video using an AI model"
 ---
 
 ```
 POST /api/generate/v2
 ```
 
-Submits an image generation request. The image is generated asynchronously — use the [status endpoint](#check-generation-status) to poll for completion.
+Submits a generation request. The output is generated asynchronously — use the [status endpoint](#check-generation-status) to poll for completion. The same endpoint serves both image models (Nanobanana / Seedream / Midjourney, etc.) and video models (Seedance 2.0, Veo 3.1); the server routes by `modelId`.
 
 ## Request
 
@@ -24,22 +24,25 @@ Submits an image generation request. The image is generated asynchronously — u
   The text description of the image to generate. Length limits vary by model (see [Models](/en/features/models)).
 </ParamField>
 
-<ParamField body="modelId" type="string" default="gemini-3-pro-image-preview">
+<ParamField body="modelId" type="string" default="nanobanana-2">
   The model to use for generation. Get available models from the [List Models](/en/api-reference/endpoint/models) endpoint.
 
-  Available values: `nanobanana-2`, `gemini-3-pro-image-preview`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-niji7`, `z-image-turbo`, `rhart-1.5`, `veo-3.1`
+  Image models: `nanobanana-2`, `gemini-3-pro-image-preview`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v7`, `midjourney-niji7`, `z-image-turbo`, `rhart-1.5`
+
+  Video models: `seedance-2-0`, `veo-3.1`
 </ParamField>
 
-<ParamField body="aspectRatio" type="string" default="1:1">
-  The aspect ratio for the generated image. Must be one of the ratios supported by the selected model.
+<ParamField body="aspectRatio" type="string" default="auto">
+  The aspect ratio for the generated output.
 
-  Common values: `1:1`, `3:4`, `4:3`, `16:9`, `9:16`
+  - Default `auto` (recommended): a suitable ratio is picked for you. Video models with `auto` use that model's primary ratio.
+  - You can also pass an explicit value, **which must be one of the ratios supported by the selected model**. Common image ratios: `1:1`, `3:4`, `4:3`, `16:9`, `9:16`, `21:9`. Seedance also accepts the special value `adaptive` (matches the reference image/video dimensions).
 </ParamField>
 
 <ParamField body="resolution" type="string" default="2K">
   The output resolution. Availability depends on the model.
 
-  Available values: `2K`, `3K`, `4K`, `720p`
+  Available values: image models `2K` / `3K` / `4K`; video models `480p` / `720p` / `1080p` (depends on the model — see [Models](/en/features/models)).
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">
@@ -64,10 +67,24 @@ Submits an image generation request. The image is generated asynchronously — u
 </ParamField>
 
 <ParamField body="referenceType" type="string" default="content">
-  For Niji 7 only. How to interpret the reference image.
+  For Midjourney V7 / Niji 7 only. How to interpret the reference image.
 
   - `content` — use as subject matter reference
   - `style` — extract visual style only
+</ParamField>
+
+<ParamField body="duration" type="number">
+  For Seedance 2.0 only. Video duration in seconds, range 4–15, default 5. Veo 3.1 is fixed at 8 seconds and ignores this parameter.
+</ParamField>
+
+<ParamField body="referenceVideo" type="string">
+  For Seedance 2.0 only. Reference video URL for "video continuation" mode. Must be a publicly accessible HTTPS URL (typically a previous generation result or an R2 upload URL).
+
+  When this field is present, billing uses the "with reference video" tier: 480p 8 credits/sec, 720p 16 credits/sec, with the minimum-billable-seconds floor applied (see [Models](/en/features/models)).
+</ParamField>
+
+<ParamField body="referenceVideoDuration" type="number">
+  For Seedance 2.0 + reference-video continuation only. Duration of the reference video itself (seconds). The server uses this to compute `max(referenceVideoDuration + duration, minBillable)` for billing. **Required when `referenceVideo` is set** — otherwise the server treats it as 0, leading to under-billing (and likely a broken continuation).
 </ParamField>
 
 ## Response
@@ -108,7 +125,7 @@ Submits an image generation request. The image is generated asynchronously — u
   "generationId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "processing",
   "creditsUsed": 5,
-  "modelId": "gemini-3-pro-image-preview",
+  "modelId": "nanobanana-2",
   "credits": {
     "daily": 10,
     "purchased": 50,
@@ -140,7 +157,7 @@ Poll this endpoint to check if your image is ready.
 }
 ```
 
-### Response (Completed)
+### Response (Image Completed)
 
 ```json
 {
@@ -151,12 +168,31 @@ Poll this endpoint to check if your image is ready.
   "videoUrl": null,
   "mediaType": "image",
   "r2Key": "generations/xxx.png",
-  "error": null
+  "error": null,
+  "aspectRatio": "16:9"
+}
+```
+
+### Response (Video Completed)
+
+```json
+{
+  "jobId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "completed",
+  "imageUrl": null,
+  "imageUrls": null,
+  "videoUrl": "https://images.meigen.art/generations/xxx.mp4",
+  "mediaType": "video",
+  "r2Key": "generations/xxx.mp4",
+  "error": null,
+  "aspectRatio": "16:9"
 }
 ```
 
 <Note>
-  Midjourney Niji 7 returns 4 candidate images per generation. The `imageUrls` array will contain all candidates, while `imageUrl` always points to the first one. Other models return a single image.
+  - **`aspectRatio`** is the final ratio applied to this generation (if you passed `auto`, this is the value that was actually used).
+  - **`mediaType`** is `image` or `video`. For video generations `imageUrl/imageUrls` are `null`, and vice versa.
+  - Midjourney V7 / Niji 7 return 4 candidate images per generation. `imageUrls` contains all candidates; `imageUrl` always points to the first one. Other image models return a single image.
 </Note>
 
 ### Response (Failed)
@@ -224,3 +260,55 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
     }
   }'
 ```
+
+### Seedance video (text-to-video)
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "A majestic eagle soaring over a misty mountain valley at sunrise, cinematic camera movement",
+    "modelId": "seedance-2-0",
+    "aspectRatio": "16:9",
+    "resolution": "720p",
+    "duration": 5
+  }'
+```
+
+Pricing: 720p × 5 sec = 26 × 5 = **130 credits**.
+
+### Seedance video continuation (with reference video)
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Continue the scene as the eagle dives toward a river below",
+    "modelId": "seedance-2-0",
+    "aspectRatio": "adaptive",
+    "resolution": "480p",
+    "duration": 5,
+    "referenceVideo": "https://images.meigen.art/generations/eagle-clip.mp4",
+    "referenceVideoDuration": 3
+  }'
+```
+
+Pricing: 480p continuation tier 8 credits/sec, billable seconds = max(3 + 5, 9) = 9 sec, total **72 credits**.
+
+### Auto ratio selection
+
+Omit `aspectRatio` or pass `"auto"` explicitly:
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Blog hero banner image, abstract gradient background with code snippets",
+    "modelId": "nanobanana-2"
+  }'
+```
+
+This request ends up generating a `16:9` image. The actual ratio used is returned in the response's `aspectRatio` field.

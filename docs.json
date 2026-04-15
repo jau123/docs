@@ -28,7 +28,6 @@
                 "pages": [
                   "en/features/gallery",
                   "en/features/generate",
-                  "en/features/prompt-enhance",
                   "en/features/models"
                 ]
               },
@@ -81,7 +80,6 @@
                 "pages": [
                   "zh/features/gallery",
                   "zh/features/generate",
-                  "zh/features/prompt-enhance",
                   "zh/features/models"
                 ]
               },

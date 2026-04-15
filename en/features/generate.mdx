@@ -1,9 +1,9 @@
 ---
 title: "AI Image & Video Generator"
-description: "Generate images & videos on MeiGen with Nano Banana 2, Niji 7, Seedream 4.5, Veo & more. Prompt editor with variables, color picker, and @ mentions."
+description: "Generate images & videos on MeiGen with Nano Banana 2, Niji 7, Seedream 4.5, Seedance 2.0, Veo 3.1 & more. Prompt editor with variables, color picker, and @ mentions."
 ---
 
-MeiGen lets you generate images and videos using multiple AI models from a unified interface. Open the generation sidebar by clicking the sparkle icon in the floating dock (desktop) or through the navigation menu.
+MeiGen lets you generate images and videos using multiple AI models from a unified interface. Open the generation sidebar from the floating dock (desktop) or the navigation menu.
 
 ## Model Selector
 
@@ -14,8 +14,6 @@ Each option shows:
 - **Model name** — the display name of the model
 - **Credit cost** — how many credits this model uses per generation
 
-When a new model is added to MeiGen, a blue dot badge appears on models you haven't tried yet. The dot disappears once you select the model.
-
 Selecting a different model automatically updates the available aspect ratios, resolution options, and advanced settings to match that model's capabilities.
 
 <Card title="Model Comparison" icon="scale-balanced" href="/en/features/models">
@@ -25,8 +23,6 @@ Selecting a different model automatically updates the available aspect ratios, r
 ---
 
 ## Prompt Editor
-
-The prompt editor is built on a rich text editor and supports several features beyond plain text input.
 
 ### Writing Effective Prompts
 
@@ -68,15 +64,27 @@ Click the translate icon (top right of the prompt editor) to translate your prom
 
 ### Prompt Enhancement
 
-Click the **magic wand button** to automatically enhance your prompt. The AI adds visual details like composition, lighting, atmosphere, and style cues.
+Click the **Enhance Prompt** button to automatically enhance your prompt based on the selected model:
 
-Two modes are available depending on the selected model:
-- **Polish** (non-Niji 7 models) — refines and enriches your prompt while preserving intent
-- **Expand** (Niji 7) — transforms a brief description into Midjourney-optimized language with anime/illustration style cues
+- **Polish mode** (non-Niji 7) — preserves intent, adds visual details like composition, lighting, and materials
+- **Expand mode** (Niji 7) — expands into Midjourney-optimized language with anime/illustration cues; non-English prompts are auto-translated
 
-<Card title="Prompt Enhancement Details" icon="wand-magic-sparkles" href="/en/features/prompt-enhance">
-  Learn about Polish vs. Expand modes, before/after examples, and when to use enhancement
-</Card>
+<CodeGroup>
+```text Input
+a cat sitting on a windowsill
+```
+
+```text Polished
+A fluffy orange tabby cat sitting gracefully on a sunlit windowsill,
+warm golden hour light streaming through sheer curtains, soft bokeh
+of a garden visible outside, cozy interior with houseplants, photorealistic
+style with shallow depth of field
+```
+</CodeGroup>
+
+<Tip>
+  Enhancement works best on brief prompts (under 30 words). Skip it for prompts that already have detailed visual descriptions — the AI may over-process them.
+</Tip>
 
 ### Keyboard Shortcuts
 
@@ -147,10 +155,11 @@ Choose how many images to generate per request (1–4).
 
 ### Aspect Ratio
 
-Select from a range of aspect ratios. The selector automatically filters to show only ratios supported by the current model.
+The default is **Auto** — no need to pick manually, a suitable ratio is chosen for you. Drop into the dropdown to pick a specific ratio when you want precise control.
 
 | Ratio | Orientation | Common Use |
 | --- | --- | --- |
+| **Auto** (default) | — | Hands-off |
 | 1:1 | Square | Social media profile, icons |
 | 3:4, 4:5, 2:3 | Portrait | Phone wallpaper, posters |
 | 9:16 | Tall portrait | Stories, Reels |
@@ -177,9 +186,9 @@ Choose the output resolution when available:
 
 ## Niji 7 Advanced Options
 
-Niji 7 is Midjourney's anime and illustration model — it excels at anime art, character design, and stylized illustrations. It returns 4 candidate images per generation, all viewable in the image detail dialog.
+When using Midjourney Niji 7, the **Advanced Options** button lets you tune extra generation parameters. **Most users can leave everything at defaults.**
 
-When using Midjourney Niji 7, a gear icon appears next to the model selector. Click it to open a popover with advanced parameters:
+<Accordion title="Parameter details (Stylize / Chaos / Weird / Raw / iw / sref / sw / sv)" icon="sliders">
 
 | Parameter | Range | Default | Description |
 | --- | --- | --- | --- |
@@ -190,20 +199,20 @@ When using Midjourney Niji 7, a gear icon appears next to the model selector. Cl
 | **Image Weight (iw)** | 0–2 | 1 | How much influence the content reference image has. Only visible when a content reference is set. |
 | **Style Reference (sref)** | URL/text | — | Provide a URL to an image whose style you want to mimic. Disabled when reference images are set to Style mode. |
 | **Style Weight (sw)** | 0–1000 | 100 | How strongly the style reference is applied. Only visible when sref or style reference images are present. |
-| **Style Version (sv)** | 1–4 | 4 | Which style algorithm version to use. |
+| **Style Version (sv)** | 1–4 | 4 | Style reference version. Default 4. |
 
-The gear icon turns blue when any parameter has been changed from its default value.
+</Accordion>
 
 ---
 
-## Reverse Prompt
+## Describe Image
 
-See an image you like but don't know how to describe it? **Reverse Prompt** uses AI vision to analyze an image and generate a detailed text prompt that captures its content, style, and composition.
+See an image you like but don't know how to describe it? **Describe Image** uses AI vision to analyze an image and generate a detailed text prompt that captures its content, style, and composition.
 
 ### How to Use
 
-1. **Image detail dialog** — open any image's detail view and click the **Reverse Prompt** button. The AI analyzes the image and generates a descriptive prompt.
-2. **Drag and drop** — drag any external image (or a gallery card) onto the **Reverse Prompt dropzone** above the prompt editor in the generation sidebar.
+1. **Image detail dialog** — open any image's detail view and click the **Describe Image** button. The AI analyzes the image and generates a descriptive prompt.
+2. **Drag and drop** — drag any external image (or a gallery card) onto the **Describe Image dropzone** above the prompt editor in the generation sidebar.
 
 ### What It Generates
 
@@ -217,14 +226,14 @@ The AI examines the image and produces a prompt describing:
 You can use the generated prompt as-is, or edit it to create variations of the original image.
 
 <Tip>
-  Reverse Prompt works well as a starting point. Try combining it with [Prompt Enhancement](/en/features/prompt-enhance) — first reverse-prompt an image you like, then enhance the result for even more detail.
+  Describe Image works well as a starting point. Combine it with [Prompt Enhancement](#prompt-enhancement) — first describe an image you like, then enhance the result for even more detail.
 </Tip>
 
 ---
 
 ## Video Generation
 
-MeiGen also supports AI video generation. Click the **clapperboard icon** in the floating dock to open the video generation sidebar.
+MeiGen offers two video models: **Seedance 2.0** (per-second pricing, 4–15 second duration) and **Veo 3.1** (fixed 8 seconds, with audio and style presets). Open the video sidebar from the **Generate Video** button in the floating dock.
 
 ### Frame Images
 
@@ -235,22 +244,82 @@ Upload up to 2 frame images to control the video's composition:
 
 Both are optional. You can also drag gallery cards directly as frame images.
 
-### Video Options
+### Seedance 2.0
 
 | Option | Values | Description |
 | --- | --- | --- |
-| **Aspect Ratio** | 16:9, 9:16 | Landscape or portrait video |
-| **Resolution** | 720p | Output resolution (varies by model) |
+| **Aspect ratio** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 | 7 ratios. `adaptive` matches the reference image/video dimensions |
+| **Resolution** | 480p, 720p (default 480p) | 480p saves credits |
+| **Duration** | 4–15 seconds (default 5) | Slider or input |
+| **Audio** | Auto-generated | Always on |
+| **Reference video** | Yes | Used for "video continuation" — the reference is prepended to the generated content |
+
+**Pricing**: per-second; full formula (including the minimum-billable table for continuation) is in the [Models](/en/features/models) page. The sidebar shows the exact total before you submit.
+
+**Three modes**:
+- Text-to-video: just write a prompt
+- Image-to-video: upload 1–2 frame images to control first/last frame
+- Video extension: upload a reference video (see the [Extending a Video](#extending-a-video) section below)
+
+<Warning>
+  **Adding a reference video makes the total credit cost depend on its length**: billed seconds = "reference video duration + your chosen duration" (never below the minimum-billable floor). Longer reference videos cost more. The sidebar shows the exact total before you submit — confirm before clicking Generate.
+</Warning>
+
+### Veo 3.1 — Fixed 8-second Video with Audio
+
+| Option | Values | Description |
+| --- | --- | --- |
+| **Aspect ratio** | 16:9, 9:16 | Landscape or portrait only |
+| **Resolution** | 720p | Fixed |
+| **Duration** | 8 seconds (fixed) | Not adjustable |
 | **Style** | Auto / Realistic / Anime / Cinematic | Visual style preset |
 | **Speed** | Auto / Slow / Fast | Playback speed control |
+| **Audio** | Auto-generated | Always on |
+
+**Pricing**: 20 credits per video, flat.
 
 <Note>
-  Veo 3.1 automatically generates AI audio for your video — no separate audio input is needed. See the [Models](/en/features/models) page for full video model specs.
+  Both video models auto-generate AI audio — no separate audio input is needed. Full specs, pricing formulas, and a side-by-side comparison are on the [Models](/en/features/models) page.
 </Note>
 
 ### Converting Images to Video
 
-After generating an image, hover over the completed card and click the **Animate** button (clapperboard icon). This sends your generated image to the video sidebar as the first frame, making it easy to turn a still image into a short video clip.
+After generating an image, hover over the completed card and click the **Animate** button. This sends your generated image to the video sidebar as the first frame, making it easy to turn a still image into a short video clip.
+
+### Extending a Video
+
+Seedance 2.0 only. You can take an existing video as a starting point and generate a new segment appended to it.
+
+#### Three entry points
+
+1. **From a video card**: hover over any completed video card and click the **Extend** button in the top-left corner — the video loads into the Seedance sidebar as a reference
+2. **Drag a video to the reference-image area**: drag a video (local or from the gallery) onto the reference upload area — a confirmation popup asks "Use this as an extension reference?"
+3. **Direct upload**: in the Seedance sidebar's "Extend or reference video" upload area, pick a local video
+
+#### Workflow
+
+1. Trigger any of the entries above — the reference video appears in the sidebar preview
+2. The prompt box is auto-prefilled with `"Extend this video with the following plot: "` — keep this prefix and add your desired continuation
+3. Pick resolution and your new video's duration (4–15 seconds)
+4. Click Generate
+
+#### Key behavior
+
+<Warning>
+  **Your prompt must explicitly say to extend the video.** If the prompt only describes a scene without mentioning extension, the model defaults to treating the video as a **reference** (not temporally concatenated). The auto-prefilled `Extend this video with the following plot:` prefix exists precisely to avoid this pitfall — keep it and append your content.
+</Warning>
+
+<Note>
+  **Output = reference video + new content, concatenated**: the result is a single continuous video — the first half is your reference video preserved, the second half is the AI-generated continuation per your prompt. Total length ≈ reference duration + your chosen duration.
+</Note>
+
+#### Pricing
+
+Extension rates are lower (480p 8 credits/sec, 720p 16 credits/sec), but **billed seconds include the reference video's duration** (never below the minimum-billable floor). The full formula, lookup table, and examples are in [Models → Seedance 2.0](/en/features/models).
+
+Typical costs:
+- Extend by 5 sec on a 3-second video: **72 credits** (480p)
+- Extend by 10 sec on a 5-second video: **272 credits** (720p)
 
 ---
 
@@ -260,13 +329,9 @@ After submitting a generation request, your images appear as cards in the genera
 
 ### Pending State
 
-While your image is being generated, the card shows:
+Cards show live progress while generating; video generations also display an estimated completion time (e.g., `2–5 min`).
 
-- **Animated gradient background** with a subtle pulse effect
-- **Circular progress bar** — uses an exponential decay curve that progresses quickly at first and slows as it approaches the estimated completion time
-- **Estimated time** — video generations show time estimates (e.g., "2–5 min" for 720p)
-
-Generation times vary by model:
+Typical generation times by model:
 
 | Model | Typical Time |
 | --- | --- |
@@ -275,13 +340,14 @@ Generation times vary by model:
 | Nanobanana Pro | ~15 seconds |
 | GPT image1.5 | ~20 seconds |
 | Niji 7 | ~60 seconds |
+| Seedance 2.0 (video) | ~1–3 minutes (varies by duration / resolution) |
 | Veo 3.1 (video) | 2–6 minutes |
 
 ### Failed State
 
 If a generation fails, the card shows:
 
-- A user-friendly error message explaining what went wrong
+- The reason for failure
 - **"Credits refunded"** note — credits are automatically returned when a generation fails
 - **Retry button** — click to resubmit the same request with the original prompt and settings
 
@@ -292,7 +358,7 @@ Hover over a completed generation card to reveal action buttons:
 | Action | Description |
 | --- | --- |
 | **Edit** | Adds the generated image as a reference for a new generation |
-| **Cutout** | Removes the background, creating a transparent PNG |
+| **Cutout** | Removes the background, creating a transparent PNG (useful for logos, stickers, product compositing). Creates a new card; the original is preserved |
 | **Animate** | Converts the still image into a video (image-to-video) |
 | **Delete** | Removes the card from your history |
 | **Use Idea** | Copies the prompt back to the editor for reuse |
@@ -304,32 +370,23 @@ The card also shows the aspect ratio and resolution labels in the bottom-left co
 
 ---
 
-## Background Removal (Cutout)
-
-After generating an image, hover over it and click the **Cutout** button to remove the background. This creates a transparent PNG — useful for logos, stickers, product shots, or compositing.
-
-The cutout process creates a new card in your generation history. The original image is preserved.
-
----
-
 ## Credits and Billing
-
-### How Credits Work
 
 MeiGen uses a dual credit system:
 
-- **Daily credits** — free credits that refresh every 24 hours. Available to all users.
-- **Purchased credits** — credits you buy that never expire. Used when daily credits run out.
+- **Daily credits**: refresh every 24 hours, used for **basic models** (Z Image Turbo, GPT image 1.5).
+- **Purchased credits**: obtained by topping up, never expire, usable on all models.
 
-When generating via the website, **daily credits are used first**, then purchased credits. The credit cost is shown on the Generate button before you click.
+Generating with premium models (Nanobanana, Seedream, Midjourney, Seedance, Veo, etc.) requires purchased credits.
 
-You can check your credit balance by hovering over the credits card in the bottom of the left sidebar. The hover card shows a breakdown of daily and purchased credits with a dual-color progress bar.
+**API Token calls** only use purchased credits, regardless of the model; daily credits never apply to the API path.
+
+The credit cost is shown on the Generate button before you submit. Hover over the credits card at the bottom of the left sidebar to see your balance breakdown.
 
 ### Free vs Paid
 
 | Feature | Free | Paid |
 | --- | --- | --- |
-| Daily credits | Yes (reset every 24 hours) | Yes + purchased credits |
 | 4K resolution | Locked | Available |
 | Images per request | 1 | Up to 4 |
 | API access | Not available | Available (purchased credits only) |

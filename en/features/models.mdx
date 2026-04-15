@@ -1,9 +1,24 @@
 ---
 title: "AI Model Comparison"
-description: "Compare 8+ AI image & video models on MeiGen — Midjourney V7, Niji 7, Nano Banana 2, Seedream 4.5, Veo. Features, pricing, aspect ratios side by side."
+description: "Compare 9+ AI image & video models on MeiGen — Midjourney V7, Niji 7, Nano Banana 2, Seedream 4.5, Seedance 2.0, Veo 3.1. Features, pricing, aspect ratios side by side."
 ---
 
-MeiGen supports multiple AI models for image and video generation. Each model has different strengths, costs, and limitations. This page helps you choose the right model for your use case.
+MeiGen supports multiple AI models for image and video generation. Use the comparison table below to pick one, then scroll to its section for detailed specs.
+
+## Quick Comparison
+
+| Model | Credits | Speed | Ref Images | Best For |
+| --- | --- | --- | --- | --- |
+| **Z Image Turbo** | 2 | Fastest (~5s) | None | Quick drafts, prototyping |
+| **GPT image1.5** | 2 | Fast (~20s) | 2 | Budget generation with references |
+| **Nanobanana 2** | 5 | Fast (~15s) | 5 | General use, wide ratio support |
+| **Seedream 5.0 Lite** | 5 | Fast (~15s) | 5 | Photorealism, 3K output |
+| **Seedream 4.5** | 5 | Fast (~15s) | 5 | Product photos, marketing |
+| **Nanobanana Pro** | 10 | Fast (~15s) | 5 | High quality, complex scenes |
+| **Niji 7** | 15 | Slow (~60s) | 1 | Anime, illustration, artistic |
+| **Midjourney V7** | 15 | Slow (~60s) | 1 | Photorealistic, universal aesthetics |
+| **Seedance 2.0** | Per-second (480p 13/sec, 720p 26/sec) | Video, ~1-3min | First/last frame + reference video | 4–15s adjustable duration, multiple ratios, audio |
+| **Veo 3.1** | 20 (fixed 8s) | Slowest (2-6min) | 2 (first/last frame) | 8-second video with audio |
 
 ## Image Models
 
@@ -88,7 +103,7 @@ Midjourney's anime and illustration-focused model. Produces the highest quality 
 - Content and style reference modes
 - Auto-translates non-English prompts to English
 - Advanced Niji 7 parameters (stylize, chaos, weird, raw, etc.)
-- Prompt [Expand mode](/en/features/prompt-enhance) optimized for Midjourney syntax
+- Prompt [Expand mode](/en/features/generate#prompt-enhancement) optimized for Midjourney syntax
 
 **Trade-offs:**
 - Most expensive image model (15 credits)
@@ -164,7 +179,73 @@ An affordable model based on GPT image generation technology. Good balance of qu
 
 ---
 
-## Video Model
+## Video Models
+
+### Seedance 2.0
+
+| | |
+| --- | --- |
+| **Provider** | ByteDance |
+| **Credits** | Per-second pricing (see below) |
+| **Duration** | 4-15 seconds (default 5) |
+| **Reference images** | First/last frame (image-to-video) |
+| **Reference video** | Yes (video continuation) |
+| **Resolutions** | 480p, 720p (default 480p) |
+| **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
+| **Audio** | Auto-generated |
+
+ByteDance's latest video generation model. Supports text-to-video, image-to-video (first/last frame), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions.
+
+#### Pricing
+
+Per-second pricing, in two tiers:
+
+**Without reference video (text-to-video / image-to-video):**
+
+| Resolution | Rate |
+| --- | --- |
+| 480p | 13 credits/sec |
+| 720p | 26 credits/sec |
+
+**With reference video (video continuation):** lower rate, but with a minimum-billable-seconds floor.
+
+| Resolution | Rate |
+| --- | --- |
+| 480p | 8 credits/sec |
+| 720p | 16 credits/sec |
+
+For continuation, billable seconds = `max(reference video duration + your duration, minimum billable)`. Lookup table:
+
+| Your duration (sec) | Min billable (sec) |
+| --- | --- |
+| 4 | 7 |
+| 5 | 9 |
+| 6 | 10 |
+| 7 | 12 |
+| 8 | 14 |
+| 9 | 15 |
+| 10 | 17 |
+| 11 | 19 |
+| 12 | 20 |
+| 13 | 22 |
+| 14 | 24 |
+| 15 | 25 |
+
+#### Pricing Examples
+
+| Scenario | Calculation | Total |
+| --- | --- | --- |
+| 480p × 5s text-to-video | 13 × 5 | **65** |
+| 720p × 5s text-to-video | 26 × 5 | **130** |
+| 720p × 10s text-to-video | 26 × 10 | **260** |
+| 480p × 5s continuing a 3s video | 8 × max(3+5, 9) = 8 × 9 | **72** |
+| 720p × 10s continuing a 5s video | 16 × max(5+10, 17) = 16 × 17 | **272** |
+
+<Note>
+  If generation fails, the **full** credit amount is automatically refunded — including all per-second charges.
+</Note>
+
+---
 
 ### Veo 3.1
 
@@ -172,28 +253,15 @@ An affordable model based on GPT image generation technology. Good balance of qu
 | --- | --- |
 | **Provider** | Google |
 | **Credits** | 20 per video |
+| **Duration** | 8 seconds (fixed) |
 | **Reference images** | Up to 2 (as first/last frame) |
 | **Resolutions** | 720p |
 | **Aspect ratios** | 16:9, 9:16 |
 | **Audio** | Yes (generated audio) |
 
-Google's video generation model. Creates short video clips with AI-generated audio. Supports speed control (Auto / Slow / Fast) and style presets (Auto / Realistic / Anime / Cinematic).
+Google's video generation model. Creates 8-second video clips with AI-generated audio. Supports speed control (Auto / Slow / Fast) and style presets (Auto / Realistic / Anime / Cinematic). **Pick this for stable audio + style presets**; for longer durations or more aspect ratios, use Seedance 2.0.
 
 ---
-
-## Model Comparison
-
-| Model | Credits | Speed | Ref Images | Best For |
-| --- | --- | --- | --- | --- |
-| **Z Image Turbo** | 2 | Fastest (~5s) | None | Quick drafts, prototyping |
-| **GPT image1.5** | 2 | Fast (~20s) | 2 | Budget generation with references |
-| **Nanobanana 2** | 5 | Fast (~15s) | 5 | General use, wide ratio support |
-| **Seedream 5.0 Lite** | 5 | Fast (~15s) | 5 | Photorealism, 3K output |
-| **Seedream 4.5** | 5 | Fast (~15s) | 5 | Product photos, marketing |
-| **Nanobanana Pro** | 10 | Fast (~15s) | 5 | High quality, complex scenes |
-| **Niji 7** | 15 | Slow (~60s) | 1 | Anime, illustration, artistic |
-| **Midjourney V7** | 15 | Slow (~60s) | 1 | Photorealistic, universal aesthetics |
-| **Veo 3.1** | 20 | Slowest (2-6min) | 2 | Video with audio |
 
 ## Known Limitations
 
@@ -220,5 +288,15 @@ Google's video generation model. Creates short video clips with AI-generated aud
 
   <Accordion title="Seedream — 2,000 character prompt limit" icon="triangle-exclamation">
     Both Seedream models cap prompts at 2,000 characters, shorter than the 4,000-character limit of Gemini models. Plan accordingly for very detailed prompts.
+  </Accordion>
+
+  <Accordion title="Seedance 2.0 — Per-second pricing + continuation minimums" icon="circle-info">
+    Unlike image models with flat per-image pricing, Seedance is billed per second: 13 credits/sec for 480p, 26 credits/sec for 720p. The sidebar shows the exact total before you submit.
+
+    **For video continuation**: rates drop (480p 8/sec, 720p 16/sec), but a minimum-billable-seconds floor applies (so a short continuation isn't unfairly cheapened by a long reference video). For example, continuing 5 seconds bills at least 9 seconds; continuing 15 seconds bills at least 25 seconds. See the full lookup table in the Seedance 2.0 section above.
+  </Accordion>
+
+  <Accordion title="Veo 3.1 — Fixed 8-second duration" icon="triangle-exclamation">
+    Veo 3.1 always generates 8-second videos — duration is not adjustable. Only supports 16:9 / 9:16 aspect ratios and 720p resolution. For longer durations, more ratios, or 480p output, use Seedance 2.0.
   </Accordion>
 </AccordionGroup>
