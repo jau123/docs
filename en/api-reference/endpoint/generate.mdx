@@ -24,10 +24,10 @@ Submits a generation request. The output is generated asynchronously — use the
   The text description of the image to generate. Length limits vary by model (see [Models](/en/features/models)).
 </ParamField>
 
-<ParamField body="modelId" type="string" default="gpt-image-2">
-  The model to use for generation. Get available models from the [List Models](/en/api-reference/endpoint/models) endpoint.
+<ParamField body="modelId" type="string">
+  The model to use for generation. If omitted, the platform default is used (may change over time). Get available models from the [List Models](/en/api-reference/endpoint/models) endpoint.
 
-  Image models: `gpt-image-2` (default), `gemini-3-pro-image-preview`, `nanobanana-2`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v7`, `midjourney-niji7`, `z-image-turbo`
+  Image models: `gpt-image-2`, `gemini-3-pro-image-preview`, `nanobanana-2`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v7`, `midjourney-niji7`, `z-image-turbo`
 
   Video models: `seedance-2-0`, `veo-3.1`
 
@@ -44,10 +44,10 @@ Submits a generation request. The output is generated asynchronously — use the
   The final ratio used is returned in the status endpoint's `aspectRatio` field.
 </ParamField>
 
-<ParamField body="resolution" type="string" default="2K">
-  The output resolution. Availability depends on the model.
+<ParamField body="resolution" type="string">
+  The output resolution. Availability depends on the model. If omitted, the selected model's default is used.
 
-  Available values depend on the model: image models support `1K` / `2K` / `3K` / `4K`; video models support `480p` / `720p`. See [Models](/en/features/models) for each model's supported resolutions.
+  Available values depend on the model: image models support `1K` / `2K` / `3K` / `4K`; video models support `480p` / `720p`. See [Models](/en/features/models) for each model's supported resolutions and defaults.
 </ParamField>
 
 <ParamField body="quality" type="string" default="medium">

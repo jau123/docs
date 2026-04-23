@@ -24,10 +24,10 @@ POST /api/generate/v2
   要生成的图片的文本描述。长度限制因模型而异（参见[模型](/zh/features/models)）。
 </ParamField>
 
-<ParamField body="modelId" type="string" default="gpt-image-2">
-  用于生成的模型。从[模型列表](/zh/api-reference/endpoint/models)端点获取可用模型。
+<ParamField body="modelId" type="string">
+  用于生成的模型。不传则使用平台当前默认模型（可能随平台配置变化）。从[模型列表](/zh/api-reference/endpoint/models)端点获取可用模型。
 
-  图片模型：`gpt-image-2`（默认）, `gemini-3-pro-image-preview`, `nanobanana-2`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v7`, `midjourney-niji7`, `z-image-turbo`
+  图片模型：`gpt-image-2`, `gemini-3-pro-image-preview`, `nanobanana-2`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v7`, `midjourney-niji7`, `z-image-turbo`
 
   视频模型：`seedance-2-0`, `veo-3.1`
 
@@ -44,10 +44,10 @@ POST /api/generate/v2
   最终采用的比例会通过状态端点的 `aspectRatio` 字段回传。
 </ParamField>
 
-<ParamField body="resolution" type="string" default="2K">
-  输出分辨率。可用性取决于模型。
+<ParamField body="resolution" type="string">
+  输出分辨率。可用性取决于模型。不传则使用所选模型的默认分辨率。
 
-  可选值取决于模型：图片模型支持 `1K` / `2K` / `3K` / `4K`；视频模型支持 `480p` / `720p`。各模型实际支持的分辨率详见[模型对比](/zh/features/models)。
+  可选值取决于模型：图片模型支持 `1K` / `2K` / `3K` / `4K`；视频模型支持 `480p` / `720p`。各模型实际支持的分辨率和默认值详见[模型对比](/zh/features/models)。
 </ParamField>
 
 <ParamField body="quality" type="string" default="medium">
