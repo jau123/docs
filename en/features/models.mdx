@@ -9,7 +9,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 
 | Model | Credits | Speed | Ref Images | Best For |
 | --- | --- | --- | --- | --- |
-| **GPT Image 2.0** (default) | 10 (limited, was 30) | Medium (~45s) | 5 | Best accuracy & aesthetics, text rendering |
+| **GPT Image 2.0** (default) | 2–40 (by resolution × quality) | Medium (~45s) | 5 | Best accuracy & aesthetics, text rendering |
 | **Nanobanana Pro** | 10 | Fast (~45s) | 5 | High quality, complex scenes |
 | **Nanobanana 2** | 5 | Fast (~38s) | 5 | General use, wide ratio support |
 | **Seedream 5.0 Lite** | 5 | Fast (~35s) | 5 | Photorealism, 3K output |
@@ -30,13 +30,24 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | --- | --- |
 | **Model ID** | `gpt-image-2` |
 | **Provider** | OpenAI |
-| **Credits** | 10 per image (limited-time offer, was 30) |
+| **Credits** | By resolution × quality — see table below |
 | **Prompt length** | No hard limit (standard prompts recommended) |
 | **Reference images** | Up to 5 |
-| **Resolutions** | 2K |
+| **Resolutions** | 1K, 2K, 4K |
+| **Quality** | `low` (Standard) / `medium` (Pro, default) |
 | **Aspect ratios** | 1:1, 3:2, 2:3, 16:9, 9:16, 4:3, 3:4, 5:4, 4:5 |
 
-The current default model and MeiGen's **best overall image model** for prompt accuracy and aesthetic quality. Excels at instruction following, in-image text rendering, and complex multi-element scenes. Launched at a 10-credit promo price on 2026-04-22; may return to full price later.
+**Credit matrix:**
+
+| | Standard (`low`) | Pro (`medium`) |
+| --- | --- | --- |
+| **1K** | 2 | 10 (default) |
+| **2K** | 5 | 25 |
+| **4K** | 10 | 40 |
+
+Free users can pick 1K and 2K; 4K requires a paid plan.
+
+The current default model and MeiGen's **best overall image model** for prompt accuracy and aesthetic quality. Excels at instruction following, in-image text rendering, and complex multi-element scenes.
 
 <Warning>
   **Stricter moderation**: prompts involving real people, celebrities, brand logos, or violent/adult content may be rejected. Rephrase to drop specific names or try a different model.
@@ -293,8 +304,8 @@ Google's video generation model. Creates 8-second video clips with AI-generated 
     Unlike other models that return a single image, Midjourney models return 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (15 credits) for all 4 images.
   </Accordion>
 
-  <Accordion title="GPT Image 2.0 — Stricter moderation + limited-time price" icon="triangle-exclamation">
-    GPT Image 2.0 applies stricter moderation than other models to real people, celebrities, brand logos, and adult/violent content. Rephrase your prompt to drop specific names, or try a different model. Currently runs at a 10-credit promo price; the 30-credit full price may return later.
+  <Accordion title="GPT Image 2.0 — Stricter moderation" icon="triangle-exclamation">
+    GPT Image 2.0 applies stricter moderation than other models to real people, celebrities, brand logos, and adult/violent content. Rephrase your prompt to drop specific names, or try a different model.
   </Accordion>
 
   <Accordion title="Seedream — 2,000 character prompt limit" icon="triangle-exclamation">

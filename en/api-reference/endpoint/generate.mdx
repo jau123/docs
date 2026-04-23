@@ -47,7 +47,16 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="resolution" type="string" default="2K">
   The output resolution. Availability depends on the model.
 
-  Available values depend on the model: image models support `2K` / `3K` / `4K`; video models support `480p` / `720p`. See [Models](/en/features/models) for each model's supported resolutions.
+  Available values depend on the model: image models support `1K` / `2K` / `3K` / `4K`; video models support `480p` / `720p`. See [Models](/en/features/models) for each model's supported resolutions.
+</ParamField>
+
+<ParamField body="quality" type="string">
+  GPT Image 2.0 only. Quality tier.
+
+  - `low` — Standard, cheaper
+  - `medium` — Pro (default), more detail
+
+  Other models ignore this parameter.
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">
