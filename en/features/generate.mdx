@@ -1,6 +1,6 @@
 ---
 title: "AI Image & Video Generator"
-description: "Generate images & videos on MeiGen with Nano Banana 2, Niji 7, Seedream 4.5, Seedance 2.0, Veo 3.1 & more. Prompt editor with variables, color picker, and @ mentions."
+description: "Generate images & videos on MeiGen with GPT Image 2, Nano Banana 2, Seedream 5.0 Lite, Midjourney Niji 7, Seedance 2.0, Veo 3.1 & more. Prompt editor with variables, color picker, and @ mentions."
 ---
 
 MeiGen lets you generate images and videos using multiple AI models from a unified interface. Open the generation sidebar from the floating dock (desktop) or the navigation menu.
@@ -335,11 +335,11 @@ Typical generation times by model:
 
 | Model | Typical Time |
 | --- | --- |
-| Z Image Turbo | ~5 seconds |
-| Nanobanana 2, Seedream | ~15 seconds |
-| Nanobanana Pro | ~15 seconds |
-| GPT image1.5 | ~20 seconds |
-| Niji 7 | ~60 seconds |
+| Z Image Turbo | ~12 seconds |
+| Seedream 4.5 | ~17 seconds |
+| Seedream 5.0 Lite, Nanobanana 2 | ~35–38 seconds |
+| GPT Image 2.0, Nanobanana Pro | ~45 seconds |
+| Midjourney V7 / Niji 7 | ~50–77 seconds |
 | Seedance 2.0 (video) | ~1–3 minutes (varies by duration / resolution) |
 | Veo 3.1 (video) | 2–6 minutes |
 
@@ -374,10 +374,10 @@ The card also shows the aspect ratio and resolution labels in the bottom-left co
 
 MeiGen uses a dual credit system:
 
-- **Daily credits**: refresh every 24 hours, used for **basic models** (Z Image Turbo, GPT image 1.5).
+- **Daily credits**: refresh every 24 hours, used for **basic models** (currently only Z Image Turbo).
 - **Purchased credits**: obtained by topping up, never expire, usable on all models.
 
-Generating with premium models (Nanobanana, Seedream, Midjourney, Seedance, Veo, etc.) requires purchased credits.
+Generating with premium models (GPT Image 2.0, Nanobanana, Seedream, Midjourney, Seedance, Veo, etc.) requires purchased credits.
 
 **API Token calls** only use purchased credits, regardless of the model; daily credits never apply to the API path.
 
@@ -388,8 +388,10 @@ The credit cost is shown on the Generate button before you submit. Hover over th
 | Feature | Free | Paid |
 | --- | --- | --- |
 | 4K resolution | Locked | Available |
-| Images per request | 1 | Up to 4 |
+| Images per request (Web UI) | 1 | Up to 4 |
 | API access | Not available | Available (purchased credits only) |
+
+> The "Images per request" limit applies to the Web UI only. Each API call always returns 1 image (Midjourney V7 / Niji 7 always return 4 candidates per call).
 
 ---
 
@@ -397,7 +399,7 @@ The credit cost is shown on the Generate button before you submit. Hover over th
 
 <AccordionGroup>
   <Accordion title="Why is my generation taking longer than expected?" icon="clock">
-    Generation times vary by model and server load. Niji 7 typically takes ~60 seconds, and Veo 3.1 video generation takes 2–6 minutes. The progress bar uses an estimate — actual time may vary during peak hours.
+    Generation times vary by model and server load. See the table at the top of this section for typical times.
   </Accordion>
 
   <Accordion title="My generation failed — what happened to my credits?" icon="coins">

@@ -7,44 +7,52 @@ description: "获取可用的 AI 模型及其配置"
 GET /api/models
 ```
 
-返回所有可用于生成的活跃 AI 模型列表。这是一个公开端点 — 无需认证。
-
-响应缓存 5 分钟。
+返回所有可用于生成的活跃 AI 模型列表。公开端点，无需认证。
 
 ## 响应
 
-返回包含 `models` 数组的对象：
+`{ success: true, models: [...] }`。每个模型对象包含：
 
 <ResponseField name="id" type="string">
-  模型的唯一标识符。生成时用作 `modelId`。
+  模型唯一标识符。生成时用作 `modelId`。
 </ResponseField>
 
 <ResponseField name="name" type="string">
-  模型的显示名称。
+  显示名称。
 </ResponseField>
 
 <ResponseField name="provider" type="string">
-  模型供应商（如 "Google"、"ByteDance"、"Midjourney"）。
+  模型供应商家族（如 `OpenAI` / `Google` / `ByteDance` / `Midjourney`）。仅供展示，不是请求参数。
 </ResponseField>
 
 <ResponseField name="credits_per_generation" type="number">
-  每次生成消耗的基础积分。
+  每次生成消耗的积分。按秒计费的视频模型请参考 `extra_config.pricingPerSec` 中的实际费率。
 </ResponseField>
 
 <ResponseField name="supported_ratios" type="string[]">
-  支持的宽高比数组（如 `["1:1", "3:4", "16:9"]`）。
+  `aspectRatio` 接受的取值。Seedance 另支持 `"adaptive"`。
 </ResponseField>
 
 <ResponseField name="max_reference_images" type="number">
-  接受的最大参考图片数量（0 = 不支持）。
+  最大参考图片数量（`0` 表示该模型不支持参考图）。
 </ResponseField>
 
 <ResponseField name="media_type" type="string">
-  输出类型：`"image"` 或 `"video"`。
+  `"image"` 或 `"video"`。
 </ResponseField>
 
 <ResponseField name="extra_config" type="object">
-  额外的模型特定配置（分辨率、定价层级、标签等）。
+  模型特定配置。可放心使用的字段：
+
+  | 字段 | 适用模型 | 说明 |
+  | --- | --- | --- |
+  | `resolutions` | 图片 / 视频 | `resolution` 允许的取值（图片 `"2K"` / `"3K"` / `"4K"`，视频 `"480p"` / `"720p"`）|
+  | `durations` | Seedance 2.0 | `duration` 允许的取值（秒）|
+  | `pricingPerSec` | Seedance 2.0 | 每分辨率的每秒积分，例 `{ "480p": 13, "720p": 26 }` |
+  | `pricingPerSecWithVideo` | Seedance 2.0 | 提供 `referenceVideo` 时的每秒积分 |
+  | `minBillableTable` | Seedance 2.0 | 续写场景按 `duration` 的最低计费秒数 |
+
+  响应里可能出现其他键，未列在上表的请视为信息性字段，随时可能调整。
 </ResponseField>
 
 ## 示例
@@ -58,30 +66,35 @@ curl https://www.meigen.ai/api/models
   "success": true,
   "models": [
     {
-      "id": "nanobanana-2",
-      "name": "Nanobanana 2",
-      "provider": "Google",
-      "credits_per_generation": 5,
-      "supported_ratios": ["1:1", "3:4", "4:5", "2:3", "9:16", "4:3", "5:4", "3:2", "16:9", "21:9"],
+      "id": "gpt-image-2",
+      "name": "GPT Image 2.0",
+      "provider": "OpenAI",
+      "credits_per_generation": 10,
+      "supported_ratios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "4:5", "5:4"],
       "max_reference_images": 5,
       "media_type": "image",
-      "extra_config": {
-        "tags": ["New"]
-      }
+      "extra_config": { "resolutions": ["2K"] }
     },
     {
-      "id": "seedream-5.0-lite",
-      "name": "Seedream 5.0 Lite",
+      "id": "seedance-2-0",
+      "name": "Seedance 2.0",
       "provider": "ByteDance",
-      "credits_per_generation": 5,
-      "supported_ratios": ["1:1", "3:4", "4:3", "16:9", "9:16", "3:2", "2:3"],
+      "credits_per_generation": 60,
+      "supported_ratios": ["adaptive", "16:9", "4:3", "1:1", "3:4", "9:16", "21:9"],
       "max_reference_images": 5,
-      "media_type": "image",
+      "media_type": "video",
       "extra_config": {
-        "tags": ["New"],
-        "resolutions": ["2K", "3K"]
+        "resolutions": ["480p", "720p"],
+        "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        "pricingPerSec": { "480p": 13, "720p": 26 },
+        "pricingPerSecWithVideo": { "480p": 8, "720p": 16 },
+        "minBillableTable": { "4": 7, "5": 9, "6": 10, "7": 12, "8": 14, "9": 15, "10": 17, "11": 19, "12": 20, "13": 22, "14": 24, "15": 25 }
       }
     }
   ]
 }
 ```
+
+<Note>
+  示例中只列出了两个代表模型。实际端点返回全部启用模型；响应会做短暂缓存。
+</Note>

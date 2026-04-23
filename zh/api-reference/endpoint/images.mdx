@@ -1,66 +1,75 @@
 ---
-title: "图片详情"
-description: "获取生成图片的详细信息"
+title: "画廊图片详情"
+description: "根据 ID 获取 MeiGen 画廊图片的完整信息"
 ---
 
 ```
 GET /api/images/:id
 ```
 
-返回特定生成图片的详细信息。这是一个公开端点 — 无需认证。
+返回 MeiGen 精选画廊中某张图片的完整信息（不是用户自己的生成结果）。`id` 即画廊搜索结果返回的 ID。公开端点，无需认证；响应会做短暂缓存。
 
-响应缓存 1 小时。
+<Note>
+  获取**自己的生成结果**请轮询[状态端点](/zh/api-reference/endpoint/generate#查询生成状态)。本端点只返回画廊精选内容。
+</Note>
 
 ## 路径参数
 
 <ParamField path="id" type="string" required>
-  [生成](/zh/api-reference/endpoint/generate)端点返回的生成 ID。
+  画廊图片 ID。
 </ParamField>
 
 ## 响应
 
-<ResponseField name="id" type="string">
-  生成 ID。
-</ResponseField>
+<ResponseField name="success" type="boolean" />
 
-<ResponseField name="status" type="string">
-  生成状态：`"pending"`、`"completed"` 或 `"failed"`。
-</ResponseField>
+<ResponseField name="data" type="object">
+  画廊图片字段：
 
-<ResponseField name="imageUrl" type="string">
-  生成图片的 URL（仅在状态为 `"completed"` 时存在）。
-</ResponseField>
-
-<ResponseField name="prompt" type="string">
-  用于生成的提示词。
-</ResponseField>
-
-<ResponseField name="model" type="string">
-  使用的模型 ID。
-</ResponseField>
-
-<ResponseField name="aspectRatio" type="string">
-  生成图片的宽高比。
-</ResponseField>
-
-<ResponseField name="createdAt" type="string">
-  生成创建时间的 ISO 8601 时间戳。
+  | 字段 | 类型 | 说明 |
+  | --- | --- | --- |
+  | `id` | string | 画廊图片 ID |
+  | `text` | string | 原始提示词——可能是纯文本，也可能是结构化 JSON prompt，要复用请自行解析 |
+  | `media_urls` | string[] | 完整图片 URL 数组 |
+  | `thumbnail_url` | string | 缩略图 URL（通常与 `media_urls[0]` 相同）|
+  | `image_width` | number \| null | 图片宽度（像素）|
+  | `image_height` | number \| null | 图片高度（像素）|
+  | `model` | string \| null | 模型家族标签：`"nanobanana"` / `"midjourney"` / `"gptimage"`。**不是 `modelId`**——仅用于筛选/展示，不能直接传给 `/api/generate/v2` |
+  | `created_at` | string | ISO 8601 时间戳（信息性字段）|
+  | `likes` / `views` / `retweets` | number | 原帖互动指标 |
+  | `author_username` / `author_display_name` / `author_avatar_url` | string | 原作者信息——如需展示署名可使用，否则忽略 |
 </ResponseField>
 
 ## 示例
 
 ```bash
-curl https://www.meigen.ai/api/images/550e8400-e29b-41d4-a716-446655440000
+curl https://www.meigen.ai/api/images/2009629483448627597
 ```
 
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "status": "completed",
-  "imageUrl": "https://images.meigen.art/generations/550e8400.png",
-  "prompt": "A serene Japanese garden with cherry blossoms",
-  "model": "nanobanana-2",
-  "aspectRatio": "16:9",
-  "createdAt": "2025-03-01T12:00:00Z"
+  "success": true,
+  "data": {
+    "id": "2009629483448627597",
+    "text": "A serene Japanese garden with cherry blossoms",
+    "media_urls": ["https://images.meigen.ai/tweets/2009629483448627597/0.jpg"],
+    "thumbnail_url": "https://images.meigen.ai/tweets/2009629483448627597/0.jpg",
+    "image_width": 1650,
+    "image_height": 2048,
+    "model": "midjourney",
+    "created_at": "2026-01-09T14:13:00+00:00",
+    "likes": 113,
+    "views": 9266,
+    "retweets": 8,
+    "author_username": "creator",
+    "author_display_name": "Creator Name",
+    "author_avatar_url": "https://pbs.twimg.com/profile_images/.../normal.jpg"
+  }
 }
+```
+
+### 404 Not Found
+
+```json
+{ "success": false, "error": "Image not found" }
 ```

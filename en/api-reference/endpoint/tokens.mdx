@@ -1,110 +1,21 @@
 ---
 title: "API Tokens"
-description: "Create and manage API tokens for programmatic access"
+description: "Create and manage API tokens in your MeiGen account"
 ---
 
-Manage your API tokens for authenticating API requests. All token management endpoints require Supabase session authentication (browser-based).
+Create and revoke tokens at [meigen.ai → Settings → API Keys](https://www.meigen.ai). Each account supports up to 5 active tokens.
 
-## Create Token
+Token format: `meigen_sk_` followed by 32 characters. The full value is shown only at creation — copy it immediately.
 
-```
-POST /api/tokens
-```
+Pass the token as a Bearer credential on any authenticated endpoint:
 
-Creates a new API token. Each user can have up to 5 active tokens.
-
-### Request Body
-
-<ParamField body="name" type="string" required>
-  A descriptive name for the token (e.g., "My App", "CI/CD Pipeline").
-</ParamField>
-
-### Response
-
-```json
-{
-  "id": "token-uuid",
-  "token": "meigen_sk_aBcDeFgHiJkLmNoPqRsTuVwXyZ012345",
-  "name": "My App",
-  "created_at": "2025-03-01T12:00:00Z"
-}
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a minimalist logo"}'
 ```
 
 <Warning>
-  The full token value is only returned once at creation time. Copy and store it securely — you won't be able to see it again.
+  **API tokens can only spend purchased credits.** Daily free credits are not available via the API.
 </Warning>
-
-## List Tokens
-
-```
-GET /api/tokens
-```
-
-Returns all tokens for the authenticated user.
-
-### Response
-
-```json
-[
-  {
-    "id": "token-uuid",
-    "name": "My App",
-    "token_value": "meigen_sk_aBcD...****",
-    "is_active": true,
-    "last_used_at": "2025-03-01T15:30:00Z",
-    "created_at": "2025-03-01T12:00:00Z"
-  }
-]
-```
-
-## Revoke Token
-
-```
-DELETE /api/tokens/:id
-```
-
-Revokes (soft-deletes) a token. The token will immediately stop working for API authentication.
-
-### Path Parameters
-
-<ParamField path="id" type="string" required>
-  The token ID to revoke.
-</ParamField>
-
-### Response
-
-```json
-{
-  "success": true
-}
-```
-
-## Token Usage
-
-```
-GET /api/tokens/:id/usage
-```
-
-Returns the usage history for a specific token.
-
-### Path Parameters
-
-<ParamField path="id" type="string" required>
-  The token ID to check usage for.
-</ParamField>
-
-### Response
-
-```json
-{
-  "generations": [
-    {
-      "id": "generation-uuid",
-      "model": "nanobanana-2",
-      "credits_used": 5,
-      "status": "completed",
-      "created_at": "2025-03-01T15:30:00Z"
-    }
-  ]
-}
-```

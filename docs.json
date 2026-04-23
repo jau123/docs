@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "MeiGen Docs",
-  "description": "Official docs for MeiGen — free AI image & video generation with Nano Banana 2, Midjourney, Seedream. Web app, REST API, and MCP plugin for Claude Code, Cursor, OpenClaw.",
+  "description": "Official docs for MeiGen — AI image & video generation. Supports GPT Image 2, Nano Banana 2, Nanobanana Pro, Seedream 5.0 Lite, Midjourney V7/Niji 7, Seedance 2.0, Veo 3.1. Free prompt gallery, REST API, and MCP plugin for Claude Code, Cursor, OpenClaw.",
   "colors": {
     "primary": "#7C3AED",
     "light": "#A78BFA",

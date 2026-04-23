@@ -116,17 +116,6 @@ comfyui_workflow modify my-workflow --node "3" --input "steps" --value "30"
 
 ---
 
-## 性能说明
-
-| 方面 | 详情 |
-| --- | --- |
-| **并发** | 仅支持串行 — 每次一张图片。你的本地 GPU 无法并行运行多个生成任务。 |
-| **超时** | 每次生成最长 5 分钟 |
-| **轮询间隔** | 2 秒 |
-| **尺寸取整** | 尺寸取整到 8 的倍数以兼容 Stable Diffusion |
-
----
-
 ## 故障排除
 
 <AccordionGroup>

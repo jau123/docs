@@ -1,110 +1,21 @@
 ---
-title: "API Token 管理"
-description: "创建和管理 API Token 以实现编程访问"
+title: "API Token"
+description: "在 MeiGen 账户后台创建和管理 API Token"
 ---
 
-管理你的 API Token 用于认证 API 请求。所有 Token 管理端点需要 Supabase session 认证（基于浏览器）。
+前往 [meigen.ai → 设置 → API Keys](https://www.meigen.ai) 创建和撤销 Token。每个账号最多同时拥有 5 个活跃 Token。
 
-## 创建 Token
+Token 格式：`meigen_sk_` 后接 32 个字符。完整值仅在创建时显示一次，请立即复制。
 
-```
-POST /api/tokens
-```
+在任何需要认证的端点将 Token 作为 Bearer 凭证传入：
 
-创建新的 API Token。每个用户最多可拥有 5 个活跃 Token。
-
-### 请求体
-
-<ParamField body="name" type="string" required>
-  Token 的描述性名称（如 "My App"、"CI/CD Pipeline"）。
-</ParamField>
-
-### 响应
-
-```json
-{
-  "id": "token-uuid",
-  "token": "meigen_sk_aBcDeFgHiJkLmNoPqRsTuVwXyZ012345",
-  "name": "My App",
-  "created_at": "2025-03-01T12:00:00Z"
-}
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "a minimalist logo"}'
 ```
 
 <Warning>
-  完整的 Token 值仅在创建时返回一次。请复制并安全保存 — 之后将无法再次查看。
+  **API Token 只能消耗购买积分。** 每日免费积分不可用于 API 调用。
 </Warning>
-
-## 列出 Token
-
-```
-GET /api/tokens
-```
-
-返回已认证用户的所有 Token。
-
-### 响应
-
-```json
-[
-  {
-    "id": "token-uuid",
-    "name": "My App",
-    "token_value": "meigen_sk_aBcD...****",
-    "is_active": true,
-    "last_used_at": "2025-03-01T15:30:00Z",
-    "created_at": "2025-03-01T12:00:00Z"
-  }
-]
-```
-
-## 撤销 Token
-
-```
-DELETE /api/tokens/:id
-```
-
-撤销（软删除）一个 Token。该 Token 将立即停止用于 API 认证。
-
-### 路径参数
-
-<ParamField path="id" type="string" required>
-  要撤销的 Token ID。
-</ParamField>
-
-### 响应
-
-```json
-{
-  "success": true
-}
-```
-
-## Token 使用记录
-
-```
-GET /api/tokens/:id/usage
-```
-
-返回特定 Token 的使用历史。
-
-### 路径参数
-
-<ParamField path="id" type="string" required>
-  要查询使用记录的 Token ID。
-</ParamField>
-
-### 响应
-
-```json
-{
-  "generations": [
-    {
-      "id": "generation-uuid",
-      "model": "nanobanana-2",
-      "credits_used": 5,
-      "status": "completed",
-      "created_at": "2025-03-01T15:30:00Z"
-    }
-  ]
-}
-```

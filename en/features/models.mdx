@@ -1,6 +1,6 @@
 ---
 title: "AI Model Comparison"
-description: "Compare 9+ AI image & video models on MeiGen — Midjourney V7, Niji 7, Nano Banana 2, Seedream 4.5, Seedance 2.0, Veo 3.1. Features, pricing, aspect ratios side by side."
+description: "Compare 9+ AI image & video models on MeiGen — GPT Image 2.0, Midjourney V7/Niji 7, Nano Banana 2, Seedream 5.0 Lite, Seedance 2.0, Veo 3.1. Features, pricing, aspect ratios side by side."
 ---
 
 MeiGen supports multiple AI models for image and video generation. Use the comparison table below to pick one, then scroll to its section for detailed specs.
@@ -9,23 +9,46 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 
 | Model | Credits | Speed | Ref Images | Best For |
 | --- | --- | --- | --- | --- |
-| **Z Image Turbo** | 2 | Fastest (~5s) | None | Quick drafts, prototyping |
-| **GPT image1.5** | 2 | Fast (~20s) | 2 | Budget generation with references |
-| **Nanobanana 2** | 5 | Fast (~15s) | 5 | General use, wide ratio support |
-| **Seedream 5.0 Lite** | 5 | Fast (~15s) | 5 | Photorealism, 3K output |
-| **Seedream 4.5** | 5 | Fast (~15s) | 5 | Product photos, marketing |
-| **Nanobanana Pro** | 10 | Fast (~15s) | 5 | High quality, complex scenes |
-| **Niji 7** | 15 | Slow (~60s) | 1 | Anime, illustration, artistic |
-| **Midjourney V7** | 15 | Slow (~60s) | 1 | Photorealistic, universal aesthetics |
+| **GPT Image 2.0** (default) | 10 (limited, was 30) | Medium (~45s) | 5 | Best accuracy & aesthetics, text rendering |
+| **Nanobanana Pro** | 10 | Fast (~45s) | 5 | High quality, complex scenes |
+| **Nanobanana 2** | 5 | Fast (~38s) | 5 | General use, wide ratio support |
+| **Seedream 5.0 Lite** | 5 | Fast (~35s) | 5 | Photorealism, 3K output |
+| **Seedream 4.5** | 5 | Fast (~17s) | 5 | Product photos, marketing |
+| **Midjourney V7** | 15 | Slow (~50s) | 1 | Photorealistic, universal aesthetics |
+| **Midjourney Niji 7** | 15 | Slow (~77s) | 1 | Anime, illustration, artistic |
+| **Z Image Turbo** | 2 | Fastest (~12s) | None | Quick drafts, prototyping |
 | **Seedance 2.0** | Per-second (480p 13/sec, 720p 26/sec) | Video, ~1-3min | First/last frame + reference video | 4–15s adjustable duration, multiple ratios, audio |
 | **Veo 3.1** | 20 (fixed 8s) | Slowest (2-6min) | 2 (first/last frame) | 8-second video with audio |
 
+> GPT image 1.5 was retired on 2026-04-22 and replaced by GPT Image 2.0.
+
 ## Image Models
+
+### GPT Image 2.0
+
+| | |
+| --- | --- |
+| **Model ID** | `gpt-image-2` |
+| **Provider** | OpenAI |
+| **Credits** | 10 per image (limited-time offer, was 30) |
+| **Prompt length** | No hard limit (standard prompts recommended) |
+| **Reference images** | Up to 5 |
+| **Resolutions** | 2K |
+| **Aspect ratios** | 1:1, 3:2, 2:3, 16:9, 9:16, 4:3, 3:4, 5:4, 4:5 |
+
+The current default model and MeiGen's **best overall image model** for prompt accuracy and aesthetic quality. Excels at instruction following, in-image text rendering, and complex multi-element scenes. Launched at a 10-credit promo price on 2026-04-22; may return to full price later.
+
+<Warning>
+  **Stricter moderation**: prompts involving real people, celebrities, brand logos, or violent/adult content may be rejected. Rephrase to drop specific names or try a different model.
+</Warning>
+
+---
 
 ### Nanobanana 2
 
 | | |
 | --- | --- |
+| **Model ID** | `nanobanana-2` |
 | **Provider** | Google (Gemini) |
 | **Credits** | 5 per image |
 | **Prompt length** | 5–4,000 characters |
@@ -45,6 +68,7 @@ The most affordable Gemini model with the widest range of aspect ratios, includi
 
 | | |
 | --- | --- |
+| **Model ID** | `gemini-3-pro-image-preview` |
 | **Provider** | Google (Gemini) |
 | **Credits** | 10 per image |
 | **Prompt length** | 5–4,000 characters |
@@ -60,12 +84,13 @@ The premium Gemini model with higher image quality. Better at complex scenes, fi
 
 | | |
 | --- | --- |
+| **Model ID** | `seedream-5.0-lite` |
 | **Provider** | ByteDance |
 | **Credits** | 5 per image |
 | **Prompt length** | 5–2,000 characters |
 | **Reference images** | Up to 5 |
 | **Resolutions** | 2K, 3K |
-| **Aspect ratios** | 1:1, 3:4, 4:3, 16:9, 9:16, 3:2, 2:3 |
+| **Aspect ratios** | 1:1, 3:4, 4:3, 16:9, 9:16, 3:2, 2:3, 21:9 |
 
 ByteDance's latest lightweight model. Offers good quality at low cost with optional 3K resolution output. Strong at photorealistic content and Chinese-style aesthetics.
 
@@ -75,12 +100,13 @@ ByteDance's latest lightweight model. Offers good quality at low cost with optio
 
 | | |
 | --- | --- |
+| **Model ID** | `seedream-4.5` |
 | **Provider** | ByteDance |
 | **Credits** | 5 per image |
 | **Prompt length** | 5–2,000 characters |
 | **Reference images** | Up to 5 |
 | **Resolutions** | 2K, 4K |
-| **Aspect ratios** | 1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3, 21:9, 9:21 |
+| **Aspect ratios** | 1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3, 21:9 |
 
 The previous generation Seedream model. Still produces solid results, particularly good for product photography and marketing visuals.
 
@@ -90,6 +116,7 @@ The previous generation Seedream model. Still produces solid results, particular
 
 | | |
 | --- | --- |
+| **Model ID** | `midjourney-niji7` |
 | **Provider** | Midjourney |
 | **Credits** | 15 per image |
 | **Prompt length** | 1–8,192 characters |
@@ -108,7 +135,7 @@ Midjourney's anime and illustration-focused model. Produces the highest quality 
 **Trade-offs:**
 - Most expensive image model (15 credits)
 - Only 1 reference image supported
-- Slower generation (~60 seconds)
+- Slower generation (see the comparison table above)
 - Returns 4 candidate images per generation (other models return 1) — all viewable in the image detail dialog
 
 ---
@@ -117,6 +144,7 @@ Midjourney's anime and illustration-focused model. Produces the highest quality 
 
 | | |
 | --- | --- |
+| **Model ID** | `midjourney-v7` |
 | **Provider** | Midjourney |
 | **Credits** | 15 per image |
 | **Prompt length** | 1–8,192 characters |
@@ -144,6 +172,7 @@ Midjourney's general-purpose photorealistic model. Shares the same advanced para
 
 | | |
 | --- | --- |
+| **Model ID** | `z-image-turbo` |
 | **Provider** | Alibaba (Qwen) |
 | **Credits** | 2 per image |
 | **Prompt length** | 5–4,000 characters |
@@ -159,32 +188,13 @@ The fastest and cheapest model. Great for rapid prototyping and quick iterations
 
 ---
 
-### GPT image1.5
-
-| | |
-| --- | --- |
-| **Provider** | RunningHub |
-| **Credits** | 2 per image |
-| **Prompt length** | 5–800 characters |
-| **Reference images** | Up to 2 |
-| **Resolutions** | — |
-| **Aspect ratios** | 1:1, 3:2, 2:3 |
-
-An affordable model based on GPT image generation technology. Good balance of quality and cost with limited aspect ratio options.
-
-**Limitations:**
-- Shorter prompt length limit (800 characters)
-- Only 3 aspect ratios
-- Max 2 reference images
-
----
-
 ## Video Models
 
 ### Seedance 2.0
 
 | | |
 | --- | --- |
+| **Model ID** | `seedance-2-0` |
 | **Provider** | ByteDance |
 | **Credits** | Per-second pricing (see below) |
 | **Duration** | 4-15 seconds (default 5) |
@@ -251,6 +261,7 @@ For continuation, billable seconds = `max(reference video duration + your durati
 
 | | |
 | --- | --- |
+| **Model ID** | `veo-3.1` |
 | **Provider** | Google |
 | **Credits** | 20 per video |
 | **Duration** | 8 seconds (fixed) |
@@ -282,8 +293,8 @@ Google's video generation model. Creates 8-second video clips with AI-generated 
     Unlike other models that return a single image, Midjourney models return 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (15 credits) for all 4 images.
   </Accordion>
 
-  <Accordion title="GPT image1.5 — Limited ratios and prompt length" icon="triangle-exclamation">
-    Only supports 3 aspect ratios (1:1, 3:2, 2:3) and has a 800-character prompt limit. Keep prompts concise with this model.
+  <Accordion title="GPT Image 2.0 — Stricter moderation + limited-time price" icon="triangle-exclamation">
+    GPT Image 2.0 applies stricter moderation than other models to real people, celebrities, brand logos, and adult/violent content. Rephrase your prompt to drop specific names, or try a different model. Currently runs at a 10-credit promo price; the 30-credit full price may return later.
   </Accordion>
 
   <Accordion title="Seedream — 2,000 character prompt limit" icon="triangle-exclamation">

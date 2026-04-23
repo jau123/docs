@@ -7,44 +7,52 @@ description: "Get available AI models and their configurations"
 GET /api/models
 ```
 
-Returns a list of all active AI models available for generation. This is a public endpoint — no authentication required.
-
-The response is cached for 5 minutes.
+Returns a list of all active AI models available for generation. Public endpoint, no authentication required.
 
 ## Response
 
-Returns an object with a `models` array:
+`{ success: true, models: [...] }`. Each model object contains:
 
 <ResponseField name="id" type="string">
   The unique model identifier. Use this as `modelId` when generating.
 </ResponseField>
 
 <ResponseField name="name" type="string">
-  The display name of the model.
+  Display name.
 </ResponseField>
 
 <ResponseField name="provider" type="string">
-  The model provider (e.g., "Google", "ByteDance", "Midjourney").
+  Model provider family (e.g. `OpenAI`, `Google`, `ByteDance`, `Midjourney`). Display only — not a request parameter.
 </ResponseField>
 
 <ResponseField name="credits_per_generation" type="number">
-  Base credits consumed per generation.
+  Credits per generation. For per-second-billed video models, refer to `extra_config.pricingPerSec` for the actual rate.
 </ResponseField>
 
 <ResponseField name="supported_ratios" type="string[]">
-  Array of supported aspect ratios (e.g., `["1:1", "3:4", "16:9"]`).
+  Aspect ratios accepted by `aspectRatio`. Seedance additionally accepts `"adaptive"`.
 </ResponseField>
 
 <ResponseField name="max_reference_images" type="number">
-  Maximum number of reference images accepted (0 = not supported).
+  Maximum number of reference images accepted (`0` means the model does not accept references).
 </ResponseField>
 
 <ResponseField name="media_type" type="string">
-  Output type: `"image"` or `"video"`.
+  `"image"` or `"video"`.
 </ResponseField>
 
 <ResponseField name="extra_config" type="object">
-  Additional model-specific configuration (resolutions, pricing tiers, tags, etc.).
+  Model-specific configuration. Keys you may rely on:
+
+  | Key | Used by | Description |
+  | --- | --- | --- |
+  | `resolutions` | Image / video | Allowed values for `resolution` (`"2K"` / `"3K"` / `"4K"` for image, `"480p"` / `"720p"` for video) |
+  | `durations` | Seedance 2.0 | Allowed values for `duration` (seconds) |
+  | `pricingPerSec` | Seedance 2.0 | Per-resolution per-second rate, e.g. `{ "480p": 13, "720p": 26 }` |
+  | `pricingPerSecWithVideo` | Seedance 2.0 | Per-second rate when `referenceVideo` is supplied |
+  | `minBillableTable` | Seedance 2.0 | Minimum billable seconds keyed by `duration` (continuation only) |
+
+  Other keys may appear; treat anything not listed above as informational and subject to change.
 </ResponseField>
 
 ## Example
@@ -58,30 +66,35 @@ curl https://www.meigen.ai/api/models
   "success": true,
   "models": [
     {
-      "id": "nanobanana-2",
-      "name": "Nanobanana 2",
-      "provider": "Google",
-      "credits_per_generation": 5,
-      "supported_ratios": ["1:1", "3:4", "4:5", "2:3", "9:16", "4:3", "5:4", "3:2", "16:9", "21:9"],
+      "id": "gpt-image-2",
+      "name": "GPT Image 2.0",
+      "provider": "OpenAI",
+      "credits_per_generation": 10,
+      "supported_ratios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "4:5", "5:4"],
       "max_reference_images": 5,
       "media_type": "image",
-      "extra_config": {
-        "tags": ["New"]
-      }
+      "extra_config": { "resolutions": ["2K"] }
     },
     {
-      "id": "seedream-5.0-lite",
-      "name": "Seedream 5.0 Lite",
+      "id": "seedance-2-0",
+      "name": "Seedance 2.0",
       "provider": "ByteDance",
-      "credits_per_generation": 5,
-      "supported_ratios": ["1:1", "3:4", "4:3", "16:9", "9:16", "3:2", "2:3"],
+      "credits_per_generation": 60,
+      "supported_ratios": ["adaptive", "16:9", "4:3", "1:1", "3:4", "9:16", "21:9"],
       "max_reference_images": 5,
-      "media_type": "image",
+      "media_type": "video",
       "extra_config": {
-        "tags": ["New"],
-        "resolutions": ["2K", "3K"]
+        "resolutions": ["480p", "720p"],
+        "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        "pricingPerSec": { "480p": 13, "720p": 26 },
+        "pricingPerSecWithVideo": { "480p": 8, "720p": 16 },
+        "minBillableTable": { "4": 7, "5": 9, "6": 10, "7": 12, "8": 14, "9": 15, "10": 17, "11": 19, "12": 20, "13": 22, "14": 24, "15": 25 }
       }
     }
   ]
 }
 ```
+
+<Note>
+  Example shows two representative models. The live endpoint returns all active models. Response is briefly cached.
+</Note>

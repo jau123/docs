@@ -1,6 +1,6 @@
 ---
 title: "REST API Overview"
-description: "MeiGen REST API — integrate AI image & video generation into your app. Supports Nanobanana, Midjourney, Seedream, Seedance, Veo. Unified endpoints with bearer token auth."
+description: "MeiGen REST API — integrate AI image & video generation into your app. Supports GPT Image 2, Nanobanana 2, Midjourney, Seedream, Seedance, Veo. Unified endpoints with bearer token auth."
 ---
 
 The MeiGen API allows you to generate images programmatically. All endpoints are available at `https://www.meigen.ai/api/`.
@@ -27,7 +27,7 @@ Authorization: Bearer meigen_sk_YOUR_API_KEY
 
 ### Session Token
 
-For browser-based integrations, you can use a Supabase session access token. This method uses both daily and purchased credits.
+For meigen.ai's own browser integration, a logged-in session access token is accepted and can use both daily and purchased credits. Third-party integrations should always use the API Token above.
 
 ## Base URL
 
@@ -43,7 +43,7 @@ All request bodies must be sent as JSON with the `Content-Type: application/json
 curl -X POST https://www.meigen.ai/api/generate/v2 \
   -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "a minimalist logo", "modelId": "gemini-3-pro-image-preview"}'
+  -d '{"prompt": "a minimalist logo", "modelId": "gpt-image-2"}'
 ```
 
 ## Response Format
@@ -72,33 +72,23 @@ Image generation is **asynchronous**. The flow is:
 
 1. **Submit** a generation request → `POST /api/generate/v2`
 2. **Poll** the status endpoint → `GET /api/generate/v2/status/:id`
-3. **Retrieve** the completed image → `GET /api/images/:id`
+3. **Read** the resulting `imageUrl` / `imageUrls` / `videoUrl` directly from the status response once `status === "completed"`.
 
 ### Polling Best Practices
 
 - **Recommended interval**: 3 seconds between status checks
 - **Stop when**: `status` is `completed` or `failed`
-- **Timeout**: consider giving up after 5 minutes for image models, 10 minutes for video
-
-### Typical Generation Times
-
-| Model | Typical Time |
-| --- | --- |
-| Z Image Turbo | ~5 seconds |
-| Nanobanana 2, Seedream | ~15 seconds |
-| Nanobanana Pro | ~15 seconds |
-| GPT image1.5 | ~20 seconds |
-| Midjourney V7 / Niji 7 | ~60 seconds |
-| Seedance 2.0 (video) | ~1–3 minutes |
-| Veo 3.1 (video) | 2–6 minutes |
+- **Timeout**: 5 minutes for image models, 10 minutes for video. Per-model typical times are listed on the [Models](/en/features/models) page.
 
 ## Rate Limits
 
-API requests are subject to rate limiting. If you receive a `429 Too Many Requests` response:
+`POST /api/generate/v2` is limited to **12 requests per minute per user**. Exceeding the limit returns `429 Too Many Requests` with these response headers:
 
-- Wait 10–30 seconds before retrying
-- Implement exponential backoff for repeated failures
-- Specific rate limits may vary based on server load
+- `Retry-After: 60`
+- `X-RateLimit-Limit: 12`
+- `X-RateLimit-Remaining: 0`
+
+When you hit 429, respect `Retry-After` and apply exponential backoff for repeated failures.
 
 ## Caching
 
@@ -112,20 +102,7 @@ Some GET endpoints return cached responses:
 
 ## Credits
 
-Each generation consumes credits based on the model used. Check the [Models](/en/features/models) page for per-model pricing.
-
-| Model | Credits |
-| --- | --- |
-| Z Image Turbo | 2 |
-| GPT image1.5 | 2 |
-| Nanobanana 2 | 5 |
-| Seedream 5.0 Lite | 5 |
-| Seedream 4.5 | 5 |
-| Nanobanana Pro | 10 |
-| Midjourney V7 | 15 |
-| Niji 7 | 15 |
-| Seedance 2.0 | Per-second (see [Models](/en/features/models)) |
-| Veo 3.1 | 20 |
+Each generation deducts credits from your account. Image models charge a flat amount per image; Seedance 2.0 is billed per second. See the [Models](/en/features/models) page for the full per-model pricing table.
 
 ## Error Responses
 
@@ -137,6 +114,25 @@ Each generation consumes credits based on the model used. Check the [Models](/en
 | 404 | Not found |
 | 429 | Rate limited — wait and retry |
 | 500 | Server error |
+
+For `POST /api/generate/v2`, the 400 / 402 bodies include extra fields useful for debugging:
+
+```json
+// 400 — unsupported aspect ratio
+{
+  "success": false,
+  "error": "Aspect ratio 21:9 not supported by this model",
+  "supportedRatios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "5:4", "4:5"]
+}
+
+// 402 — not enough credits
+{
+  "success": false,
+  "error": "Insufficient credits",
+  "required": 10,
+  "available": 4
+}
+```
 
 ## Endpoints
 
