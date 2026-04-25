@@ -50,8 +50,8 @@ POST /api/generate/v2
   可选值取决于模型：图片模型支持 `1K` / `2K` / `3K` / `4K`；视频模型支持 `480p` / `720p`。各模型实际支持的分辨率和默认值详见[模型对比](/zh/features/models)。
 </ParamField>
 
-<ParamField body="quality" type="string" default="medium">
-  仅用于 GPT Image 2.0。可选 `low` 或 `medium`。其他模型会忽略该参数。
+<ParamField body="quality" type="string" default="low">
+  仅用于 GPT Image 2.0。可选 `low` / `medium` / `high`。其他模型会忽略该参数。
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">

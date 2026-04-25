@@ -50,8 +50,8 @@ Submits a generation request. The output is generated asynchronously — use the
   Available values depend on the model: image models support `1K` / `2K` / `3K` / `4K`; video models support `480p` / `720p`. See [Models](/en/features/models) for each model's supported resolutions and defaults.
 </ParamField>
 
-<ParamField body="quality" type="string" default="medium">
-  GPT Image 2.0 only. Accepts `low` or `medium`. Other models ignore this parameter.
+<ParamField body="quality" type="string" default="low">
+  GPT Image 2.0 only. Accepts `low` / `medium` / `high`. Other models ignore this parameter.
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">
