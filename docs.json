@@ -143,7 +143,7 @@
   "navbar": {
     "primary": {
       "type": "button",
-      "label": "Back Home",
+      "label": "Open MeiGen",
       "href": "https://www.meigen.ai"
     }
   },
