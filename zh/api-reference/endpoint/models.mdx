@@ -46,9 +46,9 @@ GET /api/models
 
   | 字段 | 适用模型 | 说明 |
   | --- | --- | --- |
-  | `resolutions` | 图片 / 视频 | `resolution` 允许的取值（图片 `"2K"` / `"3K"` / `"4K"`，视频 `"480p"` / `"720p"`）|
+  | `resolutions` | 图片 / 视频 | `resolution` 允许的取值（图片 `"1K"` / `"2K"` / `"3K"` / `"4K"`，视频 `"480p"` / `"720p"` / `"1080p"`）|
   | `durations` | Seedance 2.0 | `duration` 允许的取值（秒）|
-  | `pricingPerSec` | Seedance 2.0 | 每分辨率的每秒积分，例 `{ "480p": 13, "720p": 26 }` |
+  | `pricingPerSec` | Seedance 2.0 | 每分辨率的每秒积分，例 `{ "480p": 13, "720p": 20, "1080p": 22 }` |
   | `pricingPerSecWithVideo` | Seedance 2.0 | 提供 `referenceVideo` 时的每秒积分 |
   | `minBillableTable` | Seedance 2.0 | 续写场景按 `duration` 的最低计费秒数 |
 
@@ -84,10 +84,10 @@ curl https://www.meigen.ai/api/models
       "max_reference_images": 5,
       "media_type": "video",
       "extra_config": {
-        "resolutions": ["480p", "720p"],
+        "resolutions": ["480p", "720p", "1080p"],
         "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-        "pricingPerSec": { "480p": 13, "720p": 26 },
-        "pricingPerSecWithVideo": { "480p": 8, "720p": 16 },
+        "pricingPerSec": { "480p": 13, "720p": 20, "1080p": 22 },
+        "pricingPerSecWithVideo": { "480p": 8, "720p": 14, "1080p": 14 },
         "minBillableTable": { "4": 7, "5": 9, "6": 10, "7": 12, "8": 14, "9": 15, "10": 17, "11": 19, "12": 20, "13": 22, "14": 24, "15": 25 }
       }
     }

@@ -47,7 +47,7 @@ POST /api/generate/v2
 <ParamField body="resolution" type="string">
   输出分辨率。可用性取决于模型。不传则使用所选模型的默认分辨率。
 
-  可选值取决于模型：图片模型支持 `1K` / `2K` / `3K` / `4K`；视频模型支持 `480p` / `720p`。各模型实际支持的分辨率和默认值详见[模型对比](/zh/features/models)。
+  可选值取决于模型：图片模型支持 `1K` / `2K` / `3K` / `4K`；视频模型支持 `480p` / `720p` / `1080p`。各模型实际支持的分辨率和默认值详见[模型对比](/zh/features/models)。
 </ParamField>
 
 <ParamField body="quality" type="string" default="low">
@@ -89,7 +89,7 @@ POST /api/generate/v2
 <ParamField body="referenceVideo" type="string">
   仅用于 Seedance 2.0。用于"视频续写"模式的参考视频 URL。必须是可公开访问的 HTTPS URL（一般来自之前生成结果的 `videoUrl` 字段）。
 
-  传该字段时计费走"有参考视频"档：480p 8 积分/秒、720p 16 积分/秒，并应用最低计费秒数（详见[模型](/zh/features/models)）。
+  传该字段时计费走"有参考视频"档：480p 8 积分/秒、720p 14 积分/秒、1080p 14 积分/秒，并应用最低计费秒数（详见[模型](/zh/features/models)）。
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">
@@ -284,7 +284,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-计费：720p × 5 秒 = 26 × 5 = **130 积分**。
+计费：720p × 5 秒 = 20 × 5 = **100 积分**。
 
 ### Seedance 视频续写（参考视频）
 

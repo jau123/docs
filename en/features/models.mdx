@@ -9,7 +9,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 
 | Model | Credits | Speed | Ref Images | Best For |
 | --- | --- | --- | --- | --- |
-| **GPT Image 2.0** (default) | 2–170 (by resolution × quality) | Medium (~45s) | 5 | Best accuracy & aesthetics, text rendering |
+| **GPT Image 2.0** (default) | 2–120 (by resolution × quality) | Medium (~45s) | 5 | Best accuracy & aesthetics, text rendering |
 | **Nanobanana Pro** | 10 | Fast (~45s) | 5 | High quality, complex scenes |
 | **Nanobanana 2** | 5 | Fast (~38s) | 5 | General use, wide ratio support |
 | **Seedream 5.0 Lite** | 5 | Fast (~35s) | 5 | Photorealism, 3K output |
@@ -17,7 +17,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Midjourney V7** | 15 | Slow (~50s) | 1 | Photorealistic, universal aesthetics |
 | **Midjourney Niji 7** | 15 | Slow (~77s) | 1 | Anime, illustration, artistic |
 | **Z Image Turbo** | 2 | Fastest (~12s) | None | Quick drafts, prototyping |
-| **Seedance 2.0** | Per-second (480p 13/sec, 720p 26/sec) | Video, ~1-3min | First/last frame + reference video | 4–15s adjustable duration, multiple ratios, audio |
+| **Seedance 2.0** | Per-second (480p 13/sec, 720p 20/sec, 1080p 22/sec) | Video, ~1-3min | First/last frame + reference video | 4–15s adjustable duration, multiple ratios, audio |
 | **Veo 3.1** | 20 (fixed 8s) | Slowest (2-6min) | 2 (first/last frame) | 8-second video with audio |
 
 > GPT image 1.5 was retired on 2026-04-22 and replaced by GPT Image 2.0.
@@ -41,9 +41,9 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 
 | | Standard | Medium | High |
 | --- | --- | --- | --- |
-| **1K** | 2 | 10 | 50 |
-| **2K** | 5 | 25 | 100 |
-| **4K** | 10 | 40 | 170 |
+| **1K** | 2 | 10 | 35 |
+| **2K** | 5 | 20 | 70 |
+| **4K** | 10 | 32 | 120 |
 
 Free users can pick 1K and 2K; 4K requires a paid plan.
 
@@ -211,7 +211,7 @@ The fastest and cheapest model. Great for rapid prototyping and quick iterations
 | **Duration** | 4-15 seconds (default 5) |
 | **Reference images** | First/last frame (image-to-video) |
 | **Reference video** | Yes (video continuation) |
-| **Resolutions** | 480p, 720p (default 480p) |
+| **Resolutions** | 480p, 720p, 1080p (default 480p) |
 | **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
 | **Audio** | Auto-generated |
 
@@ -226,14 +226,16 @@ Per-second pricing, in two tiers:
 | Resolution | Rate |
 | --- | --- |
 | 480p | 13 credits/sec |
-| 720p | 26 credits/sec |
+| 720p | 20 credits/sec |
+| 1080p | 22 credits/sec |
 
 **With reference video (video continuation):** lower rate, but with a minimum-billable-seconds floor.
 
 | Resolution | Rate |
 | --- | --- |
 | 480p | 8 credits/sec |
-| 720p | 16 credits/sec |
+| 720p | 14 credits/sec |
+| 1080p | 14 credits/sec |
 
 For continuation, billable seconds = `max(reference video duration + your duration, minimum billable)`. Lookup table:
 
@@ -257,10 +259,11 @@ For continuation, billable seconds = `max(reference video duration + your durati
 | Scenario | Calculation | Total |
 | --- | --- | --- |
 | 480p × 5s text-to-video | 13 × 5 | **65** |
-| 720p × 5s text-to-video | 26 × 5 | **130** |
-| 720p × 10s text-to-video | 26 × 10 | **260** |
+| 720p × 5s text-to-video | 20 × 5 | **100** |
+| 720p × 10s text-to-video | 20 × 10 | **200** |
+| 1080p × 10s text-to-video | 22 × 10 | **220** |
 | 480p × 5s continuing a 3s video | 8 × max(3+5, 9) = 8 × 9 | **72** |
-| 720p × 10s continuing a 5s video | 16 × max(5+10, 17) = 16 × 17 | **272** |
+| 720p × 10s continuing a 5s video | 14 × max(5+10, 17) = 14 × 17 | **238** |
 
 <Note>
   If generation fails, the **full** credit amount is automatically refunded — including all per-second charges.
@@ -313,9 +316,9 @@ Google's video generation model. Creates 8-second video clips with AI-generated 
   </Accordion>
 
   <Accordion title="Seedance 2.0 — Per-second pricing + continuation minimums" icon="circle-info">
-    Unlike image models with flat per-image pricing, Seedance is billed per second: 13 credits/sec for 480p, 26 credits/sec for 720p. The sidebar shows the exact total before you submit.
+    Unlike image models with flat per-image pricing, Seedance is billed per second: 13 credits/sec for 480p, 20 credits/sec for 720p, 22 credits/sec for 1080p. The sidebar shows the exact total before you submit.
 
-    **For video continuation**: rates drop (480p 8/sec, 720p 16/sec), but a minimum-billable-seconds floor applies (so a short continuation isn't unfairly cheapened by a long reference video). For example, continuing 5 seconds bills at least 9 seconds; continuing 15 seconds bills at least 25 seconds. See the full lookup table in the Seedance 2.0 section above.
+    **For video continuation**: rates drop (480p 8/sec, 720p 14/sec, 1080p 14/sec), but a minimum-billable-seconds floor applies (so a short continuation isn't unfairly cheapened by a long reference video). For example, continuing 5 seconds bills at least 9 seconds; continuing 15 seconds bills at least 25 seconds. See the full lookup table in the Seedance 2.0 section above.
   </Accordion>
 
   <Accordion title="Veo 3.1 — Fixed 8-second duration" icon="triangle-exclamation">

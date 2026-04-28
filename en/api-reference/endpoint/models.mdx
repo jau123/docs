@@ -46,9 +46,9 @@ Returns a list of all active AI models available for generation. Public endpoint
 
   | Key | Used by | Description |
   | --- | --- | --- |
-  | `resolutions` | Image / video | Allowed values for `resolution` (`"2K"` / `"3K"` / `"4K"` for image, `"480p"` / `"720p"` for video) |
+  | `resolutions` | Image / video | Allowed values for `resolution` (`"1K"` / `"2K"` / `"3K"` / `"4K"` for image, `"480p"` / `"720p"` / `"1080p"` for video) |
   | `durations` | Seedance 2.0 | Allowed values for `duration` (seconds) |
-  | `pricingPerSec` | Seedance 2.0 | Per-resolution per-second rate, e.g. `{ "480p": 13, "720p": 26 }` |
+  | `pricingPerSec` | Seedance 2.0 | Per-resolution per-second rate, e.g. `{ "480p": 13, "720p": 20, "1080p": 22 }` |
   | `pricingPerSecWithVideo` | Seedance 2.0 | Per-second rate when `referenceVideo` is supplied |
   | `minBillableTable` | Seedance 2.0 | Minimum billable seconds keyed by `duration` (continuation only) |
 
@@ -84,10 +84,10 @@ curl https://www.meigen.ai/api/models
       "max_reference_images": 5,
       "media_type": "video",
       "extra_config": {
-        "resolutions": ["480p", "720p"],
+        "resolutions": ["480p", "720p", "1080p"],
         "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-        "pricingPerSec": { "480p": 13, "720p": 26 },
-        "pricingPerSecWithVideo": { "480p": 8, "720p": 16 },
+        "pricingPerSec": { "480p": 13, "720p": 20, "1080p": 22 },
+        "pricingPerSecWithVideo": { "480p": 8, "720p": 14, "1080p": 14 },
         "minBillableTable": { "4": 7, "5": 9, "6": 10, "7": 12, "8": 14, "9": 15, "10": 17, "11": 19, "12": 20, "13": 22, "14": 24, "15": 25 }
       }
     }

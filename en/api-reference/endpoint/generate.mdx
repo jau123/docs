@@ -47,7 +47,7 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="resolution" type="string">
   The output resolution. Availability depends on the model. If omitted, the selected model's default is used.
 
-  Available values depend on the model: image models support `1K` / `2K` / `3K` / `4K`; video models support `480p` / `720p`. See [Models](/en/features/models) for each model's supported resolutions and defaults.
+  Available values depend on the model: image models support `1K` / `2K` / `3K` / `4K`; video models support `480p` / `720p` / `1080p`. See [Models](/en/features/models) for each model's supported resolutions and defaults.
 </ParamField>
 
 <ParamField body="quality" type="string" default="low">
@@ -89,7 +89,7 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="referenceVideo" type="string">
   For Seedance 2.0 only. Reference video URL for "video continuation" mode. Must be a publicly accessible HTTPS URL (typically a previous generation result URL from the `videoUrl` field).
 
-  When this field is present, billing uses the "with reference video" tier: 480p 8 credits/sec, 720p 16 credits/sec, with the minimum-billable-seconds floor applied (see [Models](/en/features/models)).
+  When this field is present, billing uses the "with reference video" tier: 480p 8 credits/sec, 720p 14 credits/sec, 1080p 14 credits/sec, with the minimum-billable-seconds floor applied (see [Models](/en/features/models)).
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">
@@ -284,7 +284,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-Pricing: 720p × 5 sec = 26 × 5 = **130 credits**.
+Pricing: 720p × 5 sec = 20 × 5 = **100 credits**.
 
 ### Seedance video continuation (with reference video)
 
