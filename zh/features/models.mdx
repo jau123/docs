@@ -1,6 +1,6 @@
 ---
 title: "AI 模型对比"
-description: "MeiGen 支持 9+ AI 图片与视频模型对比 — GPT Image 2.0、Midjourney V7/Niji 7、Nano Banana 2（Gemini 3）、Seedream 5.0 Lite、Seedance 2.0、Veo 3.1。功能、定价、宽高比一目了然。"
+description: "MeiGen 支持 10+ AI 图片与视频模型对比 — GPT Image 2.0、Midjourney V8.1/Niji 7、Nano Banana 2（Gemini 3）、Seedream 5.0 Lite、Seedance 2.0、Happyhorse 1.0、Veo 3.1。功能、定价、宽高比一目了然。"
 ---
 
 MeiGen 支持多种 AI 模型用于图片和视频生成。先看下方对比表决定用哪个，再翻到具体章节查看参数细节。
@@ -14,13 +14,14 @@ MeiGen 支持多种 AI 模型用于图片和视频生成。先看下方对比表
 | **Nanobanana 2** | 5 | 快（约 38 秒） | 5 | 通用、宽比例支持 |
 | **Seedream 5.0 Lite** | 5 | 快（约 35 秒） | 5 | 写实、3K 输出 |
 | **Seedream 4.5** | 5 | 快（约 17 秒） | 5 | 产品照片、营销 |
-| **Midjourney V7** | 15 | 慢（约 50 秒） | 1 | 写实摄影、通用美学 |
+| **Midjourney V8.1** | 15（1K）/ 20（2K）| 慢（约 45 秒） | 1 | 写实摄影、通用美学 |
 | **Midjourney Niji 7** | 15 | 慢（约 77 秒） | 1 | 动漫、插画、艺术 |
 | **Z Image Turbo** | 2 | 最快（约 12 秒） | 无 | 快速草稿、原型制作 |
 | **Seedance 2.0** | 按秒（480p 13/秒，720p 20/秒，1080p 22/秒）| 视频，约 1-3 分钟 | 首帧/末帧 + 参考视频 | 4-15 秒可调、多比例、自带音频 |
+| **Happyhorse 1.0** | 按秒（720p 18/秒，1080p 28/秒）| 视频，约 1-2 分钟 | 1（首帧）| 3-15 秒可调、文生视频 + 单图首帧图生视频 |
 | **Veo 3.1** | 20（固定 8 秒）| 最慢（2-6 分钟） | 2（首帧/末帧）| 带音频的 8 秒视频 |
 
-> GPT image 1.5 已于 2026-04-22 下线，由 GPT Image 2.0 接替。
+> GPT image 1.5 已于 2026-04-22 下线，由 GPT Image 2.0 接替。Midjourney V7 已于 2026-05-09 由 V8.1 接替。
 
 ## 图片模型
 
@@ -151,31 +152,33 @@ Midjourney 专注于动漫和插画的模型。能生成最高质量的艺术插
 
 ---
 
-### Midjourney V7
+### Midjourney V8.1
 
 | | |
 | --- | --- |
-| **Model ID** | `midjourney-v7` |
+| **Model ID** | `midjourney-v8.1` |
 | **供应商** | Midjourney |
-| **积分** | 每张 15 积分 |
+| **积分** | 1K 每次 15 / 2K 每次 20 |
 | **提示词长度** | 1-8,192 字符 |
 | **参考图片** | 1 张（内容或风格参考） |
-| **分辨率** | — |
+| **分辨率** | 1K（1024×1024）/ 2K（2048×2048），默认 1K |
 | **宽高比** | 1:1, 4:3, 3:2, 16:9, 3:4, 2:3, 9:16 |
+| **Quality** | Standard / High（同价） |
 
-Midjourney 通用写实模型。与 Niji 7 共享相同的高级参数和参考图功能，但面向通用美学画面而非动漫风格。适合写实摄影、产品图、风景、人像等场景。
+Midjourney 通用写实旗舰。每次返回 4 张候选图片（只收一次费）。**2K** 提供原生高分辨率输出，**Quality High** 4 倍算力出更精细细节、不额外计费。与 Niji 7 共享高级参数和参考图模式。
 
 **与 Niji 7 相同：**
 - 内容和风格参考模式
-- 高级参数（stylize、chaos、weird、raw 等）
+- 高级参数（stylize、chaos、raw 等）
 - 自动翻译非英文提示词
-- 每次生成返回 4 张候选图片
+- 每次返回 4 张候选图片
 - 仅支持 1 张参考图片
 
 **与 Niji 7 不同：**
-- 默认 stylize 为 0（Niji 7 默认 100），输出更贴近提示词本身
+- 原生 2K 输出切换
+- Quality（Standard / High）切换
+- 默认 stylize 为 0（Niji 7 默认 100），输出更贴近提示词
 - 不自动追加动漫风格关键词
-- 提示词增强使用通用润色模式（非 Niji 7 专用的动漫扩写）
 
 ---
 
@@ -271,6 +274,44 @@ ByteDance 最新视频生成模型。支持文生视频、图生视频（首帧/
 
 ---
 
+### Happyhorse 1.0
+
+| | |
+| --- | --- |
+| **Model ID** | `happyhorse-1.0` |
+| **供应商** | Alibaba |
+| **积分** | 按秒计费（详见下方） |
+| **视频时长** | 3-15 秒（默认 5 秒） |
+| **参考图片** | 1 张（首帧，图生视频） |
+| **参考视频** | 不支持 |
+| **分辨率** | 720p, 1080p（默认 720p） |
+| **宽高比** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
+| **音频** | — |
+
+Alibaba 的视频生成模型。支持文生视频和单图首帧图生视频，不支持参考视频续写。**Auto** 比例会根据提示词或参考图自动推断输出比例。
+
+#### 计费方式
+
+| 分辨率 | 单价 |
+| --- | --- |
+| 720p | 18 积分/秒 |
+| 1080p | 28 积分/秒 |
+
+**计费示例：**
+
+| 场景 | 计算 | 总积分 |
+| --- | --- | --- |
+| 720p × 5 秒 | 18 × 5 | **90** |
+| 720p × 10 秒 | 18 × 10 | **180** |
+| 1080p × 5 秒 | 28 × 5 | **140** |
+| 1080p × 10 秒 | 28 × 10 | **280** |
+
+<Note>
+  生成失败会自动退还**全额**积分。
+</Note>
+
+---
+
 ### Veo 3.1
 
 | | |
@@ -299,12 +340,16 @@ Google 的视频生成模型。创建带有 AI 生成音频的 8 秒短视频片
     此模型完全不支持参考图片。选择 Z Image Turbo 时，参考图片上传区域会被隐藏。如果需要使用参考图片，请切换到其他模型。
   </Accordion>
 
-  <Accordion title="Niji 7 / Midjourney V7 — 仅支持单张参考图片" icon="triangle-exclamation">
+  <Accordion title="Niji 7 / Midjourney V8.1 — 仅支持单张参考图片" icon="triangle-exclamation">
     与支持最多 5 张参考图片的其他模型不同，Midjourney 系列模型仅接受 1 张参考图片。不过，它提供了更多控制参考图片使用方式的选项（内容参考 vs 风格参考）。
   </Accordion>
 
-  <Accordion title="Niji 7 / Midjourney V7 — 每次返回 4 张候选图" icon="info-circle">
-    与其他模型返回单张图片不同，Midjourney 系列模型每次生成会返回 4 张候选图片。所有候选图都会保存，可在图片详情对话框中浏览。4 张图片只收取一次费用（15 积分）。
+  <Accordion title="Niji 7 / Midjourney V8.1 — 每次返回 4 张候选图" icon="info-circle">
+    与其他模型返回单张图片不同，Midjourney 系列模型每次生成会返回 4 张候选图片。所有候选图都会保存，可在图片详情对话框中浏览。4 张图片只收取一次费用（V8.1：1K 15 积分 / 2K 20 积分；Niji 7：15 积分）。
+  </Accordion>
+
+  <Accordion title="Happyhorse 1.0 — 不支持参考视频续写" icon="triangle-exclamation">
+    与 Seedance 2.0 不同，Happyhorse 不支持视频续写。参考图仅接受单张首帧图。需要续写功能请使用 Seedance 2.0。
   </Accordion>
 
   <Accordion title="GPT Image 2.0 — 内容审核较严" icon="triangle-exclamation">
