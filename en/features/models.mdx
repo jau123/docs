@@ -208,7 +208,7 @@ The fastest and cheapest model. Great for rapid prototyping and quick iterations
 
 | | |
 | --- | --- |
-| **Model IDs** | `seedance-2-0` (Fast, default) / `seedance-2-0-pro` (Pro) |
+| **Model ID** | `seedance-2-0` (default) — Pro tier maps to `seedance-2-0-pro` internally |
 | **Provider** | ByteDance |
 | **Credits** | Per-second pricing (see below) |
 | **Duration** | 4-15 seconds (default 5) |
@@ -220,69 +220,41 @@ The fastest and cheapest model. Great for rapid prototyping and quick iterations
 
 ByteDance's latest video generation model. Supports text-to-video, image-to-video (first/last frame), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions.
 
-**Two tiers** — switch between them in the Web UI via the segmented `Fast / Pro` control under the model selector:
-- **Fast** (default) — fast turnaround, 1080p is upscaled from 720p
-- **Pro** — higher fidelity, **native 1080p** output (true 1080p rendering, not upscaling)
+**Two tiers** — pick one via the `Speed / Quality` segmented control inside the video sidebar. Same Seedance 2.0 model, same params, just different rendering quality and price:
+- **Fast** (default) — quick turnaround, 1080p is upscaled from 720p
+- **Pro** — higher fidelity, **native 1080p** rendering
 
-#### Pricing — Fast tier
+#### Pricing
 
-Per-second pricing, in two tiers:
+Per-second. Rate depends on **tier** (Fast / Pro) × **mode** (direct vs continuation with reference video):
 
-**Without reference video (text-to-video / image-to-video):**
+| Resolution | Fast Direct | Fast Continuation | Pro Direct | Pro Continuation |
+| --- | --- | --- | --- | --- |
+| 480p | 13/sec | 8/sec | 13/sec | — |
+| 720p | 20/sec | 14/sec | 22/sec | 16/sec |
+| 1080p | 22/sec | 14/sec | 42/sec | 28/sec |
 
-| Resolution | Rate |
-| --- | --- |
-| 480p | 13 credits/sec |
-| 720p | 20 credits/sec |
-| 1080p | 22 credits/sec |
+Pro doesn't offer a 480p continuation rate (use 720p+ on Pro, or fall back to Fast).
 
-**With reference video (video continuation):** lower rate, but with a minimum-billable-seconds floor.
+**Continuation billing rule (both tiers):** continuation is billed on the FULL output length (reference + your new segment); the per-second rate is lower as a discount, but a minimum-billable-seconds floor applies.
 
-| Resolution | Rate |
-| --- | --- |
-| 480p | 8 credits/sec |
-| 720p | 14 credits/sec |
-| 1080p | 14 credits/sec |
+`billable seconds = max(reference video duration + your duration, min billable)`
 
-#### Pricing — Pro tier
+| Your duration (sec) | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Min billable (sec) | 7 | 9 | 10 | 12 | 14 | 15 | 17 | 19 | 20 | 22 | 24 | 25 |
 
-Higher per-second rate; same continuation billing rules. **No 480p continuation tier** (480p continuation falls back to Fast).
+#### Examples
 
-| Resolution | Direct | Continuation |
+| Scenario | Calculation | Total |
 | --- | --- | --- |
-| 480p | 13 credits/sec | — |
-| 720p | 22 credits/sec | 16 credits/sec |
-| 1080p | 42 credits/sec | 28 credits/sec |
-
-For continuation, billable seconds = `max(reference video duration + your duration, minimum billable)`. Lookup table:
-
-| Your duration (sec) | Min billable (sec) |
-| --- | --- |
-| 4 | 7 |
-| 5 | 9 |
-| 6 | 10 |
-| 7 | 12 |
-| 8 | 14 |
-| 9 | 15 |
-| 10 | 17 |
-| 11 | 19 |
-| 12 | 20 |
-| 13 | 22 |
-| 14 | 24 |
-| 15 | 25 |
-
-#### Pricing Examples
-
-| Tier | Scenario | Calculation | Total |
-| --- | --- | --- | --- |
-| Fast | 480p × 5s text-to-video | 13 × 5 | **65** |
-| Fast | 720p × 5s text-to-video | 20 × 5 | **100** |
-| Fast | 1080p × 10s text-to-video | 22 × 10 | **220** |
-| Fast | 480p × 5s continuing a 3s video | 8 × max(3+5, 9) = 8 × 9 | **72** |
-| Fast | 720p × 10s continuing a 5s video | 14 × max(5+10, 17) = 14 × 17 | **238** |
-| Pro | 720p × 5s text-to-video | 22 × 5 | **110** |
-| Pro | 1080p × 5s text-to-video | 42 × 5 | **210** |
-| Pro | 1080p × 10s continuing a 5s video | 28 × max(5+10, 17) = 28 × 17 | **476** |
+| Fast 480p × 5s direct | 13 × 5 | **65** |
+| Fast 720p × 5s direct | 20 × 5 | **100** |
+| Fast 1080p × 10s direct | 22 × 10 | **220** |
+| Fast 720p × 10s continuing 5s video | 14 × max(5+10, 17) = 14 × 17 | **238** |
+| Pro 720p × 5s direct | 22 × 5 | **110** |
+| Pro 1080p × 5s direct | 42 × 5 | **210** |
+| Pro 1080p × 10s continuing 5s video | 28 × max(5+10, 17) = 28 × 17 | **476** |
 
 <Note>
   If generation fails, the **full** credit amount is automatically refunded — including all per-second charges.
