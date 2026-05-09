@@ -1,6 +1,6 @@
 ---
 title: "AI 模型对比"
-description: "MeiGen 支持 10+ AI 图片与视频模型对比 — GPT Image 2.0、Midjourney V8.1/Niji 7、Nano Banana 2（Gemini 3）、Seedream 5.0 Lite、Seedance 2.0、Happyhorse 1.0、Veo 3.1。功能、定价、宽高比一目了然。"
+description: "MeiGen 支持 10+ AI 图片与视频模型对比 — GPT Image 2.0、Midjourney V8.1/Niji 7、Nano Banana 2（Gemini 3）、Seedream 5.0 Lite、Flux 2 Klein、Seedance 2.0、Happyhorse 1.0、Veo 3.1。功能、定价、宽高比一目了然。"
 ---
 
 MeiGen 支持多种 AI 模型用于图片和视频生成。先看下方对比表决定用哪个，再翻到具体章节查看参数细节。
@@ -16,6 +16,7 @@ MeiGen 支持多种 AI 模型用于图片和视频生成。先看下方对比表
 | **Seedream 4.5** | 5 | 快（约 17 秒） | 5 | 产品照片、营销 |
 | **Midjourney V8.1** | 15（1K）/ 20（2K）| 慢（约 45 秒） | 1 | 写实摄影、通用美学 |
 | **Midjourney Niji 7** | 15 | 慢（约 77 秒） | 1 | 动漫、插画、艺术 |
+| **Flux 2 Klein** | 2 | 快（约 18 秒） | 无 | 通用基础模型、文字渲染 |
 | **Z Image Turbo** | 2 | 最快（约 12 秒） | 无 | 快速草稿、原型制作 |
 | **Seedance 2.0** | 按秒（Fast 13-22/秒，Pro 13-42/秒）| 视频，约 1-4 分钟 | 首帧/末帧 + 参考视频 | 两个档位（Fast / Pro）、4-15 秒、多比例、自带音频 |
 | **Happyhorse 1.0** | 按秒（720p 18/秒，1080p 28/秒）| 视频，约 1-2 分钟 | 1（首帧）| 3-15 秒可调、文生视频 + 单图首帧图生视频 |
@@ -182,6 +183,21 @@ Midjourney 通用写实旗舰。每次返回 4 张候选图片（只收一次费
 
 ---
 
+### Flux 2 Klein
+
+| | |
+| --- | --- |
+| **Model ID** | `flux2-klein` |
+| **供应商** | Black Forest Labs |
+| **积分** | 每张 2 积分 |
+| **每日免费积分** | 可用 |
+| **参考图片** | 不支持 |
+| **宽高比** | Auto, 1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3 |
+
+由 Black Forest Labs 出品的基础模型，适合日常通用创作。
+
+---
+
 ### Z Image Turbo
 
 | | |
@@ -189,6 +205,7 @@ Midjourney 通用写实旗舰。每次返回 4 张候选图片（只收一次费
 | **Model ID** | `z-image-turbo` |
 | **供应商** | Alibaba (Qwen) |
 | **积分** | 每张 2 积分 |
+| **每日免费积分** | 可用 |
 | **提示词长度** | 5-4,000 字符 |
 | **参考图片** | 不支持 |
 | **分辨率** | 固定 |
@@ -324,8 +341,8 @@ Google 的视频生成模型。创建带有 AI 生成音频的 8 秒短视频片
     此模型对涉及真实人物、名人、品牌 Logo 和换脸请求的内容更加敏感。在其他模型上能用的提示词可能会被拒绝。如果你收到内容违规错误，重新措辞你的提示词以移除特定名称，或尝试其他模型。
   </Accordion>
 
-  <Accordion title="Z Image Turbo — 不支持参考图片" icon="triangle-exclamation">
-    此模型完全不支持参考图片。选择 Z Image Turbo 时，参考图片上传区域会被隐藏。如果需要使用参考图片，请切换到其他模型。
+  <Accordion title="Flux 2 Klein / Z Image Turbo — 不支持参考图片" icon="triangle-exclamation">
+    这两个基础模型完全不支持参考图片。选择时参考图片上传区域会被隐藏。如果需要使用参考图片，请切换到其他模型。
   </Accordion>
 
   <Accordion title="Niji 7 / Midjourney V8.1 — 仅支持单张参考图片" icon="triangle-exclamation">

@@ -1,6 +1,6 @@
 ---
 title: "AI Model Comparison"
-description: "Compare 10+ AI image & video models on MeiGen — GPT Image 2.0, Midjourney V8.1/Niji 7, Nano Banana 2, Seedream 5.0 Lite, Seedance 2.0, Happyhorse 1.0, Veo 3.1. Features, pricing, aspect ratios side by side."
+description: "Compare 10+ AI image & video models on MeiGen — GPT Image 2.0, Midjourney V8.1/Niji 7, Nano Banana 2, Seedream 5.0 Lite, Flux 2 Klein, Seedance 2.0, Happyhorse 1.0, Veo 3.1. Features, pricing, aspect ratios side by side."
 ---
 
 MeiGen supports multiple AI models for image and video generation. Use the comparison table below to pick one, then scroll to its section for detailed specs.
@@ -16,6 +16,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Seedream 4.5** | 5 | Fast (~17s) | 5 | Product photos, marketing |
 | **Midjourney V8.1** | 15 (1K) / 20 (2K) | Slow (~45s) | 1 | Photorealistic, universal aesthetics |
 | **Midjourney Niji 7** | 15 | Slow (~77s) | 1 | Anime, illustration, artistic |
+| **Flux 2 Klein** | 2 | Fast (~18s) | None | General-purpose base model, text rendering |
 | **Z Image Turbo** | 2 | Fastest (~12s) | None | Quick drafts, prototyping |
 | **Seedance 2.0** | Per-second (Fast 13–22/sec, Pro 13–42/sec) | Video, ~1-4min | First/last frame + reference video | Two tiers (Fast / Pro), 4–15s, multiple ratios, audio |
 | **Happyhorse 1.0** | Per-second (720p 18/sec, 1080p 28/sec) | Video, ~1-2min | First frame (single image) | 3–15s adjustable duration, text-to-video + first-frame i2v |
@@ -182,6 +183,21 @@ Midjourney's photorealistic flagship. Returns 4 candidate images per generation 
 
 ---
 
+### Flux 2 Klein
+
+| | |
+| --- | --- |
+| **Model ID** | `flux2-klein` |
+| **Provider** | Black Forest Labs |
+| **Credits** | 2 per image |
+| **Daily free credits** | Eligible |
+| **Reference images** | Not supported |
+| **Aspect ratios** | Auto, 1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3 |
+
+A base model from Black Forest Labs, suited to everyday general-purpose creation.
+
+---
+
 ### Z Image Turbo
 
 | | |
@@ -189,6 +205,7 @@ Midjourney's photorealistic flagship. Returns 4 candidate images per generation 
 | **Model ID** | `z-image-turbo` |
 | **Provider** | Alibaba (Qwen) |
 | **Credits** | 2 per image |
+| **Daily free credits** | Eligible |
 | **Prompt length** | 5–4,000 characters |
 | **Reference images** | Not supported |
 | **Resolutions** | Fixed |
@@ -324,8 +341,8 @@ Google's video generation model. Creates 8-second video clips with AI-generated 
     This model is more sensitive to content involving real people, celebrities, brand logos, and face-swap requests. Prompts that work on other models may be rejected here. If you get a content violation error, rephrase your prompt to remove specific names or try a different model.
   </Accordion>
 
-  <Accordion title="Z Image Turbo — No reference images" icon="triangle-exclamation">
-    This model does not support reference images at all. The reference image upload section will be hidden when Z Image Turbo is selected. If you need to use reference images, switch to any other model.
+  <Accordion title="Flux 2 Klein / Z Image Turbo — No reference images" icon="triangle-exclamation">
+    Both base models generate images from text only. The reference image upload section will be hidden when either is selected. If you need to use reference images, switch to any other model.
   </Accordion>
 
   <Accordion title="Niji 7 / Midjourney V8.1 — Single reference image only" icon="triangle-exclamation">
