@@ -17,7 +17,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Midjourney V8.1** | 15 (1K) / 20 (2K) | Slow (~45s) | 1 | Photorealistic, universal aesthetics |
 | **Midjourney Niji 7** | 15 | Slow (~77s) | 1 | Anime, illustration, artistic |
 | **Z Image Turbo** | 2 | Fastest (~12s) | None | Quick drafts, prototyping |
-| **Seedance 2.0** | Per-second (480p 13/sec, 720p 20/sec, 1080p 22/sec) | Video, ~1-3min | First/last frame + reference video | 4–15s adjustable duration, multiple ratios, audio |
+| **Seedance 2.0** | Per-second (Fast 13–22/sec, Pro 13–42/sec) | Video, ~1-4min | First/last frame + reference video | Two tiers (Fast / Pro), 4–15s, multiple ratios, audio |
 | **Happyhorse 1.0** | Per-second (720p 18/sec, 1080p 28/sec) | Video, ~1-2min | First frame (single image) | 3–15s adjustable duration, text-to-video + first-frame i2v |
 | **Veo 3.1** | 20 (fixed 8s) | Slowest (2-6min) | 2 (first/last frame) | 8-second video with audio |
 
@@ -208,19 +208,23 @@ The fastest and cheapest model. Great for rapid prototyping and quick iterations
 
 | | |
 | --- | --- |
-| **Model ID** | `seedance-2-0` |
+| **Model IDs** | `seedance-2-0` (Fast, default) / `seedance-2-0-pro` (Pro) |
 | **Provider** | ByteDance |
 | **Credits** | Per-second pricing (see below) |
 | **Duration** | 4-15 seconds (default 5) |
 | **Reference images** | First/last frame (image-to-video) |
-| **Reference video** | Yes (video continuation) |
-| **Resolutions** | 480p, 720p, 1080p (default 480p) |
+| **Reference video** | Yes (video continuation, Pro has no 480p continuation) |
+| **Resolutions** | 480p, 720p, 1080p |
 | **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
 | **Audio** | Auto-generated |
 
 ByteDance's latest video generation model. Supports text-to-video, image-to-video (first/last frame), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions.
 
-#### Pricing
+**Two tiers** — switch between them in the Web UI via the segmented `Fast / Pro` control under the model selector:
+- **Fast** (default) — fast turnaround, 1080p is upscaled from 720p
+- **Pro** — higher fidelity, **native 1080p** output (true 1080p rendering, not upscaling)
+
+#### Pricing — Fast tier
 
 Per-second pricing, in two tiers:
 
@@ -239,6 +243,16 @@ Per-second pricing, in two tiers:
 | 480p | 8 credits/sec |
 | 720p | 14 credits/sec |
 | 1080p | 14 credits/sec |
+
+#### Pricing — Pro tier
+
+Higher per-second rate; same continuation billing rules. **No 480p continuation tier** (480p continuation falls back to Fast).
+
+| Resolution | Direct | Continuation |
+| --- | --- | --- |
+| 480p | 13 credits/sec | — |
+| 720p | 22 credits/sec | 16 credits/sec |
+| 1080p | 42 credits/sec | 28 credits/sec |
 
 For continuation, billable seconds = `max(reference video duration + your duration, minimum billable)`. Lookup table:
 
@@ -259,14 +273,16 @@ For continuation, billable seconds = `max(reference video duration + your durati
 
 #### Pricing Examples
 
-| Scenario | Calculation | Total |
-| --- | --- | --- |
-| 480p × 5s text-to-video | 13 × 5 | **65** |
-| 720p × 5s text-to-video | 20 × 5 | **100** |
-| 720p × 10s text-to-video | 20 × 10 | **200** |
-| 1080p × 10s text-to-video | 22 × 10 | **220** |
-| 480p × 5s continuing a 3s video | 8 × max(3+5, 9) = 8 × 9 | **72** |
-| 720p × 10s continuing a 5s video | 14 × max(5+10, 17) = 14 × 17 | **238** |
+| Tier | Scenario | Calculation | Total |
+| --- | --- | --- | --- |
+| Fast | 480p × 5s text-to-video | 13 × 5 | **65** |
+| Fast | 720p × 5s text-to-video | 20 × 5 | **100** |
+| Fast | 1080p × 10s text-to-video | 22 × 10 | **220** |
+| Fast | 480p × 5s continuing a 3s video | 8 × max(3+5, 9) = 8 × 9 | **72** |
+| Fast | 720p × 10s continuing a 5s video | 14 × max(5+10, 17) = 14 × 17 | **238** |
+| Pro | 720p × 5s text-to-video | 22 × 5 | **110** |
+| Pro | 1080p × 5s text-to-video | 42 × 5 | **210** |
+| Pro | 1080p × 10s continuing a 5s video | 28 × max(5+10, 17) = 28 × 17 | **476** |
 
 <Note>
   If generation fails, the **full** credit amount is automatically refunded — including all per-second charges.
