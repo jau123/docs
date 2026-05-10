@@ -19,7 +19,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Flux 2 Klein** | 2 | Fast (~18s) | None | General-purpose base model, text rendering |
 | **Z Image Turbo** | 2 | Fastest (~12s) | None | Quick drafts, prototyping |
 | **Seedance 2.0** | Per-second (Fast 13–22/sec, Pro 13–42/sec) | Video, ~1-4min | First/last frame + reference video | Two tiers (Fast / Pro), 4–15s, multiple ratios, audio |
-| **Happyhorse 1.0** | Per-second (720p 18/sec, 1080p 28/sec) | Video, ~1-2min | First frame (single image) | 3–15s adjustable duration, text-to-video + first-frame i2v |
+| **Happyhorse 1.0** | Per-second (720p 18/sec, 1080p 28/sec) | Video, ~1-2min | First frame (single image) | 3–15s adjustable duration, text-to-video + first-frame i2v, audio included |
 | **Veo 3.1** | 20 (fixed 8s) | Slowest (2-6min) | 2 (first/last frame) | 8-second video with audio |
 
 > GPT image 1.5 was retired on 2026-04-22 (replaced by GPT Image 2.0). Midjourney V7 was replaced by V8.1 on 2026-05-09.
@@ -291,9 +291,9 @@ Pro doesn't offer a 480p continuation rate (use 720p+ on Pro, or fall back to Fa
 | **Reference video** | Not supported |
 | **Resolutions** | 720p, 1080p (default 720p) |
 | **Aspect ratios** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
-| **Audio** | — |
+| **Audio** | Auto-generated |
 
-Alibaba's video model — text-to-video and single-image first-frame image-to-video. No reference-video continuation. **Auto** aspect ratio infers the output ratio from your prompt or reference image.
+Alibaba's video model — text-to-video and single-image first-frame image-to-video. AI-generated audio included. No reference-video continuation. **Auto** aspect ratio infers the output ratio from your prompt or reference image.
 
 #### Pricing
 
