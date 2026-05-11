@@ -1,12 +1,12 @@
 ---
 title: "MCP 插件安装"
-description: "为 Claude Code、Cursor、Windsurf 或 OpenClaw 安装 MeiGen MCP 插件，分钟级配置。支持 GPT Image 2、Nano Banana 2、Midjourney、Seedream 等模型。插件开源免费，生成消耗积分。"
+description: "为 Claude Code、Cursor、VS Code、Windsurf、Codex CLI、Hermes Agent 或 OpenClaw 安装 MeiGen MCP,分钟级配置。支持 GPT Image 2、Midjourney V8.1、Seedance 2.0、Veo 3.1 等图像与视频模型。开源,生成消耗积分。"
 ---
 
 ## 前提条件
 
 - 已安装 **Node.js 18+**
-- 至少一个图片生成提供商：
+- 至少一个生成提供商(`generate_image` / `generate_video` 用):
   - **MeiGen Cloud** — 从 [meigen.ai](https://www.meigen.ai) 获取 API Key（设置 → API Keys）
   - **ComfyUI** — 运行中的 ComfyUI 服务器（[安装指南](https://github.com/comfyanonymous/ComfyUI)）
   - **OpenAI 兼容 API** — 自带 Key，支持 Together AI、Fireworks AI、OpenAI 等任意供应商
@@ -32,28 +32,93 @@ description: "为 Claude Code、Cursor、Windsurf 或 OpenClaw 安装 MeiGen MCP
     ```
 
     安装后**重启 Claude Code**（关闭并重新打开，或打开一个新的终端标签页）。
-
-    <Accordion title="替代方案：手动 MCP 配置" icon="terminal">
-      如果你不想使用插件系统，可以直接添加 MCP 服务器：
-
-      ```bash
-      claude mcp add meigen -- npx -y meigen
-      ```
-    </Accordion>
   </Step>
   <Step title="配置提供商">
-    启动一个新的 Claude Code 会话并运行 `/meigen:setup`。安装向导将引导你完成提供商选择和 API Key 配置。
+    启动一个新的 Claude Code 会话并运行 `/meigen:setup`。安装向导引导你完成提供商选择和 API Key 配置,自动适配 macOS / Linux / Windows shell。
 
-    或者，你也可以直接设置环境变量（参见下方[提供商配置](#提供商配置)）。
+    或直接设置环境变量(参见下方[提供商配置](#提供商配置))。
   </Step>
   <Step title="开始使用">
-    用自然语言让 Claude 生成图片：
+    用自然语言让 Claude 生成图片或视频:
 
     - *"生成一个咖啡店的极简 Logo"*
+    - *"把这张图动画化成一段 5 秒视频"*
     - *"在画廊中搜索赛博朋克城市风景"*
-    - *"增强这个提示词：一只猫在太空中"*
+    - *"增强这个提示词:一只猫在太空中"*
   </Step>
 </Steps>
+
+### Cursor / VS Code / Windsurf / Roo Code
+
+一行命令写好每个编辑器的 MCP 配置文件:
+
+```bash
+npx meigen init cursor      # 写 .cursor/mcp.json
+npx meigen init vscode      # 写 .vscode/mcp.json
+npx meigen init windsurf    # 写 ~/.codeium/windsurf/mcp_config.json
+npx meigen init roo         # 写 .roo/mcp.json
+npx meigen init claude      # 写 .mcp.json (Claude Code 项目级)
+```
+
+配置写好后,在 shell 设置 `MEIGEN_API_TOKEN` 并重启宿主。**不支持 `/meigen:setup` slash 命令的宿主**,直接在 meigen server entry 的 `env` 块加 token。
+
+### OpenAI Codex CLI
+
+Codex 用 TOML。在 `~/.codex/config.toml` 加:
+
+```toml
+[mcp_servers.meigen]
+command = "npx"
+args = ["-y", "meigen@latest"]
+
+[mcp_servers.meigen.env]
+MEIGEN_API_TOKEN = "meigen_sk_..."
+```
+
+### Hermes Agent (NousResearch)
+
+Hermes 原生支持 MCP。在 `~/.hermes/config.yaml` 加:
+
+```yaml
+mcp_servers:
+  meigen:
+    command: "npx"
+    args: ["-y", "meigen@latest"]
+    env:
+      MEIGEN_API_TOKEN: "meigen_sk_..."
+    timeout: 600          # 视频生成可能 5-10 分钟
+    connect_timeout: 120  # 首次 npx 拉包可能慢
+```
+
+<Warning>
+  `timeout: 600` 和 `connect_timeout: 120` 这两个覆盖很重要 — Hermes 默认(120s / 60s)是给短命令调好的,视频生成或首次 npx 下载会超时。
+</Warning>
+
+### 独立 CLI 模式(不需要 MCP 宿主)
+
+适合 shell 脚本、CI 流水线以及不跑 MCP 宿主的终端用户:
+
+```bash
+# 设置 token
+export MEIGEN_API_TOKEN=meigen_sk_...
+
+# 生图
+npx meigen gen --prompt "阳光厨房里的三花猫"
+
+# 指定模型 + 比例
+npx meigen gen -p "logo design" -m midjourney-v8.1 -r 1:1
+
+# 带参考图(本地路径自动上传)
+npx meigen gen -p "产品 hero shot" --ref ~/Desktop/bottle.jpg
+
+# 只提交不等待 — 输出 generationId(适合 CI)
+npx meigen gen -p "..." --no-wait
+
+# JSON 输出(适合 jq 管道)
+npx meigen gen -p "..." --json | jq -r '.imageUrls[0]'
+```
+
+图像保存到 `~/Pictures/meigen/`(可用 `MEIGEN_OUTPUT_DIR` 覆盖;Linux 可用 `XDG_PICTURES_DIR`)。
 
 ### OpenClaw
 
@@ -73,6 +138,24 @@ npx clawhub@latest install creative-toolkit
   OpenClaw 使用 [Agent Skills](https://agentskills.io) 开放标准。无需配置 MCP — Skill 会处理一切。
 </Note>
 
+### 其它 MCP 兼容宿主
+
+任意吃 stdio MCP 的宿主,把这个加到它的配置文件:
+
+```json
+{
+  "mcpServers": {
+    "meigen": {
+      "command": "npx",
+      "args": ["-y", "meigen@latest"],
+      "env": {
+        "MEIGEN_API_TOKEN": "meigen_sk_..."
+      }
+    }
+  }
+}
+```
+
 ---
 
 ## 提供商配置
@@ -81,7 +164,7 @@ npx clawhub@latest install creative-toolkit
 
 ### MeiGen Cloud
 
-最简单的入门方式。通过 MeiGen 的托管 API 访问多个 AI 模型（GPT Image 2、Nanobanana Pro、Nanobanana 2、Seedream、Midjourney V8.1、Seedance、Happyhorse 等）。
+最简单的入门方式。通过 MeiGen 的托管 API 访问 9 个图像和视频模型 — GPT Image 2、Nanobanana Pro/2、Seedream 5.0、Midjourney V8.1、Flux 2 Klein、Seedance 2.0(fast/pro)、Happyhorse 1.0、Veo 3.1。
 
 | 变量 | 值 |
 | --- | --- |
@@ -143,10 +226,12 @@ npx clawhub@latest install creative-toolkit
 
 <AccordionGroup>
   <Accordion title="'No image generation providers configured'" icon="circle-exclamation">
-    未设置任何提供商。在 Claude Code 中运行 `/meigen:setup`，或在 MCP 配置中添加相应的环境变量：
-    - MeiGen：`MEIGEN_API_TOKEN`
-    - OpenAI 兼容：`OPENAI_API_KEY`
-    - ComfyUI：`COMFYUI_URL`（并导入一个工作流）
+    未设置任何提供商。在 Claude Code 上运行 `/meigen:setup`(交互向导)。在其它宿主(Cursor、Codex、Windsurf、Hermes Agent 等)上,直接在 MCP 配置文件加 env var:
+    - MeiGen:`MEIGEN_API_TOKEN`
+    - OpenAI 兼容:`OPENAI_API_KEY`
+    - ComfyUI:`COMFYUI_URL`(并导入一个工作流)
+
+    然后重启宿主。
   </Accordion>
 
   <Accordion title="'Insufficient credits'（MeiGen）" icon="circle-exclamation">

@@ -1,12 +1,12 @@
 ---
 title: "Install MCP Plugin"
-description: "Install MeiGen MCP plugin for Claude Code, Cursor, Windsurf, or OpenClaw in minutes. Generate with GPT Image 2, Nano Banana 2, Midjourney, Seedream and more. Open-source plugin, credit-based generation."
+description: "Install MeiGen MCP for Claude Code, Cursor, VS Code, Windsurf, Codex CLI, Hermes Agent, or OpenClaw in minutes. Generate images and videos with GPT Image 2, Midjourney V8.1, Seedance 2.0, Veo 3.1, and more. Open-source, credit-based."
 ---
 
 ## Prerequisites
 
 - **Node.js 18+** installed
-- At least one image generation provider:
+- At least one generation provider (for `generate_image` / `generate_video`):
   - **MeiGen Cloud** — an API key from [meigen.ai](https://www.meigen.ai) (Settings → API Keys)
   - **ComfyUI** — a running ComfyUI server ([installation guide](https://github.com/comfyanonymous/ComfyUI))
   - **OpenAI-Compatible API** — your own key from any provider (Together AI, Fireworks AI, OpenAI, etc.)
@@ -32,28 +32,93 @@ description: "Install MeiGen MCP plugin for Claude Code, Cursor, Windsurf, or Op
     ```
 
     **Restart Claude Code** after installation (close and reopen, or open a new terminal tab).
-
-    <Accordion title="Alternative: manual MCP setup" icon="terminal">
-      If you prefer not to use the plugin system, add the MCP server directly:
-
-      ```bash
-      claude mcp add meigen -- npx -y meigen
-      ```
-    </Accordion>
   </Step>
   <Step title="Configure a provider">
-    Start a new Claude Code session and run `/meigen:setup`. The setup wizard will guide you through provider selection and API key configuration.
+    Start a new Claude Code session and run `/meigen:setup`. The setup wizard will guide you through provider selection and API key configuration on macOS, Linux, and Windows.
 
     Alternatively, set environment variables directly (see [Provider Configuration](#provider-configuration) below).
   </Step>
   <Step title="Start using it">
-    Ask Claude to generate images naturally:
+    Ask Claude to generate images or videos naturally:
 
     - *"Generate a minimalist logo for a coffee shop"*
+    - *"Animate this photo into a 5-second clip"*
     - *"Search the gallery for cyberpunk cityscapes"*
     - *"Enhance this prompt: a cat in space"*
   </Step>
 </Steps>
+
+### Cursor / VS Code / Windsurf / Roo Code
+
+One command writes the right MCP config file for each editor:
+
+```bash
+npx meigen init cursor      # writes .cursor/mcp.json
+npx meigen init vscode      # writes .vscode/mcp.json
+npx meigen init windsurf    # writes ~/.codeium/windsurf/mcp_config.json
+npx meigen init roo         # writes .roo/mcp.json
+npx meigen init claude      # writes .mcp.json (Claude Code project-level)
+```
+
+After the config is written, set `MEIGEN_API_TOKEN` in your shell and restart the host. On hosts that don't support the `/meigen:setup` slash command, add the token to the `env` block of the meigen server entry directly.
+
+### OpenAI Codex CLI
+
+Codex uses TOML. Add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.meigen]
+command = "npx"
+args = ["-y", "meigen@latest"]
+
+[mcp_servers.meigen.env]
+MEIGEN_API_TOKEN = "meigen_sk_..."
+```
+
+### Hermes Agent (NousResearch)
+
+Hermes is a first-class MCP client. Add to `~/.hermes/config.yaml`:
+
+```yaml
+mcp_servers:
+  meigen:
+    command: "npx"
+    args: ["-y", "meigen@latest"]
+    env:
+      MEIGEN_API_TOKEN: "meigen_sk_..."
+    timeout: 600          # video generation can take 5–10 min
+    connect_timeout: 120  # first npx download can be slow
+```
+
+<Warning>
+  The `timeout: 600` and `connect_timeout: 120` overrides are important — Hermes defaults (120s / 60s) are tuned for short-running tools and will time out on video generation or first-run npx downloads.
+</Warning>
+
+### Standalone CLI (no MCP host required)
+
+For shell scripts, CI pipelines, or anyone who wants AI image generation without an MCP host:
+
+```bash
+# Auth once
+export MEIGEN_API_TOKEN=meigen_sk_...
+
+# Generate
+npx meigen gen --prompt "a calico cat in a sunlit kitchen"
+
+# With a specific model + aspect ratio
+npx meigen gen -p "logo design" -m midjourney-v8.1 -r 1:1
+
+# With a reference image (local path auto-uploaded)
+npx meigen gen -p "product hero shot" --ref ~/Desktop/bottle.jpg
+
+# Submit only — print generationId without polling (good for CI)
+npx meigen gen -p "..." --no-wait
+
+# Machine-readable output (good for jq pipes)
+npx meigen gen -p "..." --json | jq -r '.imageUrls[0]'
+```
+
+Generated images save to `~/Pictures/meigen/` by default (override with `MEIGEN_OUTPUT_DIR`, or on Linux with `XDG_PICTURES_DIR`).
 
 ### OpenClaw
 
@@ -73,6 +138,24 @@ npx clawhub@latest install creative-toolkit
   OpenClaw uses the [Agent Skills](https://agentskills.io) open standard. No MCP configuration needed — the skill handles everything.
 </Note>
 
+### Other MCP-Compatible Hosts
+
+For any host that consumes stdio MCP, add this to its config file:
+
+```json
+{
+  "mcpServers": {
+    "meigen": {
+      "command": "npx",
+      "args": ["-y", "meigen@latest"],
+      "env": {
+        "MEIGEN_API_TOKEN": "meigen_sk_..."
+      }
+    }
+  }
+}
+```
+
 ---
 
 ## Provider Configuration
@@ -81,7 +164,7 @@ Configure one or more providers. When multiple are available, the plugin selects
 
 ### MeiGen Cloud
 
-The easiest way to get started. Access multiple AI models (GPT Image 2, Nanobanana Pro/2, Seedream, Midjourney V8.1, Seedance, Happyhorse, and more) through MeiGen's hosted API.
+The easiest way to get started. Access 9 image and video models — GPT Image 2, Nanobanana Pro/2, Seedream 5.0, Midjourney V8.1, Flux 2 Klein, Seedance 2.0 (fast/pro), Happyhorse 1.0, and Veo 3.1 — through MeiGen's hosted API.
 
 | Variable | Value |
 | --- | --- |
@@ -143,10 +226,12 @@ Once installed, ask your AI assistant in plain language — for example, "Genera
 
 <AccordionGroup>
   <Accordion title="'No image generation providers configured'" icon="circle-exclamation">
-    No provider is set up. Run `/meigen:setup` in Claude Code, or add the appropriate environment variable to your MCP configuration:
+    No provider is set up. On Claude Code, run `/meigen:setup` (interactive wizard). On other hosts (Cursor, Codex, Windsurf, Hermes Agent, etc.), add the env var to your MCP config file directly:
     - MeiGen: `MEIGEN_API_TOKEN`
     - OpenAI-compatible: `OPENAI_API_KEY`
     - ComfyUI: `COMFYUI_URL` (and import a workflow)
+
+    Then restart the host.
   </Accordion>
 
   <Accordion title="'Insufficient credits' (MeiGen)" icon="circle-exclamation">

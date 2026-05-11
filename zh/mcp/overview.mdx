@@ -1,9 +1,9 @@
 ---
 title: "MCP 服务器概览"
-description: "在 Claude Code、Cursor 和 OpenClaw 中生成 AI 图片 — MeiGen 开源 MCP 服务器，支持 GPT Image 2、Nano Banana 2、Midjourney、Seedream 以及本地 ComfyUI 工作流。"
+description: "在 Claude Code、Cursor、Codex、Windsurf、Hermes Agent 和 OpenClaw 中生成 AI 图片与视频 — MeiGen 开源 MCP 服务器，支持 GPT Image 2、Nano Banana 2、Midjourney V8.1、Seedream、Flux 2、Seedance、Veo 3.1 以及本地 ComfyUI 工作流。"
 ---
 
-**MeiGen** 是一个开源的 MCP (Model Context Protocol) 服务器，赋予 AI 编程助手生成图片的能力。它支持多种生成后端 — 使用 MeiGen 的云端模型、你本地的 ComfyUI 服务器，或任何 OpenAI 兼容 API。
+**MeiGen** 是一个开源的 MCP (Model Context Protocol) 服务器，赋予 AI 编程助手生成**图片和视频**的能力。它支持多种生成后端 — 使用 MeiGen 的云端模型、你本地的 ComfyUI 服务器，或任何 OpenAI 兼容 API。
 
 <Card title="GitHub 仓库" icon="github" href="https://github.com/jau123/MeiGen-AI-Design-MCP">
   查看源代码、报告问题和贡献代码。
@@ -11,7 +11,7 @@ description: "在 Claude Code、Cursor 和 OpenClaw 中生成 AI 图片 — MeiG
 
 ## 什么是 MCP？
 
-Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外部工具。当你将 MeiGen 安装为 MCP 服务器后，你的 AI 助手就能通过自然语言生成图片、搜索精选提示词画廊和增强提示词。
+Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外部工具。当你将 MeiGen 安装为 MCP 服务器后，你的 AI 助手就能通过自然语言生成图片和视频、搜索 1,446 条精选提示词画廊和增强提示词。
 
 ---
 
@@ -21,7 +21,7 @@ MeiGen 支持三种图片生成后端。你可以配置一个或多个 — 插�
 
 <CardGroup cols={3}>
   <Card title="MeiGen Cloud" icon="cloud">
-    **托管式多模型 API**。支持 GPT Image 2、Nanobanana Pro/2、Seedream、Midjourney V8.1、Seedance、Happyhorse 等模型。无需 GPU — 只需一个 API Key。
+    **托管式多模型 API**。9 个图像和视频模型：GPT Image 2、Nanobanana Pro/2、Seedream 5.0、Midjourney V8.1、Flux 2 Klein、Seedance 2.0、Happyhorse 1.0、Veo 3.1。无需 GPU — 只需一个 API Key。
   </Card>
   <Card title="ComfyUI" icon="server">
     **本地 GPU 生成**。在你自己的硬件上运行任何 Stable Diffusion、SDXL 或 Flux 模型。完全控制工作流和参数。
@@ -43,11 +43,14 @@ MeiGen 支持三种图片生成后端。你可以配置一个或多个 — 插�
 
 ## 工具
 
+8 个 MCP 工具，其中 6 个无需配置提供商即可使用：
+
 | 工具 | 描述 | 需要提供商？ |
 | --- | --- | --- |
 | **generate_image** | 使用任意已配置的提供商生成图片 | 是 |
+| **generate_video** | 通过 MeiGen 平台生成视频(Seedance 2.0 fast/pro、Happyhorse 1.0、Veo 3.1)。支持文生视频和首/末帧图生视频。 | 是(MeiGen) |
 | **enhance_prompt** | 将简短的想法转化为详细、专业的提示词 | 否 |
-| **search_gallery** | 搜索 1,500+ 社区精选 AI 艺术提示词 | 否 |
+| **search_gallery** | 搜索 1,446 条社区精选 AI 艺术提示词 | 否 |
 | **get_inspiration** | 获取画廊条目的完整提示词和图片 | 否 |
 | **list_models** | 列出所有已配置提供商的可用模型 | 否 |
 | **manage_preferences** | 保存默认风格、宽高比和收藏的提示词 | 否 |
@@ -57,14 +60,40 @@ MeiGen 支持三种图片生成后端。你可以配置一个或多个 — 插�
 
 ## 支持的平台
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Claude Code" icon="terminal">
     从插件市场安装 — 包含斜杠命令、智能 Agent 和自动化 Hook。
+  </Card>
+  <Card title="Cursor / VS Code / Windsurf / Roo Code" icon="window">
+    一行命令 `npx meigen init <host>` 为每个编辑器写好 MCP 配置文件。
+  </Card>
+  <Card title="OpenAI Codex CLI" icon="terminal">
+    将 MCP server 加到 `~/.codex/config.toml`。标准 stdio MCP,无额外管道。
+  </Card>
+  <Card title="Hermes Agent" icon="robot">
+    原生支持 MCP — 加到 `~/.hermes/config.yaml`,视频生成需 `timeout: 600`。
   </Card>
   <Card title="OpenClaw" icon="puzzle-piece">
     从 [ClawHub](https://clawhub.ai/plugins/meigen-ai-design) 安装插件 — 包含技能、命令和 MCP 服务器。
   </Card>
+  <Card title="任意 MCP 客户端" icon="plug">
+    标准 stdio MCP — 任意 MCP 兼容客户端指向 `npx -y meigen@latest` 即可。
+  </Card>
 </CardGroup>
+
+---
+
+## 独立 CLI 模式
+
+没有 MCP 宿主?MeiGen 同包附带 CLI,适合 shell 脚本和 CI 流水线:
+
+```bash
+export MEIGEN_API_TOKEN=meigen_sk_...
+npx meigen gen --prompt "阳光厨房里的三花猫"
+npx meigen gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
+```
+
+`--json` 输出机器可读、`--no-wait` 仅提交不轮询、`--reference <path|url>` 传参考图。完整参数 `npx meigen gen --help`。
 
 ---
 
