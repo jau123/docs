@@ -1,6 +1,6 @@
 ---
 title: "AI Image & Video Generator"
-description: "Generate images & videos on MeiGen with GPT Image 2, Nano Banana 2, Seedream 5.0 Lite, Midjourney Niji 7, Seedance 2.0, Veo 3.1 & more. Prompt editor with variables, color picker, and @ mentions."
+description: "Generate images & videos on MeiGen with GPT Image 2, Nano Banana 2, Seedream 5.0 Lite, Midjourney V8.1, Seedance 2.0, Veo 3.1 & more. Prompt editor with variables, color picker, and @ mentions."
 ---
 
 MeiGen lets you generate images and videos using multiple AI models from a unified interface. Open the generation sidebar from the floating dock (desktop) or the navigation menu.
@@ -17,7 +17,7 @@ Each option shows:
 Selecting a different model automatically updates the available aspect ratios, resolution options, and advanced settings to match that model's capabilities.
 
 <Card title="Model Comparison" icon="scale-balanced" href="/en/features/models">
-  Compare all 8 models — features, pricing, strengths, and limitations
+  Compare available models — features, pricing, strengths, and limitations
 </Card>
 
 ---
@@ -28,7 +28,7 @@ Selecting a different model automatically updates the available aspect ratios, r
 
 - **Be specific** — describe composition, lighting, colors, textures, and perspective for the best results
 - **Short prompts work too** — use the Enhance button to expand brief descriptions into detailed prompts automatically
-- **Language** — most models accept English prompts. Niji 7 will auto-translate non-English prompts to English
+- **Language** — most models accept English prompts. Midjourney V8.1 will auto-translate non-English prompts to English
 
 ### Variable Tags
 
@@ -66,8 +66,8 @@ Click the translate icon (top right of the prompt editor) to translate your prom
 
 Click the **Enhance Prompt** button to automatically enhance your prompt based on the selected model:
 
-- **Polish mode** (non-Niji 7) — preserves intent, adds visual details like composition, lighting, and materials
-- **Expand mode** (Niji 7) — expands into Midjourney-optimized language with anime/illustration cues; non-English prompts are auto-translated
+- **Polish mode** (most models) — preserves intent, adds visual details like composition, lighting, and materials
+- **Expand mode** (Midjourney V8.1) — expands into Midjourney-optimized language; non-English prompts are auto-translated
 
 <CodeGroup>
 ```text Input
@@ -116,9 +116,9 @@ You don't need to download images first. Drag any gallery card directly into the
   Combine gallery references with @ mentions for powerful multi-reference workflows. For example, drag two gallery cards as references, then write: "Combine the composition of @image1 with the color palette of @image2."
 </Tip>
 
-### Reference Types (Niji 7 Only)
+### Reference Types (Midjourney V8.1)
 
-When using Midjourney Niji 7 with a reference image, a dropdown appears to choose how the reference is interpreted:
+When using Midjourney V8.1 with a reference image, a dropdown appears to choose how the reference is interpreted:
 
 | Type | Description |
 | --- | --- |
@@ -184,22 +184,20 @@ Choose the output resolution when available:
 
 ---
 
-## Niji 7 Advanced Options
+## Midjourney V8.1 Advanced Options
 
-When using Midjourney Niji 7, the **Advanced Options** button lets you tune extra generation parameters. **Most users can leave everything at defaults.**
+When using Midjourney V8.1, the **Advanced Options** button lets you tune extra generation parameters. **Most users can leave everything at defaults.**
 
-<Accordion title="Parameter details (Stylize / Chaos / Weird / Raw / iw / sref / sw / sv)" icon="sliders">
+<Accordion title="Parameter details (Stylize / Chaos / Raw / iw / sref / sw)" icon="sliders">
 
 | Parameter | Range | Default | Description |
 | --- | --- | --- | --- |
-| **Stylize** | 0–1000 | 100 | Controls how strongly Midjourney's aesthetic is applied. Lower = more literal, higher = more artistic. |
+| **Stylize** | 0–1000 | 0 | Controls how strongly Midjourney's aesthetic is applied. Lower = more literal, higher = more artistic. |
 | **Chaos** | 0–100 | 0 | Adds variation between runs. Higher values produce more unexpected results. |
-| **Weird** | 0–3000 | 0 | Introduces unusual, experimental qualities. |
-| **Raw Mode** | on/off | off | When off, Niji 7's anime style optimization is fully applied; when on, produces images with a raw, less processed aesthetic. Recommended to keep off for best anime results. |
+| **Raw Mode** | on/off | off | When on, produces images with a raw, less processed aesthetic; when off, the model's default styling is applied. |
 | **Image Weight (iw)** | 0–2 | 1 | How much influence the content reference image has. Only visible when a content reference is set. |
 | **Style Reference (sref)** | URL/text | — | Provide a URL to an image whose style you want to mimic. Disabled when reference images are set to Style mode. |
 | **Style Weight (sw)** | 0–1000 | 100 | How strongly the style reference is applied. Only visible when sref or style reference images are present. |
-| **Style Version (sv)** | 1–4 | 4 | Style reference version. Default 4. |
 
 </Accordion>
 
@@ -340,7 +338,6 @@ Typical generation times by model:
 | Seedream 5.0 Lite, Nanobanana 2 | ~35–38 seconds |
 | GPT Image 2.0, Nanobanana Pro | ~45 seconds |
 | Midjourney V8.1 | ~45 seconds |
-| Midjourney Niji 7 | ~77 seconds |
 | Happyhorse 1.0 (video) | ~1–2 minutes |
 | Seedance 2.0 (video) | ~1–3 min (Fast tier) / ~2–4 min (Pro tier) |
 | Veo 3.1 (video) | 2–6 minutes |
@@ -393,7 +390,7 @@ The credit cost is shown on the Generate button before you submit. Hover over th
 | Images per request (Web UI) | 1 | Up to 4 |
 | API access | Not available | Available (purchased credits only) |
 
-> The "Images per request" limit applies to the Web UI only. Each API call always returns 1 image (Midjourney V8.1 / Niji 7 always return 4 candidates per call).
+> The "Images per request" limit applies to the Web UI only. Each API call always returns 1 image (Midjourney V8.1 always returns 4 candidates per call).
 
 ---
 

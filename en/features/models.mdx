@@ -1,6 +1,6 @@
 ---
 title: "AI Model Comparison"
-description: "Compare 10+ AI image & video models on MeiGen — GPT Image 2.0, Midjourney V8.1/Niji 7, Nano Banana 2, Seedream 5.0 Lite, Flux 2 Klein, Seedance 2.0, Happyhorse 1.0, Veo 3.1. Features, pricing, aspect ratios side by side."
+description: "Compare AI image & video models on MeiGen — GPT Image 2.0, Midjourney V8.1, Nano Banana 2, Seedream 5.0 Lite, Flux 2 Klein, Seedance 2.0, Happyhorse 1.0, Veo 3.1. Features, pricing, aspect ratios side by side."
 ---
 
 MeiGen supports multiple AI models for image and video generation. Use the comparison table below to pick one, then scroll to its section for detailed specs.
@@ -15,7 +15,6 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Seedream 5.0 Lite** | 5 | Fast (~35s) | 5 | Photorealism, 3K output |
 | **Seedream 4.5** | 5 | Fast (~17s) | 5 | Product photos, marketing |
 | **Midjourney V8.1** | 15 (1K) / 20 (2K) | Slow (~45s) | 1 | Photorealistic, universal aesthetics |
-| **Midjourney Niji 7** | 15 | Slow (~77s) | 1 | Anime, illustration, artistic |
 | **Flux 2 Klein** | 2 | Fast (~18s) | None | General-purpose base model, text rendering |
 | **Z Image Turbo** | 2 | Fastest (~12s) | None | Quick drafts, prototyping |
 | **Seedance 2.0** | Per-second (Fast 13–22/sec, Pro 13–42/sec) | Video, ~1-4min | First/last frame + reference video | Two tiers (Fast / Pro), 4–15s, multiple ratios, audio |
@@ -125,34 +124,6 @@ The previous generation Seedream model. Still produces solid results, particular
 
 ---
 
-### Midjourney Niji 7
-
-| | |
-| --- | --- |
-| **Model ID** | `midjourney-niji7` |
-| **Provider** | Midjourney |
-| **Credits** | 15 per image |
-| **Prompt length** | 1–8,192 characters |
-| **Reference images** | 1 (content or style reference) |
-| **Resolutions** | — |
-| **Aspect ratios** | 1:1, 4:3, 3:2, 16:9, 3:4, 2:3, 9:16 |
-
-Midjourney's anime and illustration-focused model. Produces the highest quality artistic illustrations. Supports advanced parameters like stylize, chaos, weird, and style references.
-
-**Unique features:**
-- Content and style reference modes
-- Auto-translates non-English prompts to English
-- Advanced Niji 7 parameters (stylize, chaos, weird, raw, etc.)
-- Prompt [Expand mode](/en/features/generate#prompt-enhancement) optimized for Midjourney syntax
-
-**Trade-offs:**
-- Most expensive image model (15 credits)
-- Only 1 reference image supported
-- Slower generation (see the comparison table above)
-- Returns 4 candidate images per generation (other models return 1) — all viewable in the image detail dialog
-
----
-
 ### Midjourney V8.1
 
 | | |
@@ -166,20 +137,15 @@ Midjourney's anime and illustration-focused model. Produces the highest quality 
 | **Aspect ratios** | 1:1, 4:3, 3:2, 16:9, 3:4, 2:3, 9:16 |
 | **Quality** | Standard / High — default High (same price) |
 
-Midjourney's photorealistic flagship. Returns 4 candidate images per generation (charged once). Choose **2K** for native high-resolution output, **High quality** for finer detail at no extra cost. Shares advanced parameters and reference image modes with Niji 7.
+Midjourney's photorealistic flagship. Returns 4 candidate images per generation (charged once). Choose **2K** for native high-resolution output, **High quality** for finer detail at no extra cost.
 
-**Same as Niji 7:**
+**Features:**
 - Content and style reference modes
-- Advanced parameters (stylize, chaos, raw, etc.)
+- Advanced parameters (stylize, chaos, raw, etc.) — default stylize 0 keeps output close to your prompt
 - Auto-translates non-English prompts to English
-- Returns 4 candidate images per generation
-- Only 1 reference image supported
-
-**Different from Niji 7:**
+- Returns 4 candidate images per generation (only 1 reference image supported)
 - Native 2K output toggle
 - Quality (Standard / High) toggle
-- Default stylize 0 (Niji 7 defaults to 100) — output stays closer to your prompt
-- Does not auto-append anime style keywords
 
 ---
 
@@ -345,12 +311,12 @@ Google's video generation model. Creates 8-second video clips with AI-generated 
     Both base models generate images from text only. The reference image upload section will be hidden when either is selected. If you need to use reference images, switch to any other model.
   </Accordion>
 
-  <Accordion title="Niji 7 / Midjourney V8.1 — Single reference image only" icon="triangle-exclamation">
-    Unlike other models that support up to 5 reference images, Midjourney models only accept 1 reference image. However, they offer more control over how the reference is used (content vs. style reference).
+  <Accordion title="Midjourney V8.1 — Single reference image only" icon="triangle-exclamation">
+    Unlike other models that support up to 5 reference images, Midjourney V8.1 only accepts 1 reference image. However, it offers more control over how the reference is used (content vs. style reference).
   </Accordion>
 
-  <Accordion title="Niji 7 / Midjourney V8.1 — Returns 4 candidate images" icon="info-circle">
-    Unlike other models that return a single image, Midjourney models return 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (V8.1: 15 credits at 1K / 20 credits at 2K; Niji 7: 15 credits) for all 4 images.
+  <Accordion title="Midjourney V8.1 — Returns 4 candidate images" icon="info-circle">
+    Unlike other models that return a single image, Midjourney V8.1 returns 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (15 credits at 1K / 20 credits at 2K) for all 4 images.
   </Accordion>
 
   <Accordion title="Happyhorse 1.0 — No reference video continuation" icon="triangle-exclamation">

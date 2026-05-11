@@ -1,6 +1,6 @@
 ---
 title: "AI 图片与视频生成器"
-description: "在 MeiGen 使用 GPT Image 2、Nano Banana 2、Seedream 5.0 Lite、Midjourney Niji 7、Seedance 2.0、Veo 3.1 等模型生成图片与视频。提示词编辑器支持变量、颜色选择器和参考图引用。"
+description: "在 MeiGen 使用 GPT Image 2、Nano Banana 2、Seedream 5.0 Lite、Midjourney V8.1、Seedance 2.0、Veo 3.1 等模型生成图片与视频。提示词编辑器支持变量、颜色选择器和参考图引用。"
 ---
 
 MeiGen 让你通过统一的界面使用多种 AI 模型生成图片和视频。通过浮动工具栏（桌面端）或导航菜单打开生成侧边栏。
@@ -17,7 +17,7 @@ MeiGen 让你通过统一的界面使用多种 AI 模型生成图片和视频。
 选择不同的模型会自动更新可用的宽高比、分辨率选项和高级设置，以匹配该模型的能力。
 
 <Card title="模型对比" icon="scale-balanced" href="/zh/features/models">
-  对比全部 8 种模型 — 功能、定价、优势和限制
+  对比可用模型 — 功能、定价、优势和限制
 </Card>
 
 ---
@@ -28,7 +28,7 @@ MeiGen 让你通过统一的界面使用多种 AI 模型生成图片和视频。
 
 - **要具体** — 描述构图、光线、色彩、质感和视角能获得最佳效果
 - **简短提示词也可以** — 使用增强按钮自动将简短描述扩展为详细提示词
-- **语言** — 大多数模型接受英文提示词。Niji 7 会自动将非英文提示词翻译为英文
+- **语言** — 大多数模型接受英文提示词。Midjourney V8.1 会自动将非英文提示词翻译为英文
 
 ### 变量标签
 
@@ -66,8 +66,8 @@ MeiGen 让你通过统一的界面使用多种 AI 模型生成图片和视频。
 
 通过**润色提示词**按钮根据当前模型自动增强提示词：
 
-- **润色模式**（非 Niji 7） — 保留原意，补充构图、光线、材质等视觉细节
-- **扩展模式**（Niji 7） — 扩展为 Midjourney 优化的语言，带动漫/插画风格提示；非英文 prompt 会自动翻译
+- **润色模式**（大部分模型） — 保留原意，补充构图、光线、材质等视觉细节
+- **扩展模式**（Midjourney V8.1） — 扩展为 Midjourney 优化的语言；非英文 prompt 会自动翻译
 
 <CodeGroup>
 ```text 输入
@@ -116,9 +116,9 @@ style with shallow depth of field
   结合画廊参考和 @ 引用实现强大的多参考工作流。例如，拖入两张画廊卡片作为参考，然后编写："结合 @image1 的构图和 @image2 的配色方案。"
 </Tip>
 
-### 参考类型（仅 Niji 7）
+### 参考类型（Midjourney V8.1）
 
-使用 Midjourney Niji 7 并添加参考图片时，会出现下拉菜单选择参考的解读方式：
+使用 Midjourney V8.1 并添加参考图片时，会出现下拉菜单选择参考的解读方式：
 
 | 类型 | 描述 |
 | --- | --- |
@@ -184,22 +184,20 @@ style with shallow depth of field
 
 ---
 
-## Niji 7 高级选项
+## Midjourney V8.1 高级选项
 
-使用 Midjourney Niji 7 时，可通过**高级选项**按钮自定义更多生图参数。**大部分用户保持默认即可**。
+使用 Midjourney V8.1 时，可通过**高级选项**按钮自定义更多生图参数。**大部分用户保持默认即可**。
 
-<Accordion title="参数详情（Stylize / Chaos / Weird / Raw / iw / sref / sw / sv）" icon="sliders">
+<Accordion title="参数详情（Stylize / Chaos / Raw / iw / sref / sw）" icon="sliders">
 
 | 参数 | 范围 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| **Stylize** | 0-1000 | 100 | 控制 Midjourney 美学风格的应用强度。值越低越写实，值越高越艺术。 |
+| **Stylize** | 0-1000 | 0 | 控制 Midjourney 美学风格的应用强度。值越低越写实，值越高越艺术。 |
 | **Chaos** | 0-100 | 0 | 增加多次运行间的变化。值越高结果越出乎意料。 |
-| **Weird** | 0-3000 | 0 | 引入不寻常的实验性质感。 |
-| **Raw Mode** | 开/关 | 关 | 关闭时充分发挥 Niji 7 的动漫风格优化；开启则生成更原始、更少后处理感的图片。建议保持关闭以获得最佳动漫效果。 |
+| **Raw Mode** | 开/关 | 关 | 开启时生成更原始、更少后处理感的图片；关闭时应用模型默认的风格化。 |
 | **Image Weight (iw)** | 0-2 | 1 | 内容参考图片的影响程度。仅在设置了内容参考时可见。 |
 | **Style Reference (sref)** | URL/文本 | — | 提供一个你想模仿其风格的图片 URL。当参考图片设为风格模式时禁用。 |
 | **Style Weight (sw)** | 0-1000 | 100 | 风格参考的应用强度。仅在有 sref 或风格参考图片时可见。 |
-| **Style Version (sv)** | 1-4 | 4 | 风格参考版本。默认 4。 |
 
 </Accordion>
 
@@ -340,7 +338,6 @@ MeiGen 支持两个视频模型：**Seedance 2.0**（按秒计费，4-15 秒可�
 | Seedream 5.0 Lite, Nanobanana 2 | 约 35-38 秒 |
 | GPT Image 2.0, Nanobanana Pro | 约 45 秒 |
 | Midjourney V8.1 | 约 45 秒 |
-| Midjourney Niji 7 | 约 77 秒 |
 | Happyhorse 1.0（视频）| 约 1-2 分钟 |
 | Seedance 2.0（视频）| 约 1-3 分钟（Fast 档）/ 约 2-4 分钟（Pro 档）|
 | Veo 3.1（视频） | 2-6 分钟 |
@@ -393,7 +390,7 @@ MeiGen 采用双积分制：
 | 每次请求图片数（Web 界面）| 1 | 最多 4 |
 | API 访问 | 不可用 | 可用（仅购买积分） |
 
-> "每次请求图片数"限制仅作用于 Web 界面。API 每次调用始终返回 1 张图片（Midjourney V8.1 / Niji 7 例外，每次固定返回 4 张候选）。
+> "每次请求图片数"限制仅作用于 Web 界面。API 每次调用始终返回 1 张图片（Midjourney V8.1 例外，每次固定返回 4 张候选）。
 
 ---
 

@@ -27,7 +27,7 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="modelId" type="string">
   The model to use for generation. If omitted, the platform default is used (may change over time). Get available models from the [List Models](/en/api-reference/endpoint/models) endpoint.
 
-  Image models: `gpt-image-2`, `gemini-3-pro-image-preview`, `nanobanana-2`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v8.1`, `midjourney-niji7`, `z-image-turbo`
+  Image models: `gpt-image-2`, `gemini-3-pro-image-preview`, `nanobanana-2`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v8.1`, `z-image-turbo`
 
   Video models: `seedance-2-0`, `happyhorse-1.0`, `veo-3.1`
 
@@ -57,27 +57,25 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="referenceImages" type="string[]">
   Array of image URLs to use as references. Must be publicly accessible HTTPS URLs.
 
-  Maximum count is per-model — see `max_reference_images` from [List Models](/en/api-reference/endpoint/models). Z Image Turbo accepts 0; Midjourney V8.1 / Niji 7 / Happyhorse 1.0 accept 1; most others accept up to 5.
+  Maximum count is per-model — see `max_reference_images` from [List Models](/en/api-reference/endpoint/models). Z Image Turbo accepts 0; Midjourney V8.1 / Happyhorse 1.0 accept 1; most others accept up to 5.
 </ParamField>
 
 <ParamField body="niji7Options" type="object">
-  Advanced parameters for Midjourney V8.1 / Niji 7. Ignored for other models. (Field name preserved for backward compatibility.)
+  Advanced parameters for Midjourney V8.1. Ignored for other models. (Field name preserved for backward compatibility.)
 
   | Field | Type | Default | Range | Notes |
   | --- | --- | --- | --- | --- |
-  | stylize | number | 100 (Niji 7) / 0 (V8.1) | 0–1000 | |
+  | stylize | number | 0 | 0–1000 | |
   | chaos | number | 0 | 0–100 | |
-  | weird | number | 0 | 0–3000 | Niji 7 only (V8.1 ignores) |
   | raw | boolean | false | — | |
   | iw | number | 1 | 0–2 | |
   | sref | string | — | URL or text | |
   | sw | number | 100 | 0–1000 | |
-  | sv | number | 4 (Niji 7) / 6 (V8.1) | 1–4 (Niji 7) / 6 (V8.1) | |
-  | quality | string | `4` | `1` or `4` | V8.1 only — defaults to High (4× compute, no extra cost) |
+  | quality | string | `4` | `1` or `4` | Defaults to High (4× compute, no extra cost) |
 </ParamField>
 
 <ParamField body="referenceType" type="string" default="content">
-  For Midjourney V8.1 / Niji 7 only. How to interpret the reference image.
+  For Midjourney V8.1 only. How to interpret the reference image.
 
   - `content` — use as subject matter reference
   - `style` — extract visual style only
@@ -200,7 +198,7 @@ Poll this endpoint to check if your image is ready.
 <Note>
   - **`aspectRatio`** is the final ratio applied to this generation (if you passed `auto`, this is the value that was actually used).
   - **`mediaType`** is `image` or `video`. For video generations `imageUrl/imageUrls` are `null`, and vice versa.
-  - Midjourney V8.1 / Niji 7 return 4 candidate images per generation. `imageUrls` contains all candidates; `imageUrl` always points to the first one. Other image models return a single image.
+  - Midjourney V8.1 returns 4 candidate images per generation. `imageUrls` contains all candidates; `imageUrl` always points to the first one. Other image models return a single image.
 </Note>
 
 ### Response (Failed)
@@ -250,7 +248,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-### Niji 7 with style reference
+### Midjourney V8.1 with style reference
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \
@@ -258,14 +256,13 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "a warrior princess in an enchanted forest",
-    "modelId": "midjourney-niji7",
+    "modelId": "midjourney-v8.1",
     "aspectRatio": "3:4",
     "referenceImages": ["https://example.com/style-ref.jpg"],
     "referenceType": "style",
     "niji7Options": {
       "stylize": 300,
-      "sw": 500,
-      "sv": 4
+      "sw": 500
     }
   }'
 ```
