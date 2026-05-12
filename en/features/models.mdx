@@ -196,7 +196,7 @@ The fastest and cheapest model. Great for rapid prototyping and quick iterations
 | **Credits** | Per-second pricing (see below) |
 | **Duration** | 4-15 seconds (default 5) |
 | **Reference images** | First/last frame (image-to-video) |
-| **Reference video** | Yes (video continuation, Pro has no 480p continuation) |
+| **Reference video** | Yes (separate With-reference-video rate table, Pro has no 480p tier) |
 | **Resolutions** | 480p, 720p, 1080p |
 | **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
 | **Audio** | Auto-generated |
@@ -209,21 +209,23 @@ ByteDance's latest video generation model. Supports text-to-video, image-to-vide
 
 #### Pricing
 
-Per-second. Rate depends on **tier** (Fast / Pro) × **mode** (direct vs continuation with reference video):
+Per-second. Rate depends on **tier** (Fast / Pro) × **whether a reference video is uploaded**:
 
-| Resolution | Fast Direct | Fast Continuation | Pro Direct | Pro Continuation |
+| Resolution | Fast Direct | Fast With reference video | Pro Direct | Pro With reference video |
 | --- | --- | --- | --- | --- |
 | 480p | 13/sec | 8/sec | 14/sec | — |
 | 720p | 20/sec | 14/sec | 22/sec | 16/sec |
 | 1080p | 22/sec | 14/sec | 42/sec | 28/sec |
 
-Pro doesn't offer a 480p continuation rate (use 720p+ on Pro, or fall back to Fast).
+Pro doesn't offer a 480p With-reference-video rate (use 720p+ on Pro, or fall back to Fast).
 
-**Continuation billing rule (both tiers):** continuation is billed on the FULL output length (reference + your new segment); the per-second rate is lower as a discount, but a minimum-billable-seconds floor applies.
+**With-reference-video billing rule (both tiers):**
 
-`billable seconds = max(reference video duration + your duration, min billable)`
+`billable seconds = max(reference video duration + your selected duration, min billable)`
 
-| Your duration (sec) | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+Output length is always your selected duration (4–15), independent of the reference video's length.
+
+| Your selected duration (sec) | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Min billable (sec) | 7 | 9 | 10 | 12 | 14 | 15 | 17 | 19 | 20 | 22 | 24 | 25 |
 
@@ -234,10 +236,10 @@ Pro doesn't offer a 480p continuation rate (use 720p+ on Pro, or fall back to Fa
 | Fast 480p × 5s direct | 13 × 5 | **65** |
 | Fast 720p × 5s direct | 20 × 5 | **100** |
 | Fast 1080p × 10s direct | 22 × 10 | **220** |
-| Fast 720p × 10s continuing 5s video | 14 × max(5+10, 17) = 14 × 17 | **238** |
+| Fast 720p, 5s reference + 10s selected duration | 14 × max(5+10, 17) = 14 × 17 | **238** |
 | Pro 720p × 5s direct | 22 × 5 | **110** |
 | Pro 1080p × 5s direct | 42 × 5 | **210** |
-| Pro 1080p × 10s continuing 5s video | 28 × max(5+10, 17) = 28 × 17 | **476** |
+| Pro 1080p, 5s reference + 10s selected duration | 28 × max(5+10, 17) = 28 × 17 | **476** |
 
 <Note>
   If generation fails, the **full** credit amount is automatically refunded — including all per-second charges.
@@ -331,10 +333,10 @@ Google's video generation model. Creates 8-second video clips with AI-generated 
     Both Seedream models cap prompts at 2,000 characters, shorter than the 4,000-character limit of Gemini models. Plan accordingly for very detailed prompts.
   </Accordion>
 
-  <Accordion title="Seedance 2.0 — Per-second pricing + continuation minimums" icon="circle-info">
+  <Accordion title="Seedance 2.0 — Per-second pricing + With-reference-video minimum" icon="circle-info">
     Unlike image models with flat per-image pricing, Seedance is billed per second: 13 credits/sec for 480p, 20 credits/sec for 720p, 22 credits/sec for 1080p. The sidebar shows the exact total before you submit.
 
-    **For video continuation**: rates drop (480p 8/sec, 720p 14/sec, 1080p 14/sec), but a minimum-billable-seconds floor applies (so a short continuation isn't unfairly cheapened by a long reference video). For example, continuing 5 seconds bills at least 9 seconds; continuing 15 seconds bills at least 25 seconds. See the full lookup table in the Seedance 2.0 section above.
+    **With a reference video**: a separate rate table applies (480p 8/sec, 720p 14/sec, 1080p 14/sec). Billable seconds = reference duration + your selected duration, with a minimum-billable-seconds floor. For example, selecting 5 seconds bills at least 9 seconds; selecting 15 seconds bills at least 25 seconds. See the full lookup table in the Seedance 2.0 section above.
   </Accordion>
 
   <Accordion title="Veo 3.1 — Fixed 8-second duration" icon="triangle-exclamation">

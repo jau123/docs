@@ -250,7 +250,7 @@ Both are optional. You can also drag gallery cards directly as frame images.
 | **Resolution** | 480p, 720p, 1080p (default 480p) | 480p saves credits |
 | **Duration** | 4–15 seconds (default 5) | Slider or input |
 | **Audio** | Auto-generated | Always on |
-| **Reference video** | Yes | Used for "video continuation" — the reference is prepended to the generated content |
+| **Reference video** | Yes | Used as visual conditioning input for "video continuation" (see the [Extending a Video](#extending-a-video) section below) |
 
 **Pricing**: per-second; full formula (including the minimum-billable table for continuation) is in the [Models](/en/features/models) page. The sidebar shows the exact total before you submit.
 
@@ -286,7 +286,7 @@ After generating an image, hover over the completed card and click the **Animate
 
 ### Extending a Video
 
-Seedance 2.0 only. You can take an existing video as a starting point and generate a new segment appended to it.
+Seedance 2.0 only. Upload an existing video as visual conditioning input to guide the model toward generating a new segment that semantically continues the original.
 
 #### Three entry points
 
@@ -304,20 +304,20 @@ Seedance 2.0 only. You can take an existing video as a starting point and genera
 #### Key behavior
 
 <Warning>
-  **Your prompt must explicitly say to extend the video.** If the prompt only describes a scene without mentioning extension, the model defaults to treating the video as a **reference** (not temporally concatenated). The auto-prefilled `Extend this video with the following plot:` prefix exists precisely to avoid this pitfall — keep it and append your content.
+  **Your prompt must explicitly say to extend the video.** If the prompt only describes a scene without mentioning extension, the new segment may drift away from what you imagined as a "continuation" (the visuals will still be influenced by the reference, but the plot direction follows whatever your prompt says). The auto-prefilled `Extend this video with the following plot:` prefix exists to nudge the model toward "continuation" semantics — keep it and append your content.
 </Warning>
 
 <Note>
-  **Output = reference video + new content, concatenated**: the result is a single continuous video — the first half is your reference video preserved, the second half is the AI-generated continuation per your prompt. Total length ≈ reference duration + your chosen duration.
+  **Output length = your selected duration** (4–15 seconds), independent of the reference video's length. The reference video acts as visual conditioning input (influencing the new segment's framing, style, characters, etc.) and is not concatenated into the output. If you want a continuous "original + new" video, you'll need to stitch them locally with a video editor.
 </Note>
 
 #### Pricing
 
-Extension rates are lower (480p 8 credits/sec, 720p 14 credits/sec, 1080p 14 credits/sec), but **billed seconds include the reference video's duration** (never below the minimum-billable floor). The full formula, lookup table, and examples are in [Models → Seedance 2.0](/en/features/models).
+Extension uses a separate With-reference-video rate table (480p 8 credits/sec, 720p 14 credits/sec, 1080p 14 credits/sec). **Billable seconds = reference video duration + your selected duration** (not less than the minimum-billable floor). The full formula, lookup table, and examples are in [Models → Seedance 2.0](/en/features/models).
 
-Typical costs:
-- Extend by 5 sec on a 3-second video: **72 credits** (480p)
-- Extend by 10 sec on a 5-second video: **238 credits** (720p)
+Typical costs (examples):
+- Upload a 3-second reference + generate 5 seconds at 480p: **72 credits** (billable = max(3+5, 9) = 9 sec × 8)
+- Upload a 5-second reference + generate 10 seconds at 720p: **238 credits** (billable = max(5+10, 17) = 17 sec × 14)
 
 ---
 
