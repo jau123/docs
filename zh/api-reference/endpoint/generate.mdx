@@ -82,7 +82,11 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="duration" type="number">
-  视频时长（秒）。Seedance 2.0：4-15（默认 5）。Happyhorse 1.0：3-15（默认 5）。Veo 3.1 固定 8 秒，不接受此参数。
+  视频时长(秒)。Seedance 2.0:4-15(默认 5)。Happyhorse 1.0:3-15(默认 5)。Veo 3.1:4、6 或 8(默认 4)—— 只接受这三个值。
+</ParamField>
+
+<ParamField body="tier" type="string">
+  支持多档位模型的画质档位。当前 Seedance 2.0 和 Veo 3.1 支持:`fast`(默认)或 `pro`。Pro 档以更高画质渲染,单价也更高 —— 完整价格矩阵见[模型](/zh/features/models)。
 </ParamField>
 
 <ParamField body="referenceVideo" type="string">

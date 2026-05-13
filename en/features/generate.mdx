@@ -231,7 +231,7 @@ You can use the generated prompt as-is, or edit it to create variations of the o
 
 ## Video Generation
 
-MeiGen offers two video models: **Seedance 2.0** (per-second pricing, 4–15 second duration) and **Veo 3.1** (fixed 8 seconds, with audio and style presets). Open the video sidebar from the **Generate Video** button in the floating dock.
+MeiGen offers three video models: **Seedance 2.0** (per-second pricing, 4–15 seconds), **Happyhorse 1.0** (per-second, 3–15 seconds), and **Veo 3.1** (per-generation, 4 / 6 / 8 seconds, two tiers, audio always on). Open the video sidebar from the **Generate Video** button in the floating dock.
 
 ### Frame Images
 
@@ -263,18 +263,17 @@ Both are optional. You can also drag gallery cards directly as frame images.
   **Adding a reference video makes the total credit cost depend on its length**: billed seconds = "reference video duration + your chosen duration" (never below the minimum-billable floor). Longer reference videos cost more. The sidebar shows the exact total before you submit — confirm before clicking Generate.
 </Warning>
 
-### Veo 3.1 — Fixed 8-second Video with Audio
+### Veo 3.1 — Two Tiers, Native Audio
 
 | Option | Values | Description |
 | --- | --- | --- |
-| **Aspect ratio** | 16:9, 9:16 | Landscape or portrait only |
-| **Resolution** | 720p | Fixed |
-| **Duration** | 8 seconds (fixed) | Not adjustable |
-| **Style** | Auto / Realistic / Anime / Cinematic | Visual style preset |
-| **Speed** | Auto / Slow / Fast | Playback speed control |
+| **Tier** | Fast (default) / Pro | Toggle via the segmented control under the model picker |
+| **Aspect ratio** | Auto, 16:9, 9:16 | Landscape or portrait only; Auto infers from prompt or reference image |
+| **Resolution** | 720p / 1080p / 4k (default 1080p) | All three share the same price; 4k just renders longer |
+| **Duration** | 4 / 6 / 8 seconds (default 4) | Pick from the dropdown |
 | **Audio** | Auto-generated | Always on |
 
-**Pricing**: 20 credits per video, flat.
+**Pricing**: per generation, depends on tier × duration. Full table is in [Models → Veo 3.1](/en/features/models).
 
 <Note>
   Both video models auto-generate AI audio — no separate audio input is needed. Full specs, pricing formulas, and a side-by-side comparison are on the [Models](/en/features/models) page.
@@ -340,7 +339,7 @@ Typical generation times by model:
 | Midjourney V8.1 | ~45 seconds |
 | Happyhorse 1.0 (video) | ~1–2 minutes |
 | Seedance 2.0 (video) | ~1–3 min (Fast tier) / ~2–4 min (Pro tier) |
-| Veo 3.1 (video) | 2–6 minutes |
+| Veo 3.1 (video) | ~1–4 min (720p / 1080p) / ~6–8 min (4k) |
 
 ### Failed State
 

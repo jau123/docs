@@ -82,7 +82,11 @@ Submits a generation request. The output is generated asynchronously — use the
 </ParamField>
 
 <ParamField body="duration" type="number">
-  Video duration in seconds. Seedance 2.0: 4–15 (default 5). Happyhorse 1.0: 3–15 (default 5). Veo 3.1 is fixed at 8 seconds and ignores this parameter.
+  Video duration in seconds. Seedance 2.0: 4–15 (default 5). Happyhorse 1.0: 3–15 (default 5). Veo 3.1: 4, 6, or 8 (default 4) — only these three values are accepted.
+</ParamField>
+
+<ParamField body="tier" type="string">
+  Quality tier for models with multiple tiers. Currently supported by Seedance 2.0 and Veo 3.1: `fast` (default) or `pro`. Pro renders at higher fidelity for a higher price — see [Models](/en/features/models) for the full pricing matrix.
 </ParamField>
 
 <ParamField body="referenceVideo" type="string">

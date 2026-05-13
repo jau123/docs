@@ -19,7 +19,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Z Image Turbo** | 2 | Fastest (~12s) | None | Quick drafts, prototyping |
 | **Seedance 2.0** | Per-second (Fast 13–22/sec, Pro 13–42/sec) | Video, ~1-4min | First/last frame + reference video | Two tiers (Fast / Pro), 4–15s, multiple ratios, audio |
 | **Happyhorse 1.0** | Per-second (720p 18/sec, 1080p 28/sec) | Video, ~1-2min | First frame (single image) | 3–15s adjustable duration, text-to-video + first-frame i2v, audio included |
-| **Veo 3.1** | 20 (fixed 8s) | Slowest (2-6min) | 2 (first/last frame) | 8-second video with audio |
+| **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-7min | Up to 2 (first/last frame) | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
 
 > GPT image 1.5 was retired on 2026-04-22 (replaced by GPT Image 2.0). Midjourney V7 was replaced by V8.1 on 2026-05-09.
 
@@ -291,14 +291,42 @@ Alibaba's video model — text-to-video and single-image first-frame image-to-vi
 | --- | --- |
 | **Model ID** | `veo-3.1` |
 | **Provider** | Google |
-| **Credits** | 20 per video |
-| **Duration** | 8 seconds (fixed) |
+| **Credits** | Per generation (see below) |
+| **Duration** | 4, 6, or 8 seconds (default 4) |
 | **Reference images** | Up to 2 (as first/last frame) |
-| **Resolutions** | 720p |
-| **Aspect ratios** | 16:9, 9:16 |
-| **Audio** | Yes (generated audio) |
+| **Reference video** | Not supported |
+| **Resolutions** | 720p, 1080p, 4k (default 1080p) |
+| **Aspect ratios** | Auto, 16:9, 9:16 |
+| **Audio** | Auto-generated (always on) |
 
-Google's video generation model. Creates 8-second video clips with AI-generated audio. Supports speed control (Auto / Slow / Fast) and style presets (Auto / Realistic / Anime / Cinematic). **Pick this for stable audio + style presets**; for longer durations or more aspect ratios, use Seedance 2.0.
+Google's video generation model. Creates short clips with AI-generated audio synced to the prompt. **Auto** aspect ratio infers the output ratio from your prompt or reference image. Pick this for premium visual quality with native audio; for longer durations (>8s) or wider ratio support, use Seedance 2.0.
+
+**Two tiers** — pick one via the `Speed / Quality` segmented control inside the video sidebar. Same Veo 3.1 model, same params, just different rendering quality and price:
+- **Fast** (default) — quick turnaround, balanced quality
+- **Pro** — higher fidelity, longer rendering time
+
+#### Pricing
+
+Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 8s). **All resolutions (720p / 1080p / 4k) share the same price** — pick the resolution you want at no extra cost (4k takes noticeably longer to render).
+
+| Duration | Fast | Pro |
+| --- | --- | --- |
+| 4s | 80 | 220 |
+| 6s | 125 | 330 |
+| 8s | 165 | 435 |
+
+#### Examples
+
+| Scenario | Total |
+| --- | --- |
+| Fast 4s (any resolution) | **80** |
+| Fast 8s (any resolution) | **165** |
+| Pro 4s (any resolution) | **220** |
+| Pro 8s 4k | **435** |
+
+<Note>
+  If generation fails, the **full** credit amount is automatically refunded.
+</Note>
 
 ---
 
@@ -339,7 +367,11 @@ Google's video generation model. Creates 8-second video clips with AI-generated 
     **With a reference video**: a separate rate table applies (480p 8/sec, 720p 14/sec, 1080p 14/sec). Billable seconds = reference duration + your selected duration, with a minimum-billable-seconds floor. For example, selecting 5 seconds bills at least 9 seconds; selecting 15 seconds bills at least 25 seconds. See the full lookup table in the Seedance 2.0 section above.
   </Accordion>
 
-  <Accordion title="Veo 3.1 — Fixed 8-second duration" icon="triangle-exclamation">
-    Veo 3.1 always generates 8-second videos — duration is not adjustable. Only supports 16:9 / 9:16 aspect ratios and 720p resolution. For longer durations, more ratios, or 480p output, use Seedance 2.0.
+  <Accordion title="Veo 3.1 — Limited aspect ratios" icon="triangle-exclamation">
+    Veo 3.1 only supports 16:9 / 9:16 (plus Auto). Square (1:1), 4:3 / 3:4 portrait, and other ratios are not available. For wider ratio support, use Seedance 2.0 or Happyhorse 1.0.
+  </Accordion>
+
+  <Accordion title="Veo 3.1 — 4k takes longer to render" icon="circle-info">
+    720p / 1080p / 4k all cost the same on Veo 3.1, so you can pick 4k for free. The trade-off is rendering time — 4k typically takes 6–8 minutes versus 1–4 minutes for 720p / 1080p.
   </Accordion>
 </AccordionGroup>
