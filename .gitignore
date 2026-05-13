@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Mintlify
+.mintlify/
+
+# Node (in case anyone runs scripts here)
+node_modules/
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Editor
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
