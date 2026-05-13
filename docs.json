@@ -3,15 +3,6 @@
   "theme": "mint",
   "name": "MeiGen Docs",
   "description": "Official docs for MeiGen — AI image & video generation. Supports GPT Image 2, Nano Banana 2, Nanobanana Pro, Seedream 5.0 Lite, Midjourney V8.1, Seedance 2.0, Happyhorse 1.0, Veo 3.1. Free prompt gallery, REST API, and MCP plugin for Claude Code, Cursor, OpenClaw.",
-  "seo": {
-    "metatags": {
-      "og:image": "https://docs.meigen.ai/images/og-default.jpg",
-      "og:image:width": "1200",
-      "og:image:height": "630",
-      "twitter:card": "summary_large_image",
-      "twitter:image": "https://docs.meigen.ai/images/og-default.jpg"
-    }
-  },
   "colors": {
     "primary": "#7C3AED",
     "light": "#A78BFA",
