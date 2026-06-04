@@ -47,7 +47,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 
 All resolutions consume welcome or purchased credits (premium model — daily free credits don't apply). 4K is paid-only.
 
-The current default model and MeiGen's **best overall image model** for prompt accuracy and aesthetic quality. Excels at instruction following, in-image text rendering, and complex multi-element scenes.
+The current default model and MeiGen's **best overall image model**. Excels at instruction following, in-image text rendering, and complex multi-element scenes.
 
 <Warning>
   **Stricter moderation**: prompts involving real people, celebrities, brand logos, or violent/adult content may be rejected. Rephrase to drop specific names or try a different model.
@@ -137,7 +137,6 @@ Midjourney's photorealistic flagship. Returns 4 candidate images per generation 
 - Content and style reference modes
 - Advanced parameters (stylize, chaos, raw, etc.) for fine-tuning the output
 - Auto-translates non-English prompts to English
-- Returns 4 candidate images per generation (only 1 reference image supported)
 - Native 2K output toggle
 - Quality (Standard / High) toggle
 
@@ -170,7 +169,7 @@ A base model from Black Forest Labs, suited to everyday general-purpose creation
 | **Resolutions** | Fixed |
 | **Aspect ratios** | 1:1, 2:3, 3:2, 3:4, 4:3, 7:9, 9:7, 9:16, 9:21, 16:9, 21:9 |
 
-The fastest and cheapest model. Great for rapid prototyping and quick iterations when you need results in seconds.
+The fastest and cheapest model — ideal for quick drafts when you need results in seconds.
 
 <Warning>
   **No reference image support.** Z Image Turbo generates images from text only — you cannot upload reference images with this model. If you need to use reference images, choose a different model.
@@ -351,9 +350,7 @@ Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 
   </Accordion>
 
   <Accordion title="Seedance 2.0 — Per-second pricing + With-reference-video minimum" icon="circle-info">
-    Unlike image models with flat per-image pricing, Seedance is billed per second: 13 credits/sec for 480p, 20 credits/sec for 720p, 22 credits/sec for 1080p. The sidebar shows the exact total before you submit.
-
-    **With a reference video**: a separate rate table applies (480p 8/sec, 720p 14/sec, 1080p 14/sec). Billable seconds = reference duration + your selected duration, with a minimum-billable-seconds floor. For example, selecting 5 seconds bills at least 9 seconds; selecting 15 seconds bills at least 25 seconds. See the full lookup table in the Seedance 2.0 section above.
+    Seedance bills **per second**, not per image — and uploading a reference video uses a separate rate table with a minimum-billable floor. See the **Seedance 2.0** section above for the full rates and formula.
   </Accordion>
 
   <Accordion title="Veo 3.1 — Limited aspect ratios" icon="triangle-exclamation">
