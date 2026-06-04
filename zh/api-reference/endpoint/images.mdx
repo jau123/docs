@@ -30,11 +30,14 @@ GET /api/images/:id
   | --- | --- | --- |
   | `id` | string | 画廊图片 ID |
   | `text` | string | 原始提示词——可能是纯文本，也可能是结构化 JSON prompt，要复用请自行解析 |
+  | `prompt_ready` | boolean | 该图是否有可用的提示词 |
+  | `prompt_segments` | array \| null | 当提示词包含多个带标签的部分时，返回结构化分段；单段提示词为 `null` |
   | `media_urls` | string[] | 完整图片 URL 数组 |
   | `thumbnail_url` | string | 缩略图 URL（通常与 `media_urls[0]` 相同）|
   | `image_width` | number \| null | 图片宽度（像素）|
   | `image_height` | number \| null | 图片高度（像素）|
   | `model` | string \| null | 模型家族标签：`"nanobanana"` / `"midjourney"` / `"gptimage"`。**不是 `modelId`**——仅用于筛选/展示，不能直接传给 `/api/generate/v2` |
+  | `sref` | string \| null | Midjourney 风格码（如有）——复用它即可套用同款风格；非 Midjourney 图片为 `null` |
   | `created_at` | string | ISO 8601 时间戳（信息性字段）|
   | `likes` / `views` / `retweets` | number | 原帖互动指标 |
   | `author_username` / `author_display_name` / `author_avatar_url` | string | 原作者信息——如需展示署名可使用，否则忽略 |

@@ -30,11 +30,14 @@ Returns a single curated gallery image (not your own generation result). The `id
   | --- | --- | --- |
   | `id` | string | Gallery image ID |
   | `text` | string | The original prompt — may be plain text or a structured JSON prompt; parse on your side if you intend to reuse it |
+  | `prompt_ready` | boolean | Whether a usable prompt is available for this image |
+  | `prompt_segments` | array \| null | When the prompt has multiple labelled parts, the structured segments; `null` for single-part prompts |
   | `media_urls` | string[] | Full-size image URLs |
   | `thumbnail_url` | string | Thumbnail URL (often the same as `media_urls[0]`) |
   | `image_width` | number \| null | Width in pixels |
   | `image_height` | number \| null | Height in pixels |
   | `model` | string \| null | Model family label: `"nanobanana"`, `"midjourney"`, or `"gptimage"`. **This is not a `modelId`** — use it for filtering / display only, not as input to `/api/generate/v2` |
+  | `sref` | string \| null | Midjourney style reference code, when present — reuse it to apply the same style; `null` for non-Midjourney images |
   | `created_at` | string | ISO 8601 timestamp (informational) |
   | `likes` / `views` / `retweets` | number | Engagement metrics from the original source post |
   | `author_username` / `author_display_name` / `author_avatar_url` | string | Original author info — include if you display attribution, otherwise ignore |

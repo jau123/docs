@@ -27,7 +27,7 @@ POST /api/generate/v2
 <ParamField body="modelId" type="string">
   用于生成的模型。不传则使用平台当前默认模型（可能随平台配置变化）。从[模型列表](/zh/api-reference/endpoint/models)端点获取可用模型。
 
-  图片模型：`gpt-image-2`, `gemini-3-pro-image-preview`, `nanobanana-2`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v8.1`, `z-image-turbo`
+  图片模型：`gpt-image-2`, `gemini-3-pro-image-preview`, `nanobanana-2`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v8.1`, `flux2-klein`, `z-image-turbo`
 
   视频模型：`seedance-2-0`, `happyhorse-1.0`, `veo-3.1`
 
@@ -175,8 +175,8 @@ GET /api/generate/v2/status/:generationId
 {
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "completed",
-  "imageUrl": "https://images.meigen.art/generations/xxx.png",
-  "imageUrls": ["https://images.meigen.art/generations/xxx.png"],
+  "imageUrl": "https://images.meigen.ai/generations/xxx.png",
+  "imageUrls": ["https://images.meigen.ai/generations/xxx.png"],
   "videoUrl": null,
   "mediaType": "image",
   "error": null,
@@ -192,7 +192,7 @@ GET /api/generate/v2/status/:generationId
   "status": "completed",
   "imageUrl": null,
   "imageUrls": null,
-  "videoUrl": "https://images.meigen.art/generations/xxx.mp4",
+  "videoUrl": "https://images.meigen.ai/generations/xxx.mp4",
   "mediaType": "video",
   "error": null,
   "aspectRatio": "16:9"
@@ -300,7 +300,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
     "aspectRatio": "adaptive",
     "resolution": "480p",
     "duration": 5,
-    "referenceVideo": "https://images.meigen.art/generations/eagle-clip.mp4",
+    "referenceVideo": "https://images.meigen.ai/generations/eagle-clip.mp4",
     "referenceVideoDuration": 3
   }'
 ```

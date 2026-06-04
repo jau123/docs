@@ -47,9 +47,10 @@ Returns a list of all active AI models available for generation. Public endpoint
   | Key | Used by | Description |
   | --- | --- | --- |
   | `resolutions` | Image / video | Allowed values for `resolution` (`"1K"` / `"2K"` / `"3K"` / `"4K"` for image, `"480p"` / `"720p"` / `"1080p"` for video) |
+  | `tiers` | Seedance 2.0 | Available speed tiers (`fast` / `pro`), selected via `tier` |
   | `durations` | Seedance 2.0 | Allowed values for `duration` (seconds) |
-  | `pricingPerSec` | Seedance 2.0 | Per-resolution per-second rate, e.g. `{ "480p": 13, "720p": 20, "1080p": 22 }` |
-  | `pricingPerSecWithVideo` | Seedance 2.0 | Per-second rate when `referenceVideo` is supplied |
+  | `pricingPerSec` | Seedance 2.0 | Per-second rate, keyed by tier then resolution |
+  | `pricingPerSecWithVideo` | Seedance 2.0 | Per-second rate with `referenceVideo`, keyed by tier then resolution |
   | `minBillableTable` | Seedance 2.0 | Minimum billable seconds keyed by `duration` (continuation only) |
 
   Other keys may appear; treat anything not listed above as informational and subject to change.
@@ -66,14 +67,14 @@ curl https://www.meigen.ai/api/models
   "success": true,
   "models": [
     {
-      "id": "gpt-image-2",
-      "name": "GPT Image 2.0",
-      "provider": "OpenAI",
+      "id": "gemini-3-pro-image-preview",
+      "name": "Nanobanana Pro",
+      "provider": "Google",
       "credits_per_generation": 10,
-      "supported_ratios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "4:5", "5:4"],
+      "supported_ratios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "4:5", "5:4", "21:9"],
       "max_reference_images": 5,
       "media_type": "image",
-      "extra_config": { "resolutions": ["2K"] }
+      "extra_config": {}
     },
     {
       "id": "seedance-2-0",
@@ -81,14 +82,12 @@ curl https://www.meigen.ai/api/models
       "provider": "ByteDance",
       "credits_per_generation": 60,
       "supported_ratios": ["adaptive", "16:9", "4:3", "1:1", "3:4", "9:16", "21:9"],
-      "max_reference_images": 5,
+      "max_reference_images": 2,
       "media_type": "video",
       "extra_config": {
+        "tiers": ["fast", "pro"],
         "resolutions": ["480p", "720p", "1080p"],
-        "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-        "pricingPerSec": { "480p": 13, "720p": 20, "1080p": 22 },
-        "pricingPerSecWithVideo": { "480p": 8, "720p": 14, "1080p": 14 },
-        "minBillableTable": { "4": 7, "5": 9, "6": 10, "7": 12, "8": 14, "9": 15, "10": 17, "11": 19, "12": 20, "13": 22, "14": 24, "15": 25 }
+        "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
       }
     }
   ]
