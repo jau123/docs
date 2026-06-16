@@ -80,16 +80,6 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 - **停止条件**：当 `status` 为 `completed` 或 `failed` 时
 - **超时建议**：图片模型 5 分钟，视频 10 分钟。各模型典型耗时见[模型](/zh/features/models)页面。
 
-## 速率限制
-
-`POST /api/generate/v2` 限速 **每用户每分钟 12 次**。超出后返回 `429 Too Many Requests`，响应头会带：
-
-- `Retry-After: 60`
-- `X-RateLimit-Limit: 12`
-- `X-RateLimit-Remaining: 0`
-
-收到 429 时请按 `Retry-After` 等待；连续失败时叠加指数退避。
-
 ## 缓存
 
 部分 GET 端点返回缓存响应：
@@ -112,7 +102,6 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | 401 | 未授权 — token 无效或缺失 |
 | 402 | 需要付费 — 积分不足 |
 | 404 | 未找到 |
-| 429 | 请求过于频繁 — 等待后重试 |
 | 500 | 服务器错误 |
 
 `POST /api/generate/v2` 在 400 / 402 时还会附带便于排查的额外字段：

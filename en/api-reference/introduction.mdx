@@ -80,16 +80,6 @@ Image generation is **asynchronous**. The flow is:
 - **Stop when**: `status` is `completed` or `failed`
 - **Timeout**: 5 minutes for image models, 10 minutes for video. Per-model typical times are listed on the [Models](/en/features/models) page.
 
-## Rate Limits
-
-`POST /api/generate/v2` is limited to **12 requests per minute per user**. Exceeding the limit returns `429 Too Many Requests` with these response headers:
-
-- `Retry-After: 60`
-- `X-RateLimit-Limit: 12`
-- `X-RateLimit-Remaining: 0`
-
-When you hit 429, respect `Retry-After` and apply exponential backoff for repeated failures.
-
 ## Caching
 
 Some GET endpoints return cached responses:
@@ -112,7 +102,6 @@ Each generation deducts credits from your account. Image models charge a flat am
 | 401 | Unauthorized — invalid or missing token |
 | 402 | Payment required — insufficient credits |
 | 404 | Not found |
-| 429 | Rate limited — wait and retry |
 | 500 | Server error |
 
 For `POST /api/generate/v2`, the 400 / 402 bodies include extra fields useful for debugging:
