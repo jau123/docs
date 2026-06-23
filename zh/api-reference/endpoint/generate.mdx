@@ -92,7 +92,7 @@ POST /api/generate/v2
 <ParamField body="referenceVideo" type="string">
   仅用于 Seedance 2.0。用于"视频续写"模式的参考视频 URL。必须是可公开访问的 HTTPS URL（一般来自之前生成结果的 `videoUrl` 字段）。
 
-  传该字段时计费走"有参考视频"档：480p 8 积分/秒、720p 14 积分/秒、1080p 14 积分/秒，并应用最低计费秒数（详见[模型](/zh/features/models)）。
+  传该字段时计费走"有参考视频"档（Fast 480p 8、720p 14 积分/秒；Pro 720p 16、1080p 28 积分/秒），并应用最低计费秒数（详见[模型](/zh/features/models)）。
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">

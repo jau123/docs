@@ -18,7 +18,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Midjourney V8.1** | 15 (1K) / 20 (2K) | Slow (~45s) | 1 | Photorealistic, universal aesthetics |
 | **Flux 2 Klein** | 2 | Fast (~18s) | None | General-purpose base model, text rendering |
 | **Z Image Turbo** | 2 | Fastest (~12s) | None | Quick drafts, prototyping |
-| **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–22/sec, Pro 13–42/sec) | Video, ~1-4min | First/last frame + reference video | Three tiers (Mini / Fast / Pro), 4–15s, multiple ratios, audio |
+| **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~1-4min | First/last frame + reference video | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio |
 | **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video | First frame (required) | First-frame image-to-video only, 4–15s, ratio follows input, audio |
 | **Happyhorse 1.0** | Per-second (720p 18/sec, 1080p 28/sec) | Video, ~1-2min | First frame (single image) | 3–15s adjustable duration, text-to-video + first-frame i2v, audio included |
 | **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-7min | Up to 2 (first/last frame) | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
@@ -205,17 +205,17 @@ The fastest and cheapest model — ideal for quick drafts when you need results 
 | **Credits** | Per-second pricing (see below) |
 | **Duration** | 4-15 seconds (default 4) |
 | **Reference images** | First/last frame (image-to-video) |
-| **Reference video** | Yes — Fast / Pro only (Mini and Pro 480p have no With-reference-video rate) |
-| **Resolutions** | 480p, 720p, 1080p (Mini: 480p / 720p only) |
+| **Reference video** | Fast / Pro only (Mini and Pro 480p have no With-reference-video rate) |
+| **Resolutions** | Mini and Fast: 480p / 720p; Pro: 480p / 720p / 1080p / 4K |
 | **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
 | **Audio** | Auto-generated |
 
 ByteDance's latest video generation model. Supports text-to-video, image-to-video (first/last frame), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions.
 
-**Three tiers** — pick one via the `Speed / Quality` segmented control inside the video sidebar. Same Seedance 2.0 model, same params, just different rendering quality and price:
-- **Mini** (default) — cheapest and most lightweight; 480p / 720p only (no 1080p), no reference-video continuation
-- **Fast** — quick turnaround, 1080p is upscaled from 720p
-- **Pro** — higher fidelity, **native 1080p** rendering
+**Three tiers**, picked via the `Speed / Quality` segmented control inside the video sidebar. Same Seedance 2.0 model, same params, just different rendering quality and price:
+- **Mini** (default): cheapest and most lightweight; 480p / 720p only, no reference-video continuation
+- **Fast**: quick turnaround at 480p / 720p
+- **Pro**: higher fidelity, with **native 1080p and 4K** rendering
 
 #### Pricing
 
@@ -225,9 +225,10 @@ Per-second. Rate depends on **tier** (Mini / Fast / Pro) × **whether a referenc
 | --- | --- | --- | --- | --- | --- |
 | 480p | 9/sec | 13/sec | 8/sec | 14/sec | — |
 | 720p | 16/sec | 20/sec | 14/sec | 22/sec | 16/sec |
-| 1080p | — | 22/sec | 14/sec | 42/sec | 28/sec |
+| 1080p | — | — | — | 42/sec | 28/sec |
+| 4K | — | — | — | 100/sec | — |
 
-Mini only supports 480p / 720p and doesn't support reference-video continuation (use Fast / Pro for that). Pro doesn't offer a 480p With-reference-video rate (use 720p+ on Pro, or fall back to Fast).
+Mini and Fast only support 480p / 720p. Pro adds native 1080p and 4K (4K is direct-generation only). Mini has no reference-video continuation (use Fast / Pro for that), and Pro has no 480p With-reference-video rate.
 
 **With-reference-video billing rule (both tiers):**
 
@@ -247,10 +248,10 @@ Output length is always your selected duration (4–15), independent of the refe
 | Mini 720p × 5s direct | 16 × 5 | **80** |
 | Fast 480p × 5s direct | 13 × 5 | **65** |
 | Fast 720p × 5s direct | 20 × 5 | **100** |
-| Fast 1080p × 10s direct | 22 × 10 | **220** |
 | Fast 720p, 5s reference + 10s selected duration | 14 × max(5+10, 17) = 14 × 17 | **238** |
 | Pro 720p × 5s direct | 22 × 5 | **110** |
 | Pro 1080p × 5s direct | 42 × 5 | **210** |
+| Pro 4K × 5s direct | 100 × 5 | **500** |
 | Pro 1080p, 5s reference + 10s selected duration | 28 × max(5+10, 17) = 28 × 17 | **476** |
 
 <Note>
@@ -412,7 +413,7 @@ Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 
   </Accordion>
 
   <Accordion title="Seedance 2.0 Mini — No reference-video continuation" icon="triangle-exclamation">
-    The Mini tier (the default) is the lightweight option and does not support reference-video continuation. It also caps out at 720p (no 1080p). To continue from a reference video or render 1080p, switch to the **Fast** or **Pro** tier.
+    The Mini tier (the default) is the lightweight option and does not support reference-video continuation. It also caps out at 720p. To continue from a reference video, switch to **Fast** or **Pro**; for 1080p or 4K output, switch to **Pro**.
   </Accordion>
 
   <Accordion title="Grok Video 1.5 — First frame required" icon="triangle-exclamation">
