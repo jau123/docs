@@ -14,10 +14,12 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Nanobanana 2** | 5 | Fast (~38s) | 5 | General use, wide ratio support |
 | **Seedream 5.0 Lite** | 5 | Fast (~35s) | 5 | Photorealism, 3K output |
 | **Seedream 4.5** | 5 | Fast (~17s) | 5 | Product photos, marketing |
+| **Grok Imagine Quality** | 10 (1K) / 14 (2K) | Fast | 3 | High-quality generation, text-to-image + image-to-image |
 | **Midjourney V8.1** | 15 (1K) / 20 (2K) | Slow (~45s) | 1 | Photorealistic, universal aesthetics |
 | **Flux 2 Klein** | 2 | Fast (~18s) | None | General-purpose base model, text rendering |
 | **Z Image Turbo** | 2 | Fastest (~12s) | None | Quick drafts, prototyping |
-| **Seedance 2.0** | Per-second (Fast 13–22/sec, Pro 13–42/sec) | Video, ~1-4min | First/last frame + reference video | Two tiers (Fast / Pro), 4–15s, multiple ratios, audio |
+| **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–22/sec, Pro 13–42/sec) | Video, ~1-4min | First/last frame + reference video | Three tiers (Mini / Fast / Pro), 4–15s, multiple ratios, audio |
+| **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video | First frame (required) | First-frame image-to-video only, 4–15s, ratio follows input, audio |
 | **Happyhorse 1.0** | Per-second (720p 18/sec, 1080p 28/sec) | Video, ~1-2min | First frame (single image) | 3–15s adjustable duration, text-to-video + first-frame i2v, audio included |
 | **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-7min | Up to 2 (first/last frame) | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
 
@@ -119,6 +121,21 @@ The previous generation Seedream model. Still produces solid results, particular
 
 ---
 
+### Grok Imagine Quality
+
+| | |
+| --- | --- |
+| **Model ID** | `grok-image` |
+| **Provider** | xAI |
+| **Credits** | 10 (1K) / 14 (2K) per image |
+| **Reference images** | Up to 3 |
+| **Resolutions** | 1K, 2K — default 1K |
+| **Aspect ratios** | 1:1, 3:2, 2:3, 4:3, 3:4, 16:9, 9:16 |
+
+xAI's high-quality image generation model. Supports both text-to-image and image-to-image (up to 3 reference images for editing or guided generation).
+
+---
+
 ### Midjourney V8.1
 
 | | |
@@ -186,30 +203,31 @@ The fastest and cheapest model — ideal for quick drafts when you need results 
 | **Model ID** | `seedance-2-0` |
 | **Provider** | ByteDance |
 | **Credits** | Per-second pricing (see below) |
-| **Duration** | 4-15 seconds (default 5) |
+| **Duration** | 4-15 seconds (default 4) |
 | **Reference images** | First/last frame (image-to-video) |
-| **Reference video** | Yes (separate With-reference-video rate table, Pro has no 480p tier) |
-| **Resolutions** | 480p, 720p, 1080p |
+| **Reference video** | Yes — Fast / Pro only (Mini and Pro 480p have no With-reference-video rate) |
+| **Resolutions** | 480p, 720p, 1080p (Mini: 480p / 720p only) |
 | **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
 | **Audio** | Auto-generated |
 
 ByteDance's latest video generation model. Supports text-to-video, image-to-video (first/last frame), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions.
 
-**Two tiers** — pick one via the `Speed / Quality` segmented control inside the video sidebar. Same Seedance 2.0 model, same params, just different rendering quality and price:
-- **Fast** (default) — quick turnaround, 1080p is upscaled from 720p
+**Three tiers** — pick one via the `Speed / Quality` segmented control inside the video sidebar. Same Seedance 2.0 model, same params, just different rendering quality and price:
+- **Mini** (default) — cheapest and most lightweight; 480p / 720p only (no 1080p), no reference-video continuation
+- **Fast** — quick turnaround, 1080p is upscaled from 720p
 - **Pro** — higher fidelity, **native 1080p** rendering
 
 #### Pricing
 
-Per-second. Rate depends on **tier** (Fast / Pro) × **whether a reference video is uploaded**:
+Per-second. Rate depends on **tier** (Mini / Fast / Pro) × **whether a reference video is uploaded**:
 
-| Resolution | Fast Direct | Fast With reference video | Pro Direct | Pro With reference video |
-| --- | --- | --- | --- | --- |
-| 480p | 13/sec | 8/sec | 14/sec | — |
-| 720p | 20/sec | 14/sec | 22/sec | 16/sec |
-| 1080p | 22/sec | 14/sec | 42/sec | 28/sec |
+| Resolution | Mini Direct | Fast Direct | Fast With reference video | Pro Direct | Pro With reference video |
+| --- | --- | --- | --- | --- | --- |
+| 480p | 9/sec | 13/sec | 8/sec | 14/sec | — |
+| 720p | 16/sec | 20/sec | 14/sec | 22/sec | 16/sec |
+| 1080p | — | 22/sec | 14/sec | 42/sec | 28/sec |
 
-Pro doesn't offer a 480p With-reference-video rate (use 720p+ on Pro, or fall back to Fast).
+Mini only supports 480p / 720p and doesn't support reference-video continuation (use Fast / Pro for that). Pro doesn't offer a 480p With-reference-video rate (use 720p+ on Pro, or fall back to Fast).
 
 **With-reference-video billing rule (both tiers):**
 
@@ -225,6 +243,8 @@ Output length is always your selected duration (4–15), independent of the refe
 
 | Scenario | Calculation | Total |
 | --- | --- | --- |
+| Mini 480p × 4s direct | 9 × 4 | **36** |
+| Mini 720p × 5s direct | 16 × 5 | **80** |
 | Fast 480p × 5s direct | 13 × 5 | **65** |
 | Fast 720p × 5s direct | 20 × 5 | **100** |
 | Fast 1080p × 10s direct | 22 × 10 | **220** |
@@ -239,6 +259,44 @@ Output length is always your selected duration (4–15), independent of the refe
 
 ---
 
+### Grok Video 1.5
+
+| | |
+| --- | --- |
+| **Model ID** | `grok-video` |
+| **Provider** | xAI |
+| **Credits** | Per-second (see below) |
+| **Duration** | 4-15 seconds (default 4) |
+| **Reference images** | 1 — first frame **required** (image-to-video only) |
+| **Reference video** | Not supported |
+| **Resolutions** | 480p, 720p (default 480p) |
+| **Aspect ratios** | Follows the first-frame image automatically (no manual ratio selection) |
+| **Audio** | Auto-generated |
+
+xAI's image-to-video model. A starting (first-frame) image is **required** — pure text-to-video is not supported. The output aspect ratio always follows your input image, and AI-generated audio is included.
+
+#### Pricing
+
+| Resolution | Rate |
+| --- | --- |
+| 480p | 16 credits/sec |
+| 720p | 28 credits/sec |
+
+**Examples:**
+
+| Scenario | Calculation | Total |
+| --- | --- | --- |
+| 480p × 4s | 16 × 4 | **64** |
+| 480p × 10s | 16 × 10 | **160** |
+| 720p × 4s | 28 × 4 | **112** |
+| 720p × 10s | 28 × 10 | **280** |
+
+<Note>
+  If generation fails, the **full** credit amount is automatically refunded.
+</Note>
+
+---
+
 ### Happyhorse 1.0
 
 | | |
@@ -246,7 +304,7 @@ Output length is always your selected duration (4–15), independent of the refe
 | **Model ID** | `happyhorse-1.0` |
 | **Provider** | Alibaba |
 | **Credits** | Per-second (see below) |
-| **Duration** | 3–15 seconds (default 5) |
+| **Duration** | 3–15 seconds (default 4) |
 | **Reference images** | 1 (first frame, image-to-video) |
 | **Reference video** | Not supported |
 | **Resolutions** | 720p, 1080p (default 720p) |
@@ -351,6 +409,18 @@ Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 
 
   <Accordion title="Seedance 2.0 — Per-second pricing + With-reference-video minimum" icon="circle-info">
     Seedance bills **per second**, not per image — and uploading a reference video uses a separate rate table with a minimum-billable floor. See the **Seedance 2.0** section above for the full rates and formula.
+  </Accordion>
+
+  <Accordion title="Seedance 2.0 Mini — No reference-video continuation" icon="triangle-exclamation">
+    The Mini tier (the default) is the lightweight option and does not support reference-video continuation. It also caps out at 720p (no 1080p). To continue from a reference video or render 1080p, switch to the **Fast** or **Pro** tier.
+  </Accordion>
+
+  <Accordion title="Grok Video 1.5 — First frame required" icon="triangle-exclamation">
+    Grok Video 1.5 is image-to-video only — you **must** upload a starting (first-frame) image. Pure text-to-video is not supported. The output aspect ratio follows your input image. If you want text-to-video, use Seedance 2.0, Happyhorse 1.0, or Veo 3.1.
+  </Accordion>
+
+  <Accordion title="Grok Video 1.5 — 480p / 720p only" icon="triangle-exclamation">
+    Grok Video 1.5 outputs at 480p or 720p only. For higher resolutions (1080p / 4k), use Seedance 2.0 or Veo 3.1.
   </Accordion>
 
   <Accordion title="Veo 3.1 — Limited aspect ratios" icon="triangle-exclamation">
