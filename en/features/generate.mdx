@@ -233,6 +233,41 @@ You can use the generated prompt as-is, or edit it to create variations of the o
 
 MeiGen offers three video models: **Seedance 2.0** (per-second pricing, 4–15 seconds), **Happyhorse 1.0** (per-second, 3–15 seconds), and **Veo 3.1** (per-generation, 4 / 6 / 8 seconds, two tiers, audio always on). Open the video sidebar from the **Generate Video** button in the floating dock.
 
+### Storyboard — Video Prompt Builder
+
+Not sure how to write a video prompt? Click the **Storyboard** button in the video sidebar to turn a one-line idea into a complete, ready-to-shoot prompt. It's the video equivalent of image [Prompt Enhancement](#prompt-enhancement) — but instead of a single paragraph, it produces a **timed, shot-by-shot storyboard**.
+
+Storyboard expands your brief (or an existing prompt) into two parts:
+
+1. **Overview paragraph** — visual style, mood, the main subject, the environment, and the camera + lighting language.
+2. **Shot-by-shot timeline** — a beat list from `0s` to your selected duration with no gaps, e.g. `0s-2s: slow push-in + ...`, including spoken lines or sound effects where they fit.
+
+The timeline is built to match the **duration you've selected** in the sidebar, so set your duration first, then click Storyboard.
+
+<Note>
+  Storyboard keeps your input language — write your idea in any language and the storyboard comes back in the same language. It requires sign-in and shares a daily AI-assist limit with the other prompt tools, but does **not** spend image/video generation credits.
+</Note>
+
+<CodeGroup>
+```text Input (one line)
+a barista making latte art in a cozy café
+```
+
+```text Storyboard (8s)
+A warm, photorealistic close-up film of a skilled barista crafting latte art
+in a cozy sunlit café, soft morning light, shallow depth of field, gentle
+handheld camera, an inviting and calm mood.
+
+0s-2s: slow push-in on the barista's hands gripping the steaming pitcher
+2s-5s: top-down shot as milk pours into the espresso, a white rosetta blooms
+5s-8s: slow pull-back revealing the finished cup set on the counter
+```
+</CodeGroup>
+
+<Tip>
+  Keep your starting idea short — a sentence is enough. Storyboard works best when it has room to build the shots; if you already wrote a detailed timeline, you don't need it.
+</Tip>
+
 ### Frame Images
 
 Upload up to 2 frame images to control the video's composition:
