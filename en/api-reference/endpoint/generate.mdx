@@ -92,7 +92,7 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="referenceVideo" type="string">
   For Seedance 2.0 only. Reference video URL for "video continuation" mode. Must be a publicly accessible HTTPS URL (typically a previous generation result URL from the `videoUrl` field).
 
-  When this field is present, billing uses the "with reference video" tier (Fast 480p 8, 720p 14 credits/sec; Pro 720p 16, 1080p 28 credits/sec), with the minimum-billable-seconds floor applied (see [Models](/en/features/models)).
+  When this field is present, billing uses the "with reference video" tier (Mini 480p 7, 720p 13; Fast 480p 8, 720p 14; Pro 720p 16, 1080p 28 credits/sec), with the minimum-billable-seconds floor applied (see [Models](/en/features/models)).
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">
