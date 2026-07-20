@@ -9,6 +9,18 @@ GET /api/models
 
 返回所有可用于生成的活跃 AI 模型列表。公开端点，无需认证。
 
+本端点返回的所有模型都可用于 `POST /api/generate/v2`，API Token 调用同样不受限。部分模型只在特定 MeiGen 端展示（例如不在移动 App 内展示），但这从不影响 API 可用性。
+
+## 查询参数
+
+<ParamField query="media_type" type="string">
+  按输出类型过滤：`image` 或 `video`。不传则两类都返回。
+</ParamField>
+
+<ParamField query="active" type="string" default="true">
+  传 `false` 可一并返回已下线模型。已下线模型不能用于生成，此参数仅用于解析历史 `modelId`。
+</ParamField>
+
 ## 响应
 
 `{ success: true, models: [...] }`。每个模型对象包含：
@@ -26,7 +38,7 @@ GET /api/models
 </ResponseField>
 
 <ResponseField name="credits_per_generation" type="number">
-  每次生成消耗的积分。按秒计费的视频模型请参考 `extra_config.pricingPerSec` 中的实际费率。
+  名义兜底值。**视频模型请不要拿它给终端用户报价** —— 真实成本应由 `extra_config.pricingPerSec` × `duration` 推导，Veo 3.1 则查 `extra_config.pricingPerCall[tier][duration]`。Veo 3.1 请务必显式传 `duration`：省略时计费会回落到这个名义值。最终扣费以生成响应中的 `creditsUsed` 为准。
 </ResponseField>
 
 <ResponseField name="supported_ratios" type="string[]">
@@ -47,13 +59,15 @@ GET /api/models
   | 字段 | 适用模型 | 说明 |
   | --- | --- | --- |
   | `resolutions` | 图片 / 视频 | `resolution` 允许的取值（图片 `"1K"` / `"2K"` / `"3K"` / `"4K"`，视频 `"480p"` / `"720p"` / `"1080p"` / `"4k"`）|
-  | `tiers` | Seedance 2.0 | 可选档位（`mini` / `fast` / `pro`），通过 `tier` 选择 |
-  | `durations` | Seedance 2.0 | `duration` 允许的取值（秒）|
-  | `pricingPerSec` | Seedance 2.0 | 每秒积分，按档位再按分辨率分级 |
+  | `tierResolutions` | Seedance 2.0 | 各档位实际可用的分辨率，按档位分级。优先于顶层 `resolutions` |
+  | `tiers` | Seedance 2.0 / Veo 3.1 | 可选档位，通过 `tier` 选择（Seedance 2.0：`mini` / `fast` / `pro`；Veo 3.1：`fast` / `pro`）|
+  | `durations` | 视频模型 | `duration` 允许的取值（秒）|
+  | `pricingPerSec` | Seedance 2.0 / Grok Video 1.5 / Happyhorse 1.1 / Agnes Video 2.0 | 每秒积分，按分辨率分级；有档位的模型则先按档位再按分辨率 |
+  | `pricingPerCall` | Veo 3.1 | 每次生成消耗的积分，按档位再按 `duration` 二维查表。与 `pricingPerSec` 互斥，存在时优先 |
   | `pricingPerSecWithVideo` | Seedance 2.0 | 提供 `referenceVideo` 时的每秒积分，按档位再按分辨率分级 |
   | `minBillableTable` | Seedance 2.0 | 续写场景按 `duration` 的最低计费秒数 |
 
-  响应里可能出现其他键，未列在上表的请视为信息性字段，随时可能调整。
+  上述定价相关的键属于契约的一部分；响应里可能出现其它键，仅供参考。
 </ResponseField>
 
 ## 示例
@@ -86,7 +100,12 @@ curl https://www.meigen.ai/api/models
       "media_type": "video",
       "extra_config": {
         "tiers": ["mini", "fast", "pro"],
-        "resolutions": ["480p", "720p", "1080p", "4k"],
+        "resolutions": ["480p", "720p", "1080p"],
+        "tierResolutions": {
+          "mini": ["480p", "720p"],
+          "fast": ["480p", "720p"],
+          "pro": ["480p", "720p", "1080p", "4k"]
+        },
         "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
       }
     }
@@ -95,5 +114,5 @@ curl https://www.meigen.ai/api/models
 ```
 
 <Note>
-  示例中只列出了两个代表模型。实际端点返回全部启用模型；响应会做短暂缓存。
+  示例中只列出了两个代表模型。实际端点返回全部启用模型；响应缓存 1 小时（另有 stale-while-revalidate），因此新上线或已下线的模型最长可能 1 小时后才可见。
 </Note>

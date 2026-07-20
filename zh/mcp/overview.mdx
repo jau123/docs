@@ -1,6 +1,6 @@
 ---
 title: "MCP 服务器概览"
-description: "在 Claude Code、Cursor、Codex、Windsurf、Hermes Agent 和 OpenClaw 中生成 AI 图片与视频 — MeiGen 开源 MCP 服务器，支持 GPT Image 2、Nano Banana 2、Midjourney V8.1、Seedream、Flux 2、Seedance、Veo 3.1 以及本地 ComfyUI 工作流。"
+description: "在 Claude Code、Cursor、Codex、Windsurf、Hermes Agent 和 OpenClaw 中生成 AI 图片与视频 — MeiGen 开源 MCP 服务器，支持 GPT Image 2、Nano Banana 2、Midjourney V8.1、Seedream、Grok Imagine、Flux 2、Seedance、Veo 3.1、Agnes 以及本地 ComfyUI 工作流。"
 ---
 
 **MeiGen** 是一个开源的 MCP (Model Context Protocol) 服务器，赋予 AI 编程助手生成**图片和视频**的能力。它支持多种生成后端 — 使用 MeiGen 的云端模型、你本地的 ComfyUI 服务器，或任何 OpenAI 兼容 API。
@@ -11,7 +11,7 @@ description: "在 Claude Code、Cursor、Codex、Windsurf、Hermes Agent 和 Ope
 
 ## 什么是 MCP？
 
-Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外部工具。当你将 MeiGen 安装为 MCP 服务器后，你的 AI 助手就能通过自然语言生成图片和视频、搜索 1,446 条精选提示词画廊和增强提示词。
+Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外部工具。当你将 MeiGen 安装为 MCP 服务器后，你的 AI 助手就能通过自然语言生成图片和视频、对 MeiGen 社区提示词画廊做语义搜索、增强提示词。搜索、灵感和提示词增强无需 API Key；插件还内置了一套提示词库，离线时搜索依然可用。
 
 ---
 
@@ -21,7 +21,7 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 
 <CardGroup cols={3}>
   <Card title="MeiGen Cloud" icon="cloud">
-    **托管式多模型 API**。9 个图像和视频模型：GPT Image 2、Nanobanana Pro/2、Seedream、Midjourney V8.1、Flux 2 Klein、Seedance 2.0、Happyhorse 1.0、Veo 3.1。无需 GPU — 只需一个 API Key。
+    **托管式多模型 API**。汇集 OpenAI、Google、ByteDance、Midjourney、xAI、Black Forest Labs、Alibaba、Agnes 的图像与视频模型。无需 GPU — 只需一个 API Key。当前清单随时用 `list_models` 查。
   </Card>
   <Card title="ComfyUI" icon="server">
     **本地 GPU 生成**。在你自己的硬件上运行任何 Stable Diffusion、SDXL 或 Flux 模型。完全控制工作流和参数。
@@ -43,18 +43,22 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 
 ## 工具
 
-8 个 MCP 工具，其中 6 个无需配置提供商即可使用：
+大部分 MCP 工具无需配置提供商即可使用：
 
 | 工具 | 描述 | 需要提供商？ |
 | --- | --- | --- |
 | **generate_image** | 使用任意已配置的提供商生成图片 | 是 |
-| **generate_video** | 通过 MeiGen 平台生成视频(Seedance 2.0 fast/pro、Happyhorse 1.0、Veo 3.1)。支持文生视频和首/末帧图生视频。 | 是(MeiGen) |
+| **generate_video** | 通过 MeiGen 平台生成视频 — 支持文生视频、首/末帧图生视频，以及参考视频续写 | 是(MeiGen) |
 | **enhance_prompt** | 将简短的想法转化为详细、专业的提示词 | 否 |
-| **search_gallery** | 搜索 1,446 条社区精选 AI 艺术提示词 | 否 |
+| **search_gallery** | 对 MeiGen 社区提示词画廊做语义搜索，带图片预览 — 搜索 API 不可达时回落到插件内置的离线提示词库 | 否 |
 | **get_inspiration** | 获取画廊条目的完整提示词和图片 | 否 |
 | **list_models** | 列出所有已配置提供商的可用模型 | 否 |
-| **manage_preferences** | 保存默认风格、宽高比和收藏的提示词 | 否 |
+| **manage_preferences** | 保存默认项（风格、宽高比、模型、提供商、自由文本风格备注）以及收藏的提示词 | 否 |
 | **comfyui_workflow** | 导入、查看、修改和删除 ComfyUI 工作流模板 | 否 |
+
+<Note>
+  视频能力因模型而异 — 画质档位、可选时长与分辨率、音频、参考视频续写，以及是否必须提供首帧图。部分模型仅支持图生视频。当前清单用 `list_models` 查，或见[模型对比](/zh/features/models)。
+</Note>
 
 ---
 

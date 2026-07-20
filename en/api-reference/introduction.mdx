@@ -27,7 +27,7 @@ Authorization: Bearer meigen_sk_YOUR_API_KEY
 
 ### Session Token
 
-For meigen.ai's own browser integration, a logged-in session access token is accepted. Daily free credits cover **basic models only** (currently Z Image Turbo); premium models always require welcome or purchased credits. Third-party integrations should always use the API Token above.
+For meigen.ai's own browser integration, a logged-in session access token is accepted. Daily free credits cover **basic models only** (currently Z Image Turbo, Flux 2 Klein, Agnes Image 2.1 Flash and Agnes Video 2.0); every other model always requires welcome or purchased credits. Third-party integrations should always use the API Token above.
 
 ## Base URL
 
@@ -78,7 +78,7 @@ Image generation is **asynchronous**. The flow is:
 
 - **Recommended interval**: 3 seconds between status checks
 - **Stop when**: `status` is `completed` or `failed`
-- **Timeout**: 5 minutes for image models, 10 minutes for video. Per-model typical times are listed on the [Models](/en/features/models) page.
+- **Timeout**: allow up to 6 minutes for image models and up to 12 minutes for video. A job that overruns comes back as `failed` and the credits are refunded in full — the output is discarded, so a late result never arrives. Short of that, the opposite applies: if your client stops polling early, the job still completes and is still charged. Poll until `status` is terminal (`completed` / `failed`), and treat the wall-clock values above only as a backstop. The slowest cases are Seedance 2.0 and Veo 3.1 at high resolution / long duration. Per-model typical times are listed on the [Models](/en/features/models) page.
 
 ## Caching
 
@@ -86,13 +86,15 @@ Some GET endpoints return cached responses:
 
 | Endpoint | Cache Duration |
 | --- | --- |
-| `GET /api/models` | 5 minutes |
+| `GET /api/models` | 1 hour (plus stale-while-revalidate) |
 | `GET /api/images/:id` | 1 hour |
 | `POST` endpoints | No caching |
 
+Model list changes — a new model, a retired one, a changed default — can therefore take up to an hour to become visible. Plan your own refresh cadence accordingly.
+
 ## Credits
 
-Each generation deducts credits from your account. Image models charge a flat amount per image; Seedance 2.0 is billed per second. See the [Models](/en/features/models) page for the full per-model pricing table.
+Each generation deducts credits from your account. Image models charge per image (the amount can vary with resolution and quality); video models are billed per second or per generation, depending on the model. See the [Models](/en/features/models) page for the full per-model pricing table.
 
 ## Error Responses
 
@@ -104,20 +106,37 @@ Each generation deducts credits from your account. Image models charge a flat am
 | 404 | Not found |
 | 500 | Server error |
 
-For `POST /api/generate/v2`, the 400 / 402 bodies include extra fields useful for debugging:
+For `POST /api/generate/v2`, error bodies include extra fields useful for debugging, and most carry a machine-readable `code` alongside the human-readable `error`:
+
+| `code` | Status | Meaning |
+| --- | --- | --- |
+| `premium_model_paywall` | 402 | The selected model requires purchased credits |
+| `insufficient_credits` | 402 | Not enough usable credits for this request |
+| `invalid_reference_url` | 400 | A `referenceImages` / `referenceVideo` entry is not an accepted URL or base64 value |
+
+Errors without a `code` (such as an unsupported aspect ratio) should be handled by status code and `error` text.
 
 ```json
 // 400 — unsupported aspect ratio
 {
   "success": false,
-  "error": "Aspect ratio 32:9 not supported by this model",
-  "supportedRatios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "5:4", "4:5", "21:9", "9:21"]
+  "error": "Aspect ratio 32:9 is not supported by GPT Image 2.0",
+  "supportedRatios": ["1:1", "1:3", "16:9", "2:3", "21:9", "3:1", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "9:21"]
 }
 
-// 402 — not enough credits
+// 400 — unusable reference image
 {
   "success": false,
-  "error": "Insufficient credits",
+  "code": "invalid_reference_url",
+  "error": "Reference images must be public HTTP(S) URLs or data:image/*;base64 inline data. Local file paths (e.g. C:/Users/...) and file:// URIs are not supported — upload the file to a public URL or pass base64 inline.",
+  "received": "C:/Users/me/ref.png"
+}
+
+// 402 — premium model, no purchased credits
+{
+  "success": false,
+  "code": "premium_model_paywall",
+  "error": "Premium model requires purchased credits",
   "required": 10,
   "available": 4
 }
@@ -135,7 +154,7 @@ For `POST /api/generate/v2`, the 400 / 402 bodies include extra fields useful fo
   <Card title="Get Image" icon="image" href="/en/api-reference/endpoint/images">
     GET /api/images/:id
   </Card>
-  <Card title="Manage Tokens" icon="key" href="/en/api-reference/endpoint/tokens">
-    POST/GET/DELETE /api/tokens
+  <Card title="API Tokens" icon="key" href="/en/api-reference/endpoint/tokens">
+    Create & revoke in account settings
   </Card>
 </CardGroup>

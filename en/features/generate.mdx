@@ -3,7 +3,7 @@ title: "AI Image & Video Generator"
 description: "Generate images & videos on MeiGen with GPT Image 2, Nano Banana 2, Seedream 5.0 Lite, Midjourney V8.1, Seedance 2.0, Veo 3.1 & more. Prompt editor with variables, color picker, and @ mentions."
 ---
 
-MeiGen lets you generate images and videos using multiple AI models from a unified interface. Open the generation sidebar from the floating dock (desktop) or the navigation menu.
+MeiGen lets you generate images and videos using multiple AI models from a unified interface. On desktop, open the generation sidebar from the floating dock; on mobile, tap **Generate** in the bottom dock to open the generation sheet. Both surfaces offer the same models, reference images, `@` mentions, prompt enhancement, AI edit, and Storyboard — this guide applies to both unless a section says otherwise.
 
 ## Model Selector
 
@@ -46,6 +46,32 @@ When you have multiple reference images uploaded, you can mention specific image
 4. Write instructions around the mentions: *"Use @image1 as the background scenery and apply the color palette from @image2"*
 
 This gives you precise control over how each reference image influences the generation.
+
+### Characters
+
+Create a character once and reference it across generations, so the same figure stays consistent from image to image — and into video.
+
+1. Click the **Characters** button above the prompt editor (available in both the image and video sidebars)
+2. In **Create Character**, give it a name and add **1–4 images** — upload them, or pick from your recent creations
+3. Back in the prompt, type `@` and select the character: *"@Mia standing in a neon-lit alley, cinematic lighting"*
+
+You don't need to attach the character's images as reference images again — selecting it in the prompt is enough. Rename or delete characters under **My Characters**; deleting one breaks the prompts that reference it.
+
+<Tip>
+  Best results: give the character one vertical full-body shot plus one neutral face close-up of the same character.
+</Tip>
+
+<Warning>
+  Only AI-generated or virtual characters are allowed. Images that resemble a real person are rejected by content review.
+</Warning>
+
+<Note>
+  **Limits** — there is a cap on how many characters an account can keep, and on how many you can create per day. The dialog tells you when you reach it; delete unused characters under **My Characters** to free up room.
+
+  **Availability** — image models that accept reference images (all except Flux 2 Klein and Z Image Turbo), plus **Seedance 2.0** for video. Selecting a character on a text-only model returns an error.
+
+  If you submit a work that mentions a character to the public gallery, that character's main image becomes publicly visible alongside it — the publish dialog asks you to confirm first.
+</Note>
 
 ### # Color Picker
 
@@ -101,8 +127,9 @@ Upload reference images as visual context to guide the AI's output — for style
 - **Upload methods** — drag-and-drop files onto the reference area, or click to browse
 - **Supported formats** — JPG, PNG, WebP
 - **Auto-compression** — images are automatically compressed to max 2MB / 2048px before upload
+- **Maximum source dimensions** — an image whose width or height exceeds **8000 pixels** is rejected before upload, with a message asking you to resize it. Everyday files stay well clear of this: a 4K photo is 3840px on its long edge, and an A4 scan at 300dpi is 2480×3508. Only print-scale source files (large-format banners, poster artwork at full print resolution) run into it — scale those down before uploading
 - **Thumbnail grid** — uploaded images appear as thumbnails with an × button to remove each one
-- **Per-model limits** — the maximum number of reference images varies by model (0–5). Models that don't support references (like Z Image Turbo) hide this section entirely.
+- **Per-model limits** — the maximum number of reference images varies by model (0–10; Seedream 5.0 Pro accepts the most at 10). Models that don't support references (Flux 2 Klein and Z Image Turbo) hide this section entirely.
 
 <Note>
   See the [Models](/en/features/models) page for the exact reference image limit of each model.
@@ -163,9 +190,12 @@ The default is **Auto** — no need to pick manually, a suitable ratio is chosen
 | 1:1 | Square | Social media profile, icons |
 | 3:4, 4:5, 2:3 | Portrait | Phone wallpaper, posters |
 | 9:16 | Tall portrait | Stories, Reels |
+| 9:21 | Ultra tall | Vertical banners (GPT Image 2.0, Z Image Turbo) |
+| 1:3 | Ultra tall | Vertical banners (GPT Image 2.0 only) |
 | 1:4, 1:8 | Ultra tall | Scrolling banners (Nanobanana 2 only) |
 | 4:3, 3:2 | Landscape | Desktop wallpaper |
 | 16:9, 21:9 | Wide | Cinematic, ultrawide displays |
+| 3:1 | Ultra wide | Header banners (GPT Image 2.0 only) |
 | 4:1, 8:1 | Ultra wide | Panoramic banners (Nanobanana 2 only) |
 
 <Warning>
@@ -174,13 +204,19 @@ The default is **Auto** — no need to pick manually, a suitable ratio is chosen
 
 ### Resolution
 
-Choose the output resolution when available:
+The resolution options come from the model you picked — the selector only offers what that model supports:
 
-| Resolution | Availability |
+| Model | Resolution options |
 | --- | --- |
-| **2K** | Available to all users (default) |
-| **3K** | Select models only (e.g., Seedream 5.0 Lite) |
-| **4K** | Paid users only — a lock icon appears for free users |
+| Nanobanana 2, Nanobanana Pro, Seedream 4.5 | 2K / 4K (default 2K) |
+| GPT Image 2.0 | 1K / 2K / 4K (default 2K) |
+| Grok Imagine Quality, Midjourney V8.1, Seedream 5.0 Pro | 1K / 2K (default 1K) |
+| Seedream 5.0 Lite | 2K / 3K |
+| Flux 2 Klein, Z Image Turbo, Agnes Image 2.1 Flash | Fixed — no resolution selector |
+
+<Note>
+  **The highest option of each model is paid-only** and shows a lock icon for free users. On a 1K / 2K model that means 2K is locked; on a 2K / 4K model it's 4K; on a 2K / 3K model it's 3K. The same rule applies to 4k on video (Seedance 2.0 Pro and Veo 3.1).
+</Note>
 
 ---
 
@@ -231,7 +267,15 @@ You can use the generated prompt as-is, or edit it to create variations of the o
 
 ## Video Generation
 
-MeiGen offers three video models: **Seedance 2.0** (per-second pricing, 4–15 seconds), **Happyhorse 1.0** (per-second, 3–15 seconds), and **Veo 3.1** (per-generation, 4 / 6 / 8 seconds, two tiers, audio always on). Open the video sidebar from the **Generate Video** button in the floating dock.
+MeiGen offers several video models — the current list and full specs are on the [Models](/en/features/models) page:
+
+- **Seedance 2.0** — three tiers, per-second pricing, 4–15 seconds, supports reference-video continuation
+- **Veo 3.1** — two tiers, per-generation pricing, 4 / 6 / 8 seconds, audio always on
+- **Happyhorse 1.1** — per-second pricing, 3–15 seconds
+- **Grok Video 1.5** — per-second pricing, 4–15 seconds, a first-frame image is required
+- **Agnes Video 2.0** — per-second pricing, fixed 5 seconds, covered by daily free credits
+
+Open the video sidebar from the **Generate Video** button in the floating dock on desktop, or from **Generate** in the bottom dock on mobile.
 
 ### Storyboard — Video Prompt Builder
 
@@ -270,20 +314,24 @@ handheld camera, an inviting and calm mood.
 
 ### Frame Images
 
-Upload up to 2 frame images to control the video's composition:
+Upload frame images to control the video's composition:
 
 - **First Frame** — sets the starting composition of the video
 - **Last Frame** — sets the ending composition
 
-Both are optional. You can also drag gallery cards directly as frame images.
+**Seedance 2.0** and **Veo 3.1** accept both frames (up to 2). **Happyhorse 1.1**, **Grok Video 1.5** and **Agnes Video 2.0** accept a first frame only.
+
+Frames are optional except on **Grok Video 1.5**, which is image-to-video only — a first frame is required, and the output ratio follows that image.
+
+You can also drag gallery cards directly as frame images.
 
 ### Seedance 2.0
 
 | Option | Values | Description |
 | --- | --- | --- |
 | **Aspect ratio** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 | 7 ratios. `adaptive` matches the reference image/video dimensions |
-| **Resolution** | 480p, 720p, 1080p (default 480p) | 480p saves credits |
-| **Duration** | 4–15 seconds (default 5) | Slider or input |
+| **Resolution** | Mini / Fast: 480p, 720p. Pro: 480p, 720p, 1080p, 4K (default 480p) | Depends on the selected tier; 480p saves credits |
+| **Duration** | 4–15 seconds (default 4) | Slider or input |
 | **Audio** | Auto-generated | Always on |
 | **Reference video** | Yes | Used as visual conditioning input for "video continuation" (see the [Extending a Video](#extending-a-video) section below) |
 
@@ -350,8 +398,8 @@ Seedance 2.0 only. Upload an existing video as visual conditioning input to guid
 Extension uses a separate With-reference-video rate table (Mini 480p 7 credits/sec, 720p 13 credits/sec; Fast 480p 8, 720p 14; Pro 720p 16, 1080p 28). **Billable seconds = reference video duration + your selected duration** (not less than the minimum-billable floor). The full formula, lookup table, and examples are in [Models → Seedance 2.0](/en/features/models).
 
 Typical costs (examples):
-- Upload a 3-second reference + generate 5 seconds at 480p: **72 credits** (billable = max(3+5, 9) = 9 sec × 8)
-- Upload a 5-second reference + generate 10 seconds at 720p: **238 credits** (billable = max(5+10, 17) = 17 sec × 14)
+- Upload a 3-second reference + generate 5 seconds at **Fast** 480p: **72 credits** (billable = max(3+5, 9) = 9 sec × 8)
+- Upload a 5-second reference + generate 10 seconds at **Fast** 720p: **238 credits** (billable = max(5+10, 17) = 17 sec × 14)
 
 ---
 
@@ -367,13 +415,21 @@ Typical generation times by model:
 
 | Model | Typical Time |
 | --- | --- |
-| Z Image Turbo | ~12 seconds |
-| Seedream 4.5 | ~17 seconds |
-| Seedream 5.0 Lite, Nanobanana 2 | ~35–38 seconds |
-| GPT Image 2.0, Nanobanana Pro | ~45 seconds |
-| Midjourney V8.1 | ~45 seconds |
-| Happyhorse 1.0 (video) | ~1–2 minutes |
-| Seedance 2.0 (video) | ~1–2 min (Mini, default) / ~1–3 min (Fast) / ~2–5 min (Pro, longer at 4K) |
+| Grok Imagine Quality | ~9 seconds (1K) / ~17 seconds (2K) |
+| Z Image Turbo | ~11 seconds |
+| Nanobanana 2 | ~20 seconds |
+| Flux 2 Klein | ~21 seconds |
+| Nanobanana Pro | ~30 seconds |
+| Agnes Image 2.1 Flash | ~30 seconds |
+| Seedream 4.5 | ~32 seconds |
+| GPT Image 2.0 | ~35 seconds |
+| Seedream 5.0 Lite | ~42 seconds |
+| Midjourney V8.1 | ~50 seconds |
+| Seedream 5.0 Pro | ~2 min (1K) / ~2.5 min (2K) |
+| Grok Video 1.5 (video) | ~35 seconds |
+| Agnes Video 2.0 (video) | ~2 min |
+| Seedance 2.0 (video) | ~2–3 min (Mini, default) / ~2–4 min (Fast) / ~3–6 min (Pro, longer at 4K) |
+| Happyhorse 1.1 (video) | ~2–4 min (720p) — varies with clip length, and runs faster when you supply a first frame; 1080p takes noticeably longer |
 | Veo 3.1 (video) | ~1–4 min (720p / 1080p) / ~6–8 min (4k) |
 
 ### Failed State
@@ -395,7 +451,7 @@ Hover over a completed generation card to reveal action buttons:
 | **Animate** | Converts the still image into a video (image-to-video) |
 | **Delete** | Removes the card from your history |
 | **Use Idea** | Copies the prompt back to the editor for reuse |
-| **Favorite** | Saves to your favorites collection |
+| **Save** | Saves to your favorites collection |
 | **Download** | Saves the image to your device |
 | **Share to X** | Opens a pre-filled tweet with your generated image |
 
@@ -407,10 +463,10 @@ The card also shows the aspect ratio and resolution labels in the bottom-left co
 
 MeiGen uses a dual credit system:
 
-- **Daily credits**: refresh every 24 hours, used for **basic models** (currently only Z Image Turbo).
-- **Purchased credits**: obtained by topping up, never expire, usable on all models.
+- **Daily credits**: a free daily allowance that resets at 00:00 UTC, usable on **basic models** — currently **Z Image Turbo**, **Flux 2 Klein** and **Agnes Image 2.1 Flash** for images, and **Agnes Video 2.0** for video (the only video model daily credits cover). They are grouped under **Basic Models** in the model picker.
+- **Purchased credits**: your non-expiring balance, shown as **Credits** in the sidebar. It covers everything outside the daily allowance — credits you topped up, plus any bonus credits granted to your account (sign-up welcome bonus, referral rewards). Usable on all models.
 
-Generating with premium models (GPT Image 2.0, Nanobanana, Seedream, Midjourney, Seedance, Veo, etc.) requires purchased credits.
+Generating with premium models (GPT Image 2.0, Nanobanana 2 / Pro, Seedream, Midjourney V8.1, Grok Imagine Quality, Seedance 2.0, Veo 3.1, Happyhorse 1.1, Grok Video 1.5, and so on) requires welcome or purchased credits — daily credits never apply to them, whether or not you have purchased before.
 
 **API Token calls** only use purchased credits, regardless of the model; daily credits never apply to the API path.
 
@@ -420,11 +476,13 @@ The credit cost is shown on the Generate button before you submit. Hover over th
 
 | Feature | Free | Paid |
 | --- | --- | --- |
-| 4K resolution | Locked | Available |
+| Highest resolution of each model | Locked | Available |
 | Images per request (Web UI) | 1 | Up to 4 |
-| API access | Not available | Available (purchased credits only) |
+| API access | Available (purchased credits only) | Available (purchased credits only) |
 
 > The "Images per request" limit applies to the Web UI only. Each API call always returns 1 image (Midjourney V8.1 always returns 4 candidates per call).
+>
+> Creating an API token does not require a paid account — any account can issue one from Settings → API Keys. What API calls do require is purchased credits, since daily free credits never apply on the API path.
 
 ---
 
@@ -448,6 +506,6 @@ The credit cost is shown on the Generate button before you submit. Hover over th
   </Accordion>
 
   <Accordion title="Why does the resolution selector show a lock icon?" icon="lock">
-    4K resolution is available to paid users only. Free users can generate at 2K resolution. Upgrade your account to unlock higher resolutions.
+    The top resolution of each model is reserved for paid users — 4K on models offering 2K / 4K, 3K on Seedream 5.0 Lite, and 2K on models offering 1K / 2K. Upgrade your account to unlock it.
   </Accordion>
 </AccordionGroup>

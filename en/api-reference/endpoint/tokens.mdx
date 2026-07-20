@@ -16,6 +16,10 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   -d '{"prompt": "a minimalist logo"}'
 ```
 
+<Note>
+  Token management itself (`POST` / `GET` / `DELETE /api/tokens`) is authenticated with a logged-in browser session, not with an API key — an API key cannot create or revoke tokens. Manage them from account settings.
+</Note>
+
 <Warning>
   **API tokens can only spend purchased credits.** Daily free credits are not available via the API.
 </Warning>

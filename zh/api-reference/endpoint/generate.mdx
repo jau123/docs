@@ -7,7 +7,7 @@ description: "使用 AI 模型生成图片或视频"
 POST /api/generate/v2
 ```
 
-提交图片或视频生成请求。生成异步进行 — 使用[状态查询端点](#查询生成状态)轮询完成情况。同一端点同时支持图片模型（GPT Image 2、Nanobanana、Seedream、Midjourney 等）和视频模型（Seedance 2.0、Veo 3.1），通过 `modelId` 选择。
+提交图片或视频生成请求。生成异步进行 — 使用[状态查询端点](#查询生成状态)轮询完成情况。同一端点同时支持图片模型（GPT Image 2、Nanobanana、Seedream、Midjourney 等）和视频模型（Seedance 2.0、Veo 3.1、Grok Video 等），通过 `modelId` 选择。
 
 ## 请求
 
@@ -25,11 +25,11 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="modelId" type="string">
-  用于生成的模型。不传则使用平台当前默认模型（可能随平台配置变化）。从[模型列表](/zh/api-reference/endpoint/models)端点获取可用模型。
+  用于生成的模型。不传则使用平台当前默认模型（可能随平台配置变化）。
 
-  图片模型：`gpt-image-2`, `gemini-3-pro-image-preview`, `nanobanana-2`, `seedream-5.0-lite`, `seedream-4.5`, `midjourney-v8.1`, `flux2-klein`, `z-image-turbo`
+  **[模型列表](/zh/api-reference/endpoint/models)是模型 ID 的权威来源。** 模型会不断上新与下线，请在运行时动态解析 ID，不要在自己这边硬编码一份模型清单。该端点返回的所有模型都可用于本端点，API Token 调用同样不受限。
 
-  视频模型：`seedance-2-0`, `happyhorse-1.0`, `veo-3.1`
+  常用取值：图片 `gpt-image-2`、`nanobanana-2`、`midjourney-v8.1`；视频 `seedance-2-0`、`veo-3.1`。
 
   > `rhart-1.5`（GPT image 1.5）已于 2026-04-22 下线，请改用 `gpt-image-2`。`midjourney-v7` 已于 2026-05-09 由 `midjourney-v8.1` 接替（出于向后兼容仍接受老 ID 调用）。
 </ParamField>
@@ -39,15 +39,16 @@ POST /api/generate/v2
 
   - 默认 `auto`（推荐）：为你自动挑选合适的比例。
   - 也可显式指定——必须是 [模型列表](/zh/api-reference/endpoint/models) 返回的 `supported_ratios` 之一。常见图片比例：`1:1`, `3:4`, `4:3`, `16:9`, `9:16`, `21:9`, `5:4`, `4:5`。
-  - Seedance 还接受特殊值 `adaptive`，按 `referenceImages` 或 `referenceVideo` 的尺寸自适应。仅在提供其中之一时才使用 `adaptive`；无参考时的行为未定义。
+  - Seedance 2.0 还接受特殊值 `adaptive`，按 `referenceImages` 或 `referenceVideo` 的尺寸自适应。仅在提供其中之一时才使用 `adaptive`；无参考时的行为未定义。
+  - **Seedance 2.0 上不传 `aspectRatio`（或传了无法识别的取值）都会解析为 `adaptive`。** 纯文生视频没有可供自适应的参考，因此在不带参考图/参考视频生成时，请务必显式指定比例。
 
-  最终采用的比例会通过状态端点的 `aspectRatio` 字段回传。
+  最终采用的比例会同时在本端点的响应和状态端点的 `aspectRatio` 字段返回。
 </ParamField>
 
 <ParamField body="resolution" type="string">
   输出分辨率。可用性取决于模型。不传则使用所选模型的默认分辨率。
 
-  可选值取决于模型：图片模型支持 `1K` / `2K` / `3K` / `4K`；视频模型支持 `480p` / `720p` / `1080p`。各模型实际支持的分辨率和默认值详见[模型对比](/zh/features/models)。
+  可选值取决于模型：图片模型用 `1K` / `2K` / `3K` / `4K`；视频模型用 `480p` / `720p` / `1080p` / `4k`（视频侧的 k 是小写）。并非每个视频模型都支持全部取值 —— `4k` 仅 Seedance 2.0 的 `pro` 档和 Veo 3.1 支持，Seedance 上的 `1080p` 同样需要 `pro` 档。各模型实际支持的分辨率和默认值详见[模型对比](/zh/features/models)。
 </ParamField>
 
 <ParamField body="quality" type="string" default="low">
@@ -55,9 +56,18 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">
-  用作参考的图片 URL 数组。必须是可公开访问的 HTTPS URL。
+  参考图数组。每一项必须是可公开访问的 HTTP(S) URL，或形如 `data:image/png;base64,...` 的内联 base64 数据。本地文件路径（如 `C:/Users/...`）与 `file://` URI 会被拒绝，返回 `400` / `invalid_reference_url`。
 
-  最大数量按模型不同——参考[模型列表](/zh/api-reference/endpoint/models)的 `max_reference_images` 字段。Z Image Turbo 不支持参考图；Midjourney V8.1 / Happyhorse 1.0 仅支持 1 张；其他模型最多 5 张。
+  最大数量按模型不同——请始终以[模型列表](/zh/api-reference/endpoint/models)返回的 `max_reference_images` 为准。撰写时的实况：
+
+  | 上限 | 模型 |
+  | --- | --- |
+  | 10 | Seedream 5.0 Pro |
+  | 5 | GPT Image 2.0、Nanobanana 2、Nanobanana Pro、Seedream 5.0 Lite、Seedream 4.5 |
+  | 3 | Grok Imagine Quality |
+  | 2 | Seedance 2.0、Veo 3.1 |
+  | 1 | Midjourney V8.1、Happyhorse 1.1、Agnes Image 2.1 Flash、Agnes Video 2.0、Grok Video 1.5 |
+  | 0 | Flux 2 Klein、Z Image Turbo |
 </ParamField>
 
 <ParamField body="niji7Options" type="object">
@@ -82,11 +92,28 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="duration" type="number">
-  视频时长(秒)。Seedance 2.0:4-15(默认 5)。Happyhorse 1.0:3-15(默认 5)。Veo 3.1:4、6 或 8(默认 4)—— 只接受这三个值。
+  视频时长(秒)。不传则按该模型的默认时长出片。
+
+  | 模型 | 可选值 | 默认 |
+  | --- | --- | --- |
+  | Seedance 2.0 | 4-15 | 4 |
+  | Veo 3.1 | 仅 4、6、8 | 4 |
+  | Grok Video 1.5 | 4-15 | 4 |
+  | Happyhorse 1.1 | 3-15 | 4 |
+  | Agnes Video 2.0 | 仅 5(固定) | 5 |
+
+  **调用视频模型时请始终显式传 `duration`。** 上表"默认"列只是不传该字段时实际出片的时长,计费并不跟着它走:漏传 `duration` 时,费用会回落到该模型的名义单价,而不是按出片时长计算,因而可能明显高于显式写清时长的同一请求。Veo 3.1 的落差最大 —— 漏传时按该模型单次计费的最高价扣,显式传 `duration: 4` 则按 4 秒档计费。
+
+  无论怎么传,实际扣除的积分都会在响应的 `creditsUsed` 中返回,请以该字段为准,不要自行推算。
 </ParamField>
 
 <ParamField body="tier" type="string">
-  支持多档位模型的画质档位。当前 Seedance 2.0 和 Veo 3.1 支持:`fast`(默认)或 `pro`。Pro 档以更高画质渲染,单价也更高 —— 完整价格矩阵见[模型](/zh/features/models)。
+  支持多档位模型的画质档位。
+
+  - Seedance 2.0:`mini`(默认)、`fast` 或 `pro`
+  - Veo 3.1:`fast`(默认)或 `pro`
+
+  档位越高画质越好,每秒单价也越高。不传则使用该模型自身的默认档 —— 注意 Seedance 2.0 的默认档是最便宜的 `mini`。完整价格矩阵见[模型](/zh/features/models)。
 </ParamField>
 
 <ParamField body="referenceVideo" type="string">
@@ -121,6 +148,10 @@ POST /api/generate/v2
   本次生成使用的模型。
 </ResponseField>
 
+<ResponseField name="aspectRatio" type="string">
+  本次生成最终采用的宽高比。默认 `auto` 会选择合适的比例，提交时即在此返回 —— 无需等第一次轮询，可用于在界面上按正确比例预留占位。
+</ResponseField>
+
 <ResponseField name="credits" type="object">
   扣除后更新的积分余额。
 
@@ -138,6 +169,7 @@ POST /api/generate/v2
   "status": "processing",
   "creditsUsed": 10,
   "modelId": "gpt-image-2",
+  "aspectRatio": "1:1",
   "credits": {
     "daily": 2,
     "purchased": 50,
@@ -211,6 +243,7 @@ GET /api/generate/v2/status/:generationId
 {
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "failed",
+  "creditsStatus": "refunded",
   "imageUrl": null,
   "imageUrls": null,
   "videoUrl": null,
@@ -220,7 +253,7 @@ GET /api/generate/v2/status/:generationId
 }
 ```
 
-生成失败时，积分会自动退还。
+生成失败时，积分会自动退还。可通过 `creditsStatus` 确认退款是否落地：`pending`（已预扣，结果未定）、`confirmed`（已实际扣费）、`refunded`（已退回余额）。
 
 ## 示例
 
@@ -286,7 +319,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-计费：720p × 5 秒 = 20 × 5 = **100 积分**。
+计费：这里没有传 `tier`，因此走 Seedance 的默认 **Mini** 档 —— 720p 单价 16 积分/秒 × 5 秒 = **80 积分**。改传 `"tier": "fast"`（20 积分/秒 → 100 积分）或 `"pro"` 会更贵，详见[模型](/zh/features/models)。
 
 ### Seedance 视频续写（参考视频）
 
@@ -305,7 +338,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-计费：480p 带参考视频单价 8 积分/秒，计费秒数 = max(3 + 5, 9) = 9 秒，共 **72 积分**。输出视频长度 = `duration` = 5 秒。
+计费：这里没有传 `tier`，因此走默认 **Mini** 档 —— 480p 带参考视频单价 7 积分/秒，计费秒数 = max(3 + 5, 9) = 9 秒，共 **63 积分**。同样的请求走 `fast` 档则是 8 × 9 = 72 积分。输出视频长度 = `duration` = 5 秒。
 
 ### 让系统自动选比例（Auto）
 
@@ -320,4 +353,4 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-实际采用的比例会通过状态端点的 `aspectRatio` 字段返回。
+实际采用的比例会通过 `aspectRatio` 字段返回 —— 本次请求的响应和状态端点里都有。

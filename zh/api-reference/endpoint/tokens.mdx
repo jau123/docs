@@ -16,6 +16,10 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   -d '{"prompt": "a minimalist logo"}'
 ```
 
+<Note>
+  Token 管理本身（`POST` / `GET` / `DELETE /api/tokens`）使用登录后的浏览器 session 鉴权，而非 API Key —— API Key 无法创建或撤销 Token，请在账户设置中管理。
+</Note>
+
 <Warning>
   **API Token 只能消耗购买积分。** 每日免费积分不可用于 API 调用。
 </Warning>

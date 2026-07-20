@@ -118,7 +118,7 @@ npx meigen gen -p "..." --no-wait
 npx meigen gen -p "..." --json | jq -r '.imageUrls[0]'
 ```
 
-Generated images save to `~/Pictures/meigen/` by default (override with `MEIGEN_OUTPUT_DIR`, or on Linux with `XDG_PICTURES_DIR`).
+Generated images save to `~/Pictures/meigen/` by default — see [Output Directories](#output-directories) to change where files land.
 
 ### OpenClaw
 
@@ -164,7 +164,7 @@ Configure one or more providers. When multiple are available, the plugin selects
 
 ### MeiGen Cloud
 
-The easiest way to get started. Access 9 image and video models — GPT Image 2, Nanobanana Pro/2, Seedream, Midjourney V8.1, Flux 2 Klein, Seedance 2.0 (fast/pro), Happyhorse 1.0, and Veo 3.1 — through MeiGen's hosted API.
+The easiest way to get started. MeiGen's hosted API gives you image and video models from OpenAI, Google, ByteDance, Midjourney, xAI, Black Forest Labs, Alibaba, and Agnes — no GPU required. Call `list_models` for the current lineup, or see the [model comparison](/en/features/models) for capabilities and pricing.
 
 | Variable | Value |
 | --- | --- |
@@ -203,6 +203,19 @@ Run image generation on your own GPU with full control over models, samplers, an
 <Note>
   ComfyUI runs serially: one image at a time.
 </Note>
+
+---
+
+## Output Directories
+
+Generated files are written to disk by both the MCP tools and the standalone CLI.
+
+| Type | Default location | Override | Linux fallback |
+| --- | --- | --- | --- |
+| Images | `~/Pictures/meigen/` | `MEIGEN_OUTPUT_DIR` | `XDG_PICTURES_DIR` |
+| Videos | `~/Movies/meigen/` | `MEIGEN_VIDEO_OUTPUT_DIR` | `XDG_VIDEOS_DIR` |
+
+Set these the same way as your provider variables — in the `env` block of your MCP config, or exported in your shell for CLI use.
 
 ---
 
@@ -259,7 +272,9 @@ Once installed, ask your AI assistant in plain language — for example, "Genera
   </Accordion>
 
   <Accordion title="Generation timeout" icon="circle-exclamation">
-    Generation times vary by model and provider. MeiGen Cloud models range from 5–60 seconds. ComfyUI depends on your GPU. The plugin waits up to 5 minutes before timing out.
+    Generation times vary by model and provider. MeiGen Cloud image models typically finish in 5–60 seconds; video generation takes 1–8 minutes. ComfyUI depends on your GPU.
+
+    Timeouts: `generate_image` waits up to 5 minutes, `generate_video` up to 8 minutes, and both the standalone CLI and ComfyUI up to 5 minutes.
   </Accordion>
 
   <Accordion title="Changes to config not taking effect" icon="circle-exclamation">

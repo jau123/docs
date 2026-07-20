@@ -118,7 +118,7 @@ npx meigen gen -p "..." --no-wait
 npx meigen gen -p "..." --json | jq -r '.imageUrls[0]'
 ```
 
-图像保存到 `~/Pictures/meigen/`(可用 `MEIGEN_OUTPUT_DIR` 覆盖;Linux 可用 `XDG_PICTURES_DIR`)。
+图像默认保存到 `~/Pictures/meigen/` — 改保存位置见[输出目录](#输出目录)。
 
 ### OpenClaw
 
@@ -164,7 +164,7 @@ npx clawhub@latest install creative-toolkit
 
 ### MeiGen Cloud
 
-最简单的入门方式。通过 MeiGen 的托管 API 访问 9 个图像和视频模型 — GPT Image 2、Nanobanana Pro/2、Seedream、Midjourney V8.1、Flux 2 Klein、Seedance 2.0(fast/pro)、Happyhorse 1.0、Veo 3.1。
+最简单的入门方式。MeiGen 的托管 API 汇集了 OpenAI、Google、ByteDance、Midjourney、xAI、Black Forest Labs、Alibaba、Agnes 的图像与视频模型 — 无需 GPU。当前清单用 `list_models` 查，能力与定价见[模型对比](/zh/features/models)。
 
 | 变量 | 值 |
 | --- | --- |
@@ -203,6 +203,19 @@ npx clawhub@latest install creative-toolkit
 <Note>
   ComfyUI 串行处理：每次只生成一张图片。
 </Note>
+
+---
+
+## 输出目录
+
+MCP 工具和独立 CLI 都会把生成结果落盘到本地。
+
+| 类型 | 默认位置 | 覆盖变量 | Linux 备选 |
+| --- | --- | --- | --- |
+| 图片 | `~/Pictures/meigen/` | `MEIGEN_OUTPUT_DIR` | `XDG_PICTURES_DIR` |
+| 视频 | `~/Movies/meigen/` | `MEIGEN_VIDEO_OUTPUT_DIR` | `XDG_VIDEOS_DIR` |
+
+设置方式与提供商变量相同 — 写在 MCP 配置的 `env` 块里，或在 shell 里 export 供 CLI 使用。
 
 ---
 
@@ -259,7 +272,9 @@ npx clawhub@latest install creative-toolkit
   </Accordion>
 
   <Accordion title="生成超时" icon="circle-exclamation">
-    生成时间因模型和提供商而异。MeiGen Cloud 模型的生成时间在 5-60 秒之间。ComfyUI 取决于你的 GPU 性能。插件最多等待 5 分钟后超时。
+    生成时间因模型和提供商而异。MeiGen Cloud 图片模型通常 5-60 秒；视频生成需要 1-8 分钟。ComfyUI 取决于你的 GPU 性能。
+
+    超时上限：`generate_image` 最多等 5 分钟，`generate_video` 最多等 8 分钟，独立 CLI 和 ComfyUI 均为 5 分钟。
   </Accordion>
 
   <Accordion title="配置修改未生效" icon="circle-exclamation">

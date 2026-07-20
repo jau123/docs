@@ -3,7 +3,7 @@ title: "AI Art Gallery"
 description: "Browse MeiGen's AI art gallery — thousands of curated AI-generated images with prompts. Find prompts and inspiration by theme (holidays, product ads, portraits) with hybrid search, then reuse any prompt."
 ---
 
-The gallery is MeiGen's home screen — a curated collection of AI-generated artwork sourced from the community on X (Twitter), updated weekly across multiple AI models.
+The gallery is MeiGen's home screen — a curated mix of AI-generated artwork sourced from the community on X (Twitter) and submitted directly by MeiGen creators, updated daily across multiple AI models.
 
 ## Browsing the Gallery
 
@@ -17,10 +17,12 @@ Use the category tags in the left sidebar to filter the gallery:
 | --- | --- |
 | **Ads & Product** | Product photography, packaging, marketing visuals |
 | **Brand & Logo** | Logos, brand identity, visual systems |
+| **Videos** | Hand-picked AI videos from top creators — clicking switches to the video view |
 | **Illustration & 3D** | Digital art, concept art, 3D renders, character design |
 | **Posters & Visuals** | Posters, key visuals, graphic and layout design |
 | **Portraits** | People, portraits, and photographic styles |
-| **Videos** | Hand-picked AI videos from top creators — clicking switches to the video view |
+| **Storyboard & Characters** | Storyboard sequences and character sheets — reusable prompts for consistent characters |
+| **Wallpaper** | Desktop and phone wallpapers |
 
 You can also switch to **Recent** view to see the latest additions in chronological order.
 
@@ -60,7 +62,7 @@ When you hover over a card, an overlay appears with three actions:
     This button only appears when the prompt has been extracted and is available. Some newer posts may show "Prompt Pending" while the prompt is being processed.
   </Accordion>
 
-  <Accordion title="Favorite" icon="layer-group">
+  <Accordion title="Save" icon="heart">
     Saves the image to your personal favorites collection. Click again to remove it. Requires sign-in.
 
     Favorites are synced across all your devices — save on desktop, access on mobile.
@@ -85,6 +87,8 @@ Gallery cards are draggable — you can grab any card and drag it to different a
 ### Mobile
 
 On mobile devices, there are no hover actions. Tapping a card opens the full image detail view directly, where all actions are accessible.
+
+Generation is fully available on mobile too — tap **Generate** in the bottom dock. Your generation history, favorites, boards, and credits all live in the mobile app shell as well.
 
 ---
 
@@ -134,6 +138,16 @@ The gallery also includes video content:
 - **Self-generated videos** (created on MeiGen) — auto-play directly in the dialog with playback controls and looping
 - **Videos from X** — due to cross-origin restrictions, these cannot play directly. A "View on Twitter" link is shown instead, opening the original post where you can watch the video.
 
+### Sharing
+
+Images and videos each have their own shareable page. Use the share button in the detail view (or in the mobile video feed) to copy a link — anyone can open it, signed in or not. Videos get a dedicated video page rather than the image one, so shared video links play correctly.
+
+### Reporting & Blocking
+
+Every image and video has a **Report** option in its detail view (and in the top-right menu of the mobile video feed). Pick a reason — sexual or explicit content, violence or gore, hate or harassment, copyright / IP violation, spam or misleading, or *report this author* for abusive or impersonating accounts — and add details if you want. Our team reviews every report and can dismiss it, take the content down, or remove all of that author's content.
+
+You can also **Block author** from the same menu. The block is saved to your account and hides that author's content in the MeiGen mobile app.
+
 ---
 
 ## Finding Prompts & Inspiration
@@ -142,7 +156,7 @@ Looking for prompt ideas — for a holiday like Father's Day, a product ad, a po
 
 - **Search by theme or keyword** — open search (`Cmd+K` / `Ctrl+K`) and type what you want (e.g. "father's day", "jewelry logo", "street fashion"). Hybrid search matches both the wording and the visual content of thousands of community prompts.
 - **Reuse any prompt** — click **Use Idea** on a card to drop its prompt straight into the [generation editor](/en/features/generate), then tweak the blue `[variable]` tags.
-- **Filter by category** — narrow to Ads & Product, Brand & Logo, Portraits, and more from the left sidebar.
+- **Filter by category** — narrow to Ads & Product, Brand & Logo, Portraits, Storyboard & Characters, Wallpaper, and more from the left sidebar.
 
 <Card title="Browse the gallery on MeiGen" icon="images" href="https://www.meigen.ai">
   Open MeiGen to search thousands of prompts and start generating.
@@ -150,43 +164,63 @@ Looking for prompt ideas — for a holiday like Father's Day, a product ad, a po
 
 ## Search
 
-Open the search dialog by pressing `Cmd+K` (Mac) or `Ctrl+K` (Windows), or by clicking the search icon in the left sidebar. The dialog has two tabs:
+On desktop, open the search dialog by pressing `Cmd+K` (Mac) or `Ctrl+K` (Windows), or by clicking the search icon in the left sidebar — **sign-in is required**, and if you aren't signed in the sign-in dialog opens instead. On mobile, the search page is open to everyone and needs no sign-in.
 
-### Posts Tab
+Search covers the gallery of community artwork.
 
-Search across the entire gallery of community artwork.
+- **Type and press `Enter`** — the dialog closes and the results page opens with your query
+- **Hybrid search** — combines text matching with vector (semantic) search, across prompts, descriptions, and visual content
+- **Suggestions** — as you type, popular search terms appear beneath the input with the matching prefix highlighted. Click one to search it, or use `↑` / `↓` to pick and `Enter` to confirm
+- **Before you type** — the dialog shows shortcuts back into what you were doing: your recent searches, images you recently viewed, and your most recent saves. Click any recent search to run it again, or any thumbnail to reopen that image
+- **Search by image** — click the camera icon in the search bar to upload an image and find visually similar artwork
+- **Infinite scroll** — results load progressively as you scroll the results page
 
-- **Hybrid search** — combines text matching with vector (semantic) search. Searches across prompts, descriptions, and visual content.
-- **Filters** — narrow results by:
-  - **Model** — filter to images from a specific AI model
-  - **Category** — filter by content category (Ads & Product, Portraits, etc.)
-  - **Has Prompt** — only show images where the prompt is available
-- **Empty query** — when you haven't typed anything, the search shows **Recent Posts** as default content
-- **Infinite scroll** — results load progressively as you scroll down
-- **Real-time** — search fires automatically after you stop typing (300ms debounce)
-
-### Generations Tab
-
-Search your own generated images. Requires sign-in.
-
-- Search by prompt text across all your past generations
-- Navigate results with keyboard: `↑` / `↓` arrow keys to move, `Enter` to open
-- Shows pending, completed, and failed generations
+<Note>
+  **Daily search limit** — free accounts get a daily search allowance, whether or not you're signed in. Text search and image search draw on the same allowance, and paging through results does not count as an extra search. Paid accounts are not limited. Prompt translation is unlimited on all accounts.
+</Note>
 
 ---
 
 ## Favorites
 
-Access your favorites from the sidebar or the floating dock. Your favorites collection stores two types of content:
+Access your saved content from the sidebar or the floating dock. The page has two areas: **Boards** at the top and **Saves** below.
+
+### Boards
+
+Boards let you group saves into named collections instead of one long list.
+
+- **Create** — click the create card in the Boards row and name it (e.g. "Posters")
+- **Add** — use **Save to board** on any gallery card, video, or one of your own generations. Both images and videos can be filed
+- **Organize** — rename a board, set a cover image, merge one board into another, or delete it. Deleting a board keeps its items — they return to Saves
+- **Share** — boards are private by default. Make one public to get a shareable link; visitors can browse it and use **Save as my board** to copy the whole board into their own account, and anything saved from the gallery still credits the original author
+
+### Saves
+
+Saves stores two types of content:
 
 - **Gallery posts** — community artwork you've saved from the gallery
 - **Your generations** — images you've generated and favorited
 
+Anything you have filed into a board is hidden from Saves, so the two areas never show the same item twice.
+
 ### Managing Favorites
 
-- **Add** — click the Favorite button (layer icon) on any gallery card or generation card
-- **Remove** — click the Favorite button again, or use the remove button in the favorites grid
+- **Add** — click the **Save** button (heart icon) on any gallery card or generation card
+- **Remove** — click the **Save** button again, or use the remove button in the saves grid
 - **Filter** — switch between All / Posts / Generations tabs to view specific content types
-- **Sync** — favorites are tied to your account and synced across all devices
+- **Sync** — favorites and boards are tied to your account and synced across all devices
 
-Favorited cards in the favorites grid also support hover actions: **Use Idea** (if prompt available) and **Remove from Favorites**.
+Saved cards in the grid also support hover actions: **Use Idea** (if prompt available) and removing the item from your saves.
+
+---
+
+## Publishing Your Work to the Gallery
+
+You can submit your own generations to the public gallery. Submissions are reviewed by our team; accepted work is published with your profile name and avatar as the author.
+
+- **Submit** — use *Publish to gallery* from a generation's menu. Both images and videos can be submitted
+- **Track** — the **My Submissions** page shows the status of everything you sent in, with a link straight to each published piece
+- **Your author link** — set a social profile URL in your MeiGen profile and it is attached to every one of your published pieces at once. Only personal-profile URLs on a list of supported platforms are accepted
+- **Paid-creator badge** — published work from creators with a paid account carries a gold badge in the gallery
+
+Once a submission is accepted and published, it stays in the gallery even if you later delete your account — see [Account & Data Deletion](/en/account) for what happens to your name and profile information in that case.

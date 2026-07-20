@@ -36,7 +36,7 @@ Returns a single curated gallery image (not your own generation result). The `id
   | `thumbnail_url` | string | Thumbnail URL (often the same as `media_urls[0]`) |
   | `image_width` | number \| null | Width in pixels |
   | `image_height` | number \| null | Height in pixels |
-  | `model` | string \| null | Model family label: `"nanobanana"`, `"midjourney"`, or `"gptimage"`. **This is not a `modelId`** — use it for filtering / display only, not as input to `/api/generate/v2` |
+  | `model` | string \| null | Label for the model the source artwork was made with. Granularity is mixed: some values are coarse family names (`"nanobanana"`, `"gptimage"`, `"midjourney"`, `"other"`), others are exact model IDs (e.g. `"flux2-klein"`, `"seedream-4.5"`). New values appear as new models are added. Treat it as a display / filter label — don't assume it can be passed straight to `/api/generate/v2`; resolve generation IDs from [List Models](/en/api-reference/endpoint/models) |
   | `sref` | string \| null | Midjourney style reference code, when present — reuse it to apply the same style; `null` for non-Midjourney images |
   | `created_at` | string | ISO 8601 timestamp (informational) |
   | `likes` / `views` / `retweets` | number | Engagement metrics from the original source post |
