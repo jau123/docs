@@ -1,6 +1,6 @@
 ---
 title: "AI Model Comparison"
-description: "Compare AI image & video models on MeiGen — GPT Image 2.0, Seedream 5.0 Pro, Midjourney V8.1, Nano Banana 2, Seedream 5.0 Lite, Flux 2 Klein, Agnes Image 2.1 Flash, Seedance 2.0, Happyhorse 1.1, Veo 3.1, Agnes Video 2.0. Features, pricing, aspect ratios side by side."
+description: "Compare AI image & video models on MeiGen — GPT Image 2.0, Seedream 5.0 Pro, Midjourney V8.1, Nano Banana 2, Seedream 5.0 Lite, Flux 2 Klein, Agnes Image 2.1 Flash, Seedance 2.0, Veo 3.1, Agnes Video 2.0. Features, pricing, aspect ratios side by side."
 ---
 
 MeiGen supports multiple AI models for image and video generation. Use the comparison table below to pick one, then scroll to its section for detailed specs.
@@ -22,11 +22,10 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Agnes Image 2.1 Flash** | 1 | Fast (~30s) | 1 | Cheapest model, high-volume drafts, covered by daily free credits |
 | **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame + reference video | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio |
 | **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video, ~35s | First frame (required) | First-frame image-to-video only, 4–15s, ratio follows input, audio |
-| **Happyhorse 1.1** | Per-second (720p 18/sec, 1080p 28/sec) | Video, ~2-4min (720p) | First frame (single image) | 3–15s adjustable duration, text-to-video + first-frame i2v, audio included |
 | **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-8min | Up to 2 (first/last frame) | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
 | **Agnes Video 2.0** | 10 per video (480p, 2/sec × 5s) | Video, ~2min | First frame (single image) | Fixed 5s / 480p, the only video model covered by daily free credits |
 
-> GPT image 1.5 was retired on 2026-04-22 (replaced by GPT Image 2.0). Midjourney V7 was replaced by V8.1 on 2026-05-09.
+> GPT image 1.5 was retired on 2026-04-22 (replaced by GPT Image 2.0). Midjourney V7 was replaced by V8.1 on 2026-05-09. Happyhorse 1.1 was retired on 2026-07-31.
 
 ## Image Models
 
@@ -331,46 +330,6 @@ xAI's image-to-video model. A starting (first-frame) image is **required** — p
 
 ---
 
-### Happyhorse 1.1
-
-| | |
-| --- | --- |
-| **Model ID** | `happyhorse-1.1` |
-| **Provider** | Alibaba |
-| **Credits** | Per-second (see below) |
-| **Duration** | 3–15 seconds (default 4) |
-| **Reference images** | 1 (first frame, image-to-video) |
-| **Reference video** | Not supported |
-| **Resolutions** | 720p, 1080p (default 720p) |
-| **Aspect ratios** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
-| **Audio** | Auto-generated |
-
-Alibaba's video model — text-to-video and single-image first-frame image-to-video. AI-generated audio included. No reference-video continuation. **Auto** aspect ratio infers the output ratio from your prompt or reference image.
-
-Typical 720p runs take about 2–4 minutes; the time scales with the clip length you choose, and first-frame image-to-video generally finishes faster than pure text-to-video. 1080p takes noticeably longer.
-
-#### Pricing
-
-| Resolution | Rate |
-| --- | --- |
-| 720p | 18 credits/sec |
-| 1080p | 28 credits/sec |
-
-**Examples:**
-
-| Scenario | Calculation | Total |
-| --- | --- | --- |
-| 720p × 5s | 18 × 5 | **90** |
-| 720p × 10s | 18 × 10 | **180** |
-| 1080p × 5s | 28 × 5 | **140** |
-| 1080p × 10s | 28 × 10 | **280** |
-
-<Note>
-  If generation fails, the **full** credit amount is automatically refunded.
-</Note>
-
----
-
 ### Veo 3.1
 
 | | |
@@ -430,7 +389,7 @@ Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 
 | **Resolutions** | 480p |
 | **Aspect ratios** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
 
-The only basic-tier video model — and the only one your daily free credits cover. Supports text-to-video and single-image first-frame image-to-video at a fixed 5 seconds / 480p. For higher resolution or longer clips, use Seedance 2.0, Happyhorse 1.1, or Veo 3.1.
+The only basic-tier video model — and the only one your daily free credits cover. Supports text-to-video and single-image first-frame image-to-video at a fixed 5 seconds / 480p. For higher resolution or longer clips, use Seedance 2.0 or Veo 3.1.
 
 #### Pricing
 
@@ -465,10 +424,6 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
     Unlike other models that return a single image, Midjourney V8.1 returns 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (15 credits at 1K / 20 credits at 2K) for all 4 images.
   </Accordion>
 
-  <Accordion title="Happyhorse 1.1 — No reference video continuation" icon="triangle-exclamation">
-    Unlike Seedance 2.0, Happyhorse does not support video continuation. Reference image input is single first-frame only. For continuation, use Seedance 2.0.
-  </Accordion>
-
   <Accordion title="GPT Image 2.0 — Stricter moderation" icon="triangle-exclamation">
     GPT Image 2.0 applies stricter moderation than other models to real people, celebrities, brand logos, and adult/violent content. Rephrase your prompt to drop specific names, or try a different model.
   </Accordion>
@@ -482,7 +437,7 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
   </Accordion>
 
   <Accordion title="Grok Video 1.5 — First frame required" icon="triangle-exclamation">
-    Grok Video 1.5 is image-to-video only — you **must** upload a starting (first-frame) image. Pure text-to-video is not supported. The output aspect ratio follows your input image. If you want text-to-video, use Seedance 2.0, Happyhorse 1.1, or Veo 3.1.
+    Grok Video 1.5 is image-to-video only — you **must** upload a starting (first-frame) image. Pure text-to-video is not supported. The output aspect ratio follows your input image. If you want text-to-video, use Seedance 2.0 or Veo 3.1.
   </Accordion>
 
   <Accordion title="Grok Video 1.5 — 480p / 720p only" icon="triangle-exclamation">
@@ -490,7 +445,7 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
   </Accordion>
 
   <Accordion title="Veo 3.1 — Limited aspect ratios" icon="triangle-exclamation">
-    Veo 3.1 only supports 16:9 / 9:16 (plus Auto). Square (1:1), 4:3 / 3:4 portrait, and other ratios are not available. For wider ratio support, use Seedance 2.0 or Happyhorse 1.1.
+    Veo 3.1 only supports 16:9 / 9:16 (plus Auto). Square (1:1), 4:3 / 3:4 portrait, and other ratios are not available. For wider ratio support, use Seedance 2.0.
   </Accordion>
 
   <Accordion title="Veo 3.1 — 4k costs no extra credits, but needs a paid account" icon="circle-info">

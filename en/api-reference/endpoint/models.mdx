@@ -62,7 +62,7 @@ Every model returned by this endpoint can be used with `POST /api/generate/v2`, 
   | `tierResolutions` | Seedance 2.0 | Resolutions actually available in each tier, keyed by tier. Takes precedence over the top-level `resolutions` |
   | `tiers` | Seedance 2.0 / Veo 3.1 | Available tiers, selected via `tier` (Seedance 2.0: `mini` / `fast` / `pro`; Veo 3.1: `fast` / `pro`) |
   | `durations` | Video models | Allowed values for `duration` (seconds) |
-  | `pricingPerSec` | Seedance 2.0 / Grok Video 1.5 / Happyhorse 1.1 / Agnes Video 2.0 | Per-second rate, keyed by resolution — or by tier then resolution on models that expose tiers |
+  | `pricingPerSec` | Seedance 2.0 / Grok Video 1.5 / Agnes Video 2.0 | Per-second rate, keyed by resolution — or by tier then resolution on models that expose tiers |
   | `pricingPerCall` | Veo 3.1 | Credits per generation, looked up by tier then `duration`. Mutually exclusive with `pricingPerSec`; when present it takes precedence |
   | `pricingPerSecWithVideo` | Seedance 2.0 | Per-second rate with `referenceVideo`, keyed by tier then resolution |
   | `minBillableTable` | Seedance 2.0 | Minimum billable seconds keyed by `duration` (continuation only) |

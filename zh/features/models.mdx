@@ -1,6 +1,6 @@
 ---
 title: "AI 模型对比"
-description: "MeiGen 提供多款 AI 图片与视频模型对比 — GPT Image 2.0、Seedream 5.0 Pro、Midjourney V8.1、Nano Banana 2、Seedream 5.0 Lite、Flux 2 Klein、Agnes Image 2.1 Flash、Seedance 2.0、Happyhorse 1.1、Veo 3.1、Agnes Video 2.0。功能、定价、宽高比一目了然。"
+description: "MeiGen 提供多款 AI 图片与视频模型对比 — GPT Image 2.0、Seedream 5.0 Pro、Midjourney V8.1、Nano Banana 2、Seedream 5.0 Lite、Flux 2 Klein、Agnes Image 2.1 Flash、Seedance 2.0、Veo 3.1、Agnes Video 2.0。功能、定价、宽高比一目了然。"
 ---
 
 MeiGen 支持多种 AI 模型用于图片和视频生成。先看下方对比表决定用哪个，再翻到具体章节查看参数细节。
@@ -22,11 +22,10 @@ MeiGen 支持多种 AI 模型用于图片和视频生成。先看下方对比表
 | **Agnes Image 2.1 Flash** | 1 | 快（约 30 秒） | 1 | 全站最便宜、大批量草稿、每日免费积分可用 |
 | **Seedance 2.0** | 按秒（Mini 9-16/秒，Fast 13-20/秒，Pro 14-100/秒）| 视频，约 2-6 分钟 | 首帧/末帧 + 参考视频 | 三个档位（Mini / Fast / Pro）、Pro 最高 4K、4-15 秒、自带音频 |
 | **Grok Video 1.5** | 按秒（480p 16/秒，720p 28/秒）| 视频，约 35 秒 | 1（首帧，必填）| 仅首帧图生视频、4-15 秒、比例跟随输入图、自带音频 |
-| **Happyhorse 1.1** | 按秒（720p 18/秒，1080p 28/秒）| 视频，约 2-4 分钟（720p） | 1（首帧）| 3-15 秒可调、文生视频 + 单图首帧图生视频、自带音频 |
 | **Veo 3.1** | 单次计费（Fast 80-165、Pro 220-435） | 视频，约 1-8 分钟 | 最多 2（首帧/末帧）| 两个档位（Fast / Pro）、4/6/8 秒、720p/1080p/4k 同价、带音频 |
 | **Agnes Video 2.0** | 每条 10（480p，2/秒 × 5 秒）| 视频，约 2 分钟 | 1（首帧）| 固定 5 秒 / 480p，唯一每日免费积分可用的视频模型 |
 
-> GPT image 1.5 已于 2026-04-22 下线，由 GPT Image 2.0 接替。Midjourney V7 已于 2026-05-09 由 V8.1 接替。
+> GPT image 1.5 已于 2026-04-22 下线，由 GPT Image 2.0 接替。Midjourney V7 已于 2026-05-09 由 V8.1 接替。Happyhorse 1.1 已于 2026-07-31 下线。
 
 ## 图片模型
 
@@ -331,46 +330,6 @@ xAI 的图生视频模型。**必须**上传起始（首帧）图 —— 不支�
 
 ---
 
-### Happyhorse 1.1
-
-| | |
-| --- | --- |
-| **Model ID** | `happyhorse-1.1` |
-| **供应商** | Alibaba |
-| **积分** | 按秒计费（详见下方） |
-| **视频时长** | 3-15 秒（默认 4 秒） |
-| **参考图片** | 1 张（首帧，图生视频） |
-| **参考视频** | 不支持 |
-| **分辨率** | 720p, 1080p（默认 720p） |
-| **宽高比** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
-| **音频** | 自动生成 |
-
-Alibaba 的视频生成模型。支持文生视频和单图首帧图生视频，自带 AI 生成音频，不支持参考视频续写。**Auto** 比例会根据提示词或参考图自动推断输出比例。
-
-720p 典型耗时约 2-4 分钟：所选时长越长越久，提供首帧图的图生视频通常比纯文生视频更快。1080p 明显更久。
-
-#### 计费方式
-
-| 分辨率 | 单价 |
-| --- | --- |
-| 720p | 18 积分/秒 |
-| 1080p | 28 积分/秒 |
-
-**计费示例：**
-
-| 场景 | 计算 | 总积分 |
-| --- | --- | --- |
-| 720p × 5 秒 | 18 × 5 | **90** |
-| 720p × 10 秒 | 18 × 10 | **180** |
-| 1080p × 5 秒 | 28 × 5 | **140** |
-| 1080p × 10 秒 | 28 × 10 | **280** |
-
-<Note>
-  生成失败会自动退还**全额**积分。
-</Note>
-
----
-
 ### Veo 3.1
 
 | | |
@@ -430,7 +389,7 @@ Google 的视频生成模型,生成带原生音频的短视频片段,音频与�
 | **分辨率** | 480p |
 | **宽高比** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
 
-唯一的基础档视频模型，也是唯一可用每日免费积分生成的视频模型。支持文生视频和单图首帧图生视频，固定 5 秒 / 480p。需要更高分辨率或更长时长请用 Seedance 2.0、Happyhorse 1.1 或 Veo 3.1。
+唯一的基础档视频模型，也是唯一可用每日免费积分生成的视频模型。支持文生视频和单图首帧图生视频，固定 5 秒 / 480p。需要更高分辨率或更长时长请用 Seedance 2.0 或 Veo 3.1。
 
 #### 计费方式
 
@@ -465,10 +424,6 @@ Google 的视频生成模型,生成带原生音频的短视频片段,音频与�
     与其他模型返回单张图片不同，Midjourney V8.1 每次生成会返回 4 张候选图片。所有候选图都会保存，可在图片详情对话框中浏览。4 张图片只收取一次费用（1K 15 积分 / 2K 20 积分）。
   </Accordion>
 
-  <Accordion title="Happyhorse 1.1 — 不支持参考视频输入" icon="triangle-exclamation">
-    与 Seedance 2.0 不同，Happyhorse 不支持参考视频。参考图仅接受单张首帧图。需要带参考视频生成请使用 Seedance 2.0。
-  </Accordion>
-
   <Accordion title="GPT Image 2.0 — 内容审核较严" icon="triangle-exclamation">
     GPT Image 2.0 对真实人物、名人、品牌 Logo 和成人/暴力内容的审核比其他模型严格。可尝试去掉具体姓名、品牌名或使用其他模型。
   </Accordion>
@@ -482,7 +437,7 @@ Google 的视频生成模型,生成带原生音频的短视频片段,音频与�
   </Accordion>
 
   <Accordion title="Grok Video 1.5 — 首帧必填" icon="triangle-exclamation">
-    Grok Video 1.5 仅支持图生视频 —— **必须**上传起始（首帧）图，不支持纯文生视频。输出画面比例跟随输入图。如需文生视频，请使用 Seedance 2.0、Happyhorse 1.1 或 Veo 3.1。
+    Grok Video 1.5 仅支持图生视频 —— **必须**上传起始（首帧）图，不支持纯文生视频。输出画面比例跟随输入图。如需文生视频，请使用 Seedance 2.0 或 Veo 3.1。
   </Accordion>
 
   <Accordion title="Grok Video 1.5 — 仅支持 480p / 720p" icon="triangle-exclamation">
@@ -490,7 +445,7 @@ Google 的视频生成模型,生成带原生音频的短视频片段,音频与�
   </Accordion>
 
   <Accordion title="Veo 3.1 — 仅支持横/竖屏两种比例" icon="triangle-exclamation">
-    Veo 3.1 只支持 16:9 / 9:16(以及 Auto)。方形(1:1)、4:3 / 3:4 等其他比例不可用。如需更多比例选项,请使用 Seedance 2.0 或 Happyhorse 1.1。
+    Veo 3.1 只支持 16:9 / 9:16(以及 Auto)。方形(1:1)、4:3 / 3:4 等其他比例不可用。如需更多比例选项,请使用 Seedance 2.0。
   </Accordion>
 
   <Accordion title="Veo 3.1 — 4k 不加价,但需付费账户" icon="circle-info">

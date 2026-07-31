@@ -62,7 +62,7 @@ GET /api/models
   | `tierResolutions` | Seedance 2.0 | 各档位实际可用的分辨率，按档位分级。优先于顶层 `resolutions` |
   | `tiers` | Seedance 2.0 / Veo 3.1 | 可选档位，通过 `tier` 选择（Seedance 2.0：`mini` / `fast` / `pro`；Veo 3.1：`fast` / `pro`）|
   | `durations` | 视频模型 | `duration` 允许的取值（秒）|
-  | `pricingPerSec` | Seedance 2.0 / Grok Video 1.5 / Happyhorse 1.1 / Agnes Video 2.0 | 每秒积分，按分辨率分级；有档位的模型则先按档位再按分辨率 |
+  | `pricingPerSec` | Seedance 2.0 / Grok Video 1.5 / Agnes Video 2.0 | 每秒积分，按分辨率分级；有档位的模型则先按档位再按分辨率 |
   | `pricingPerCall` | Veo 3.1 | 每次生成消耗的积分，按档位再按 `duration` 二维查表。与 `pricingPerSec` 互斥，存在时优先 |
   | `pricingPerSecWithVideo` | Seedance 2.0 | 提供 `referenceVideo` 时的每秒积分，按档位再按分辨率分级 |
   | `minBillableTable` | Seedance 2.0 | 续写场景按 `duration` 的最低计费秒数 |
