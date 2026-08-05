@@ -1,0 +1,130 @@
+---
+title: "远程 MCP 服务器"
+description: "连接 MeiGen 官方托管的远程 MCP 服务器(api/mcp)—— 零安装、无需 Node.js,图片与视频模型始终保持最新。支持 Claude Code、Cursor 及任意 Streamable HTTP MCP 客户端。"
+---
+
+MeiGen 同时提供**远程 MCP 服务器** —— 没有本地进程,不用装 npm 包,不需要安装或维护任何东西。任意支持 MCP 的客户端指向下面的地址即可开始生成。
+
+```
+https://www.meigen.ai/api/mcp
+```
+
+---
+
+## 接入
+
+### Claude Code
+
+```bash
+claude mcp add --transport http meigen https://www.meigen.ai/api/mcp --header "Authorization: Bearer meigen_sk_..."
+```
+
+### 其他 MCP 客户端
+
+大多数支持 Streamable HTTP 的客户端配置形如下方 —— 具体字段名以你的客户端文档为准:
+
+```json
+{
+  "mcpServers": {
+    "meigen": {
+      "url": "https://www.meigen.ai/api/mcp",
+      "headers": {
+        "Authorization": "Bearer meigen_sk_..."
+      }
+    }
+  }
+}
+```
+
+获取 API Key:登录 [meigen.ai](https://www.meigen.ai) → 头像 → **设置** → **API Keys** → 创建新 Key。
+
+<Tip>
+  不需要配置提供商,也不需要管理环境变量 —— 唯一要配置的就是这个 token。
+</Tip>
+
+---
+
+## 为什么选远程版
+
+<CardGroup cols={3}>
+  <Card title="零安装" icon="bolt">
+    不需要 Node.js,不需要 `npx`,没有本地进程要维持运行。
+  </Card>
+  <Card title="始终最新" icon="rotate">
+    模型上下线、能力变化、定价调整都立即生效 —— 无需升级任何东西。
+  </Card>
+  <Card title="无需重新配置" icon="check">
+    模型阵容在背后如何变化,同一个地址始终能用。
+  </Card>
+</CardGroup>
+
+---
+
+## 提供的工具
+
+远程服务器提供 6 个工具:
+
+| 工具 | 描述 | 需要 token |
+| --- | --- | --- |
+| **generate_image** | 使用 MeiGen Cloud 模型生成图片 | 是 |
+| **generate_video** | 生成视频 —— 支持文生视频、首/末帧图生视频,以及参考视频续写 | 是 |
+| **check_generation** | 按生成 ID 查询状态,任务完成后取回结果 | 是 |
+| **list_models** | 列出可用的图片与视频模型 | 否 |
+| **search_gallery** | 对 MeiGen 社区提示词画廊做语义搜索,带图片预览 | 否 |
+| **get_inspiration** | 获取画廊条目的完整提示词和图片 | 否 |
+
+<Note>
+  远程版**不提供**:`enhance_prompt`、`manage_preferences`、`comfyui_workflow`。这三个仅本地版才有 —— 见下方对比。
+</Note>
+
+---
+
+## 远程版 vs 本地 npm 版
+
+<Card title="本地安装指南" icon="wrench" href="/zh/mcp/setup">
+  想用本地版?查看 Claude Code、Cursor、Codex 等的安装步骤。
+</Card>
+
+| | 远程 MCP | 本地 npm 包 |
+| --- | --- | --- |
+| 安装 | 无需安装 —— 直接加地址 | 需要 Node.js 18+ 和 `npx meigen` |
+| 更新 | 自动 | 手动(`npx meigen@latest`) |
+| 提供商 | 仅 MeiGen Cloud | MeiGen Cloud、本地 ComfyUI,或任意 OpenAI 兼容 API |
+| 提示词增强、保存偏好 | 不支持 | 支持 |
+| 结果 | 仅返回 URL | 自动保存到本地目录 |
+
+---
+
+## 鉴权说明
+
+远程服务器使用与 REST API 相同的 API Token(`meigen_sk_...`)。
+
+- **只读工具** —— `list_models`、`search_gallery`、`get_inspiration` —— 无需 token 即可使用。
+- **生成类工具** —— `generate_image`、`generate_video`、`check_generation` —— 必须带有效 token。
+
+<Warning>
+  API Token 只能消耗**购买积分**,不能用每日免费积分。生成前请确认账号有购买积分。
+</Warning>
+
+---
+
+## 限制
+
+- 无法接入本地 ComfyUI —— 远程生成仅使用 MeiGen Cloud 模型。
+- 无法保存偏好设置或收藏提示词(没有 `manage_preferences`)。
+- 结果只返回 URL,不会落到本地磁盘。需要本地文件请自行下载。
+
+如果需要以上能力,改用[本地 npm 版](/zh/mcp/setup)。
+
+---
+
+## 下一步
+
+<CardGroup cols={2}>
+  <Card title="MCP 概览" icon="book-open" href="/zh/mcp/overview">
+    完整工具参考与提供商详情。
+  </Card>
+  <Card title="REST API" icon="code" href="/zh/api-reference/introduction">
+    想直接用 HTTP?不用 MCP 也能集成。
+  </Card>
+</CardGroup>

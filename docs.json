@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "MeiGen Docs",
-  "description": "Official docs for MeiGen — AI image & video generation. Supports GPT Image 2, Nanobanana 2, Nanobanana Pro, Seedream 5.0 Pro, Seedream 5.0 Lite, Midjourney V8.1, Grok Imagine, Seedance 2.0, Grok Video 1.5, Veo 3.1. Free prompt gallery, REST API, and MCP plugin for Claude Code, Cursor, OpenClaw.",
+  "description": "Official docs for MeiGen — AI image & video generation. Image models include GPT Image 2, Nanobanana 2, Nanobanana Pro, Seedream 5.0 Pro, Seedream 5.0 Lite, Seedream 4.5, Midjourney V8.1, Grok Imagine, Z Image Turbo, Flux 2 Klein and Agnes Image 2.1 Flash; video models include Seedance 2.0, Veo 3.1, Grok Video 1.5 and Agnes Video 2.0. Free prompt gallery, REST API, and MCP plugin for Claude Code, Cursor, OpenClaw.",
   "colors": {
     "primary": "#7C3AED",
     "light": "#A78BFA",
@@ -28,6 +28,7 @@
                 "pages": [
                   "en/features/gallery",
                   "en/features/generate",
+                  "en/features/skills",
                   "en/features/models"
                 ]
               },
@@ -35,6 +36,7 @@
                 "group": "MCP Plugin",
                 "pages": [
                   "en/mcp/overview",
+                  "en/mcp/remote",
                   "en/mcp/setup",
                   "en/mcp/comfyui"
                 ]
@@ -86,6 +88,7 @@
                 "pages": [
                   "zh/features/gallery",
                   "zh/features/generate",
+                  "zh/features/skills",
                   "zh/features/models"
                 ]
               },
@@ -93,6 +96,7 @@
                 "group": "MCP 插件",
                 "pages": [
                   "zh/mcp/overview",
+                  "zh/mcp/remote",
                   "zh/mcp/setup",
                   "zh/mcp/comfyui"
                 ]

@@ -7,24 +7,26 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 
 ## Quick Comparison
 
-| Model | Credits | Speed | Ref Images | Best For |
-| --- | --- | --- | --- | --- |
-| **GPT Image 2.0** (default) | 2–80 (by resolution × quality) | Fast (~35s) | 5 | Best accuracy & aesthetics, text rendering |
-| **Nanobanana Pro** | 10 | Fast (~30s) | 5 | High quality, complex scenes |
-| **Nanobanana 2** | 5 | Fast (~20s) | 5 | General use, wide ratio support |
-| **Seedream 5.0 Pro** | 10 (1K) / 20 (2K) | Slow (~2 min) | 10 | Multi-reference composition (up to 10 refs), character consistency |
-| **Seedream 5.0 Lite** | 5 | Medium (~42s) | 5 | Photorealism, 3K output |
-| **Seedream 4.5** | 5 | Fast (~32s) | 5 | Product photos, marketing |
-| **Grok Imagine Quality** | 10 (1K) / 14 (2K) | Fastest (~9s) | 3 | High-quality generation, text-to-image + image-to-image |
-| **Midjourney V8.1** | 15 (1K) / 20 (2K) | Medium (~50s) | 1 | Photorealistic, universal aesthetics |
-| **Flux 2 Klein** | 2 | Fast (~21s) | None | General-purpose base model, text rendering |
-| **Z Image Turbo** | 2 | Fastest (~11s) | None | Quick drafts, prototyping |
-| **Agnes Image 2.1 Flash** | 1 | Fast (~30s) | 1 | Cheapest model, high-volume drafts, covered by daily free credits |
-| **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame + reference video | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio |
-| **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video, ~35s | First frame (required) | First-frame image-to-video only, 4–15s, ratio follows input, audio |
-| **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-8min | Up to 2 (first/last frame) | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
-| **Agnes Video 2.0** | 10 per video (480p, 2/sec × 5s) | Video, ~2min | First frame (single image) | Fixed 5s / 480p, the only video model covered by daily free credits |
+| Model | Credits | Speed | Ref Images | App | Best For |
+| --- | --- | --- | --- | --- | --- |
+| **GPT Image 2.0** (default) | 2–80 (by resolution × quality) | Fast (~30s) | 5 | ✓ | Best accuracy & aesthetics, text rendering |
+| **Nanobanana Pro** | 10 | Fast (~34s) | 5 | ✓ | High quality, complex scenes |
+| **Nanobanana 2** | 5 | Fast (~24s) | 5 | ✓ | General use, wide ratio support |
+| **Seedream 5.0 Pro** | 10 (1K) / 20 (2K) | Slow (~1min 45s) | 10 | Web only | Multi-reference composition (up to 10 refs), character consistency |
+| **Seedream 5.0 Lite** | 5 | Medium (~42s) | 5 | Web only | Photorealism, 3K output |
+| **Seedream 4.5** | 5 | Fast (~32s) | 5 | Web only | Product photos, marketing |
+| **Grok Imagine Quality** | 10 (1K) / 14 (2K) | Fastest (~9s) | 3 | Web only | High-quality generation, text-to-image + image-to-image |
+| **Midjourney V8.1** | 15 (1K) / 20 (2K) | Fast (~33s) | 1 | ✓ | Photorealistic, universal aesthetics |
+| **Flux 2 Klein** | 2 | Fast (~23s) | None | ✓ | General-purpose base model, text rendering |
+| **Z Image Turbo** | 2 | Fastest (~11s) | None | ✓ | Quick drafts, prototyping |
+| **Agnes Image 2.1 Flash** | 1 | Fast (~30s) | 1 | ✓ | Cheapest model, high-volume drafts, covered by daily free credits |
+| **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio |
+| **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video, ~35s | First frame (required) | Web only | First-frame image-to-video only, 4–15s, ratio follows input, audio |
+| **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-8min | Up to 2 (first/last frame) | Web only | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
+| **Agnes Video 2.0** | 10 per video (480p, 2/sec × 5s) | Video, ~2min | First frame (single image) | ✓ | Fixed 5s / 480p, the only video model covered by daily free credits |
 
+> ✓ = available on the iOS/Android app and web. Web only = browser only for now.
+>
 > GPT image 1.5 was retired on 2026-04-22 (replaced by GPT Image 2.0). Midjourney V7 was replaced by V8.1 on 2026-05-09. Happyhorse 1.1 was retired on 2026-07-31.
 
 ## Image Models
@@ -236,18 +238,22 @@ The cheapest model on MeiGen at 1 credit per image, and the only basic-tier **im
 | **Provider** | ByteDance |
 | **Credits** | Per-second pricing (see below) |
 | **Duration** | 4-15 seconds (default 4) |
-| **Reference images** | First/last frame (image-to-video) |
-| **Reference video** | All tiers (Pro 480p has no With-reference-video rate) |
-| **Resolutions** | Mini and Fast: 480p / 720p; Pro: 480p / 720p / 1080p / 4K |
+| **Reference images** | Up to 2 as first/last frame (default), or up to 9 as content reference (`referenceMode: content`) |
+| **Reference video** | All three tiers. Upload must be 2–15s and ≤50MB — the platform detects the actual duration automatically |
+| **Resolutions** | Direct: Mini/Fast 480p/720p, Pro 480p/720p/1080p/4K. With reference video: Mini/Fast 480p/720p, Pro 720p/1080p (no 480p, no 4K) |
 | **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
 | **Audio** | Auto-generated |
 
-ByteDance's latest video generation model. Supports text-to-video, image-to-video (first/last frame), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions. Seedance 2.0 is also the only video model with **character assets**: save a character once, then reference it with `@` in your prompt to keep the same subject across shots.
+ByteDance's latest video generation model. Supports text-to-video, image-to-video (first/last frame or content reference), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions. Seedance 2.0 is also the only video model with **character assets**: save a character once, then reference it with `@` in your prompt to keep the same subject across shots.
+
+Two reference-image modes: **first/last frame** (default, up to 2 images) sets the opening and/or closing frame; **content reference** (`referenceMode: content`, up to 9 images) guides style or subject instead of fixing a frame position.
 
 **Three tiers**, picked from the tier switch (Mini / Fast / Pro) in the video sidebar. Same Seedance 2.0 model, same params, just different rendering quality and price:
-- **Mini** (default): cheapest and most lightweight; 480p / 720p, supports reference-video continuation
+- **Mini** (default): cheapest and most lightweight; 480p / 720p
 - **Fast**: quick turnaround at 480p / 720p
-- **Pro**: higher fidelity, with **native 1080p and 4K** rendering
+- **Pro**: higher fidelity, with **native 1080p and 4K** rendering (4K is direct-generation only)
+
+All three tiers support reference-video continuation — continuation output tops out at 1080p even on Pro.
 
 #### Pricing
 
@@ -260,7 +266,7 @@ Per-second. Rate depends on **tier** (Mini / Fast / Pro) × **whether a referenc
 | 1080p | — | — | — | — | 42/sec | 28/sec |
 | 4K | — | — | — | — | 100/sec | — |
 
-Mini and Fast only support 480p / 720p. Pro adds native 1080p and 4K (4K is direct-generation only). All three tiers support reference-video continuation; Pro has no 480p With-reference-video rate.
+Mini and Fast only support 480p / 720p. Pro adds native 1080p and 4K for direct generation; with a reference video, Pro is limited to 720p / 1080p (no 480p rate).
 
 **With-reference-video billing rule (all tiers):**
 
@@ -433,7 +439,7 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
   </Accordion>
 
   <Accordion title="Seedance 2.0 Mini — 480p / 720p only" icon="triangle-exclamation">
-    The Mini tier (the default) is the lightweight option, capped at 720p (it does support reference-video continuation). For 1080p or 4K output, switch to **Pro**.
+    The Mini tier (the default) is the lightweight option, capped at 720p. For 1080p or 4K output, switch to **Pro** — note that reference-video continuation on Pro tops out at 1080p (4K needs direct generation with no reference video).
   </Accordion>
 
   <Accordion title="Grok Video 1.5 — First frame required" icon="triangle-exclamation">

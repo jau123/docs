@@ -1,0 +1,130 @@
+---
+title: "Remote MCP Server"
+description: "Connect to MeiGen's hosted remote MCP server at api/mcp — zero install, no Node.js, always up to date with the latest image and video models. Works with Claude Code, Cursor, and any Streamable HTTP MCP host."
+---
+
+MeiGen also runs as a **remote MCP server** — no local process, no npm package, nothing to install or keep updated. Point any MCP-compatible host at the URL below and start generating.
+
+```
+https://www.meigen.ai/api/mcp
+```
+
+---
+
+## Connect
+
+### Claude Code
+
+```bash
+claude mcp add --transport http meigen https://www.meigen.ai/api/mcp --header "Authorization: Bearer meigen_sk_..."
+```
+
+### Other MCP hosts
+
+Most hosts that support Streamable HTTP servers use a config shape like this — check your host's docs for the exact field names:
+
+```json
+{
+  "mcpServers": {
+    "meigen": {
+      "url": "https://www.meigen.ai/api/mcp",
+      "headers": {
+        "Authorization": "Bearer meigen_sk_..."
+      }
+    }
+  }
+}
+```
+
+Get an API key: sign in at [meigen.ai](https://www.meigen.ai) → avatar → **Settings** → **API Keys** → create a new key.
+
+<Tip>
+  No provider setup, no environment variables to manage — the token is the only thing you configure.
+</Tip>
+
+---
+
+## Why remote
+
+<CardGroup cols={3}>
+  <Card title="Zero install" icon="bolt">
+    No Node.js, no `npx`, no local process to keep running.
+  </Card>
+  <Card title="Always current" icon="rotate">
+    New models, capability changes, and pricing take effect immediately — nothing to upgrade.
+  </Card>
+  <Card title="Nothing to reconfigure" icon="check">
+    The same URL keeps working as the model lineup changes underneath it.
+  </Card>
+</CardGroup>
+
+---
+
+## Tools
+
+The remote server exposes 6 tools:
+
+| Tool | Description | Requires token |
+| --- | --- | --- |
+| **generate_image** | Generate images using MeiGen Cloud models | Yes |
+| **generate_video** | Generate videos — text-to-video, first/last-frame image-to-video, and reference-video continuation | Yes |
+| **check_generation** | Check the status of a generation by ID and retrieve the result once ready | Yes |
+| **list_models** | List available image and video models | No |
+| **search_gallery** | Semantic search across the MeiGen community prompt gallery, with image previews | No |
+| **get_inspiration** | Get the full prompt and images for any gallery entry | No |
+
+<Note>
+  Not available remotely: `enhance_prompt`, `manage_preferences`, `comfyui_workflow`. These stay local-only — see the comparison below.
+</Note>
+
+---
+
+## Remote vs. local npm package
+
+<Card title="Local Setup Guide" icon="wrench" href="/en/mcp/setup">
+  Prefer the local package instead? See installation for Claude Code, Cursor, Codex, and more.
+</Card>
+
+| | Remote MCP | Local npm package |
+| --- | --- | --- |
+| Install | None — just add the URL | Node.js 18+ and `npx meigen` |
+| Updates | Automatic | Manual (`npx meigen@latest`) |
+| Providers | MeiGen Cloud only | MeiGen Cloud, local ComfyUI, or any OpenAI-compatible API |
+| Prompt enhancement, saved preferences | Not available | Available |
+| Results | URLs only | Auto-saved to a local folder |
+
+---
+
+## Authentication
+
+The remote server uses the same API tokens (`meigen_sk_...`) as the REST API.
+
+- **Read-only tools** — `list_models`, `search_gallery`, `get_inspiration` — work without a token.
+- **Generation tools** — `generate_image`, `generate_video`, `check_generation` — require a valid token.
+
+<Warning>
+  API tokens can only spend **purchased credits**, not daily free credits. Make sure your account has purchased credits before generating.
+</Warning>
+
+---
+
+## Limitations
+
+- Can't connect to a local ComfyUI server — remote generation uses MeiGen Cloud models only.
+- Can't save preferences or favorite prompts (no `manage_preferences`).
+- Results are returned as URLs, not saved to disk. Download the file yourself if you need a local copy.
+
+If you need any of these, use the [local npm package](/en/mcp/setup) instead.
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Overview" icon="book-open" href="/en/mcp/overview">
+    Full tool reference and provider details.
+  </Card>
+  <Card title="REST API" icon="code" href="/en/api-reference/introduction">
+    Prefer HTTP directly? Integrate without MCP.
+  </Card>
+</CardGroup>

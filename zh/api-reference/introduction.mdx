@@ -78,7 +78,8 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 
 - **推荐间隔**：每 3 秒检查一次状态
 - **停止条件**：当 `status` 为 `completed` 或 `failed` 时
-- **超时建议**：图片模型留到 6 分钟，视频留到 12 分钟。超时仍未完成的任务会以 `failed` 返回并**全额退还积分**，产物直接丢弃，不会迟到送达。未超时则相反：客户端过早停止轮询，任务仍会跑完并照常计费。请轮询到 `status` 进入终态（`completed` / `failed`），上面的墙钟时间只作兜底。最慢的情形是高分辨率 / 长时长的 Seedance 2.0 与 Veo 3.1。各模型典型耗时见[模型](/zh/features/models)页面。
+- 当 `status` 为 `processing` 时，响应会带上 `expectedWaitSeconds`（该模型 + 分辨率的预估剩余等待秒数）与 `pollHintSeconds`（建议继续轮询的剩余秒数，归零表示可以停止）。用这两个字段替代写死的超时时间——实际耗时会随模型、分辨率、时长变化。各模型典型耗时见[模型](/zh/features/models)页面。
+- 客户端过早停止轮询不影响结果：任务仍会跑完并照常计费，请务必轮询到 `status` 进入终态。
 
 ## 缓存
 
@@ -103,16 +104,34 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | 400 | 请求无效 — 参数错误 |
 | 401 | 未授权 — token 无效或缺失 |
 | 402 | 需要付费 — 积分不足 |
+| 403 | 禁止访问 — 该模型在当前平台不可用 |
 | 404 | 未找到 |
-| 500 | 服务器错误 |
+| 409 | 冲突 — 幂等键已被占用，换一个重试 |
+| 5xx | 服务器错误 — 稍后重试；生成失败的积分会自动退还 |
 
 `POST /api/generate/v2` 的错误响应会附带便于排查的额外字段，且大多在人类可读的 `error` 之外还带一个可供程序判断的 `code`：
 
 | `code` | 状态码 | 含义 |
 | --- | --- | --- |
-| `premium_model_paywall` | 402 | 所选模型需要购买积分 |
 | `insufficient_credits` | 402 | 本次请求的可用积分不足 |
-| `invalid_reference_url` | 400 | `referenceImages` / `referenceVideo` 中存在不合法的 URL 或 base64 值 |
+| `premium_model_paywall` | 402 | 所选模型需要购买积分（每日免费积分不适用） |
+| `unsupported_duration` | 400 | 该模型不支持这个时长 |
+| `unsupported_tier` | 400 | 该模型不支持这个档位 |
+| `unsupported_resolution` | 400 | 该模型/档位不支持这个分辨率 |
+| `first_frame_required` | 400 | 该模型必须提供首帧图 |
+| `reference_video_not_supported` | 400 | 该模型/档位/分辨率不支持参考视频续写 |
+| `invalid_reference_video` | 400 | 参考视频无法读取或时长超范围——须 2–15 秒、不超过 50MB，且为平台内的视频链接 |
+| `invalid_reference_url` | 400 | `referenceImages` 中存在不合法的 URL 或 base64 值 |
+| `frame_reference_limit` | 400 | `referenceMode: "frame"` 最多 2 张图，改用 `referenceMode: "content"` 可传更多 |
+| `too_many_references` | 400 | 参考图数量超出该模型上限 |
+| `too_many_characters` | 400 | 每次生成最多引用 3 个 `[character:...]` |
+| `character_not_found` | 400 | 该角色不存在或不属于当前账号 |
+| `characters_not_supported` | 400 | 该模型不支持角色引用 |
+| `character_tier_required` | 400 | 该角色需要更高档位 |
+| `model_not_available` | 403 | 该模型在当前平台不可用 |
+| `idempotency_conflict` | 409 | 换一个新的 `idempotencyKey` 重试 |
+
+除上述之外的错误——包括所有 `5xx` 响应——都代表服务端暂时不可用。稍后重试即可，生成失败的积分会自动退还。
 
 不带 `code` 的错误（如比例不被支持）请按状态码与 `error` 文案处理。
 

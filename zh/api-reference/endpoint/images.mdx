@@ -38,6 +38,7 @@ GET /api/images/:id
   | `image_height` | number \| null | 图片高度（像素）|
   | `model` | string \| null | 标注该作品出自哪个模型的标签。粒度不统一：部分取值是粗粒度家族名（`"nanobanana"` / `"gptimage"` / `"midjourney"` / `"other"`），部分则是精确的模型 ID（如 `"flux2-klein"` / `"seedream-4.5"`）；随着新模型上线还会出现新取值。请当作展示/筛选标签使用——不要假定它可以直接传给 `/api/generate/v2`，生成用的 ID 请以[模型列表](/zh/api-reference/endpoint/models)为准 |
   | `sref` | string \| null | Midjourney 风格码（如有）——复用它即可套用同款风格；非 Midjourney 图片为 `null` |
+  | `profile` | string \| null | Midjourney 个性化档案码（如有）——独立于 `sref`，可与其组合使用；未设置时为 `null` |
   | `created_at` | string | ISO 8601 时间戳（信息性字段）|
   | `likes` / `views` / `retweets` | number | 原帖互动指标 |
   | `author_username` / `author_display_name` / `author_avatar_url` | string | 原作者信息——如需展示署名可使用，否则忽略 |

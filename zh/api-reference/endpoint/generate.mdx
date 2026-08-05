@@ -21,7 +21,9 @@ POST /api/generate/v2
 ### 请求体参数
 
 <ParamField body="prompt" type="string" required>
-  要生成的图片的文本描述。
+  要生成的图片或视频的文本描述。要引用已创建的角色，在文本中内嵌 `[character:<uuid>]` ——例如 `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`。每次生成最多引用 3 个角色。
+
+  支持范围:所有接受参考图的图片模型(除 Flux 2 Klein、Z Image Turbo 外)+ 视频侧的 Seedance 2.0。模型不支持、角色不存在或无权访问、引用数超限均返回 `400`(`characters_not_supported`、`character_not_found`、`too_many_characters`);部分角色需要更高的 `tier`(`character_tier_required`)。
 </ParamField>
 
 <ParamField body="modelId" type="string">
@@ -48,7 +50,7 @@ POST /api/generate/v2
 <ParamField body="resolution" type="string">
   输出分辨率。可用性取决于模型。不传则使用所选模型的默认分辨率。
 
-  可选值取决于模型：图片模型用 `1K` / `2K` / `3K` / `4K`；视频模型用 `480p` / `720p` / `1080p` / `4k`（视频侧的 k 是小写）。并非每个视频模型都支持全部取值 —— `4k` 仅 Seedance 2.0 的 `pro` 档和 Veo 3.1 支持，Seedance 上的 `1080p` 同样需要 `pro` 档。各模型实际支持的分辨率和默认值详见[模型对比](/zh/features/models)。
+  可选值取决于模型：图片模型用 `1K` / `2K` / `3K` / `4K`；视频模型用 `480p` / `720p` / `1080p` / `4k`（视频侧的 k 是小写）。并非每个视频模型都支持全部取值 —— `4k` 仅 Seedance 2.0 的 `pro` 档和 Veo 3.1 支持，Seedance 上的 `1080p` 同样需要 `pro` 档。各模型实际支持的分辨率和默认值详见[模型对比](/zh/features/models)。带 `referenceVideo` 续写时（Seedance 2.0），上限为 `1080p` —— `4k` 仅对不带参考视频的生成开放。
 </ParamField>
 
 <ParamField body="quality" type="string" default="low">
@@ -65,9 +67,20 @@ POST /api/generate/v2
   | 10 | Seedream 5.0 Pro |
   | 5 | GPT Image 2.0、Nanobanana 2、Nanobanana Pro、Seedream 5.0 Lite、Seedream 4.5 |
   | 3 | Grok Imagine Quality |
-  | 2 | Seedance 2.0、Veo 3.1 |
-  | 1 | Midjourney V8.1、Agnes Image 2.1 Flash、Agnes Video 2.0、Grok Video 1.5 |
+  | 2 | Seedance 2.0、Veo 3.1 —— 默认 `frame` 模式(首/尾帧),见下方 `referenceMode` |
+  | 1 | Midjourney V8.1、Agnes Image 2.1 Flash、Agnes Video 2.0、Grok Video 1.5(**必传** —— 仅支持图生视频) |
   | 0 | Flux 2 Klein、Z Image Turbo |
+
+  Seedance 2.0 上,将 `referenceMode` 切到 `content` 可将上限提高到 9。
+</ParamField>
+
+<ParamField body="referenceMode" type="string" default="frame">
+  仅用于视频模型。决定 `referenceImages` 的解读方式。
+
+  - `frame`(默认)—— 首/尾帧参考,最多 2 张
+  - `content` —— 内容参考,不绑定具体帧位置。Seedance 2.0 最多 9 张;其他视频模型仍沿用 `frame` 模式的 2 张上限
+
+  超限返回 `400` —— `frame` 模式下为 `frame_reference_limit`,`content` 模式下为 `too_many_references`。
 </ParamField>
 
 <ParamField body="niji7Options" type="object">
@@ -92,7 +105,7 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="duration" type="number">
-  视频时长(秒)。不传则按该模型的默认时长出片。
+  视频时长(秒)。不传则按该模型自身的默认时长出片与计费:
 
   | 模型 | 可选值 | 默认 |
   | --- | --- | --- |
@@ -101,9 +114,7 @@ POST /api/generate/v2
   | Grok Video 1.5 | 4-15 | 4 |
   | Agnes Video 2.0 | 仅 5(固定) | 5 |
 
-  **调用视频模型时请始终显式传 `duration`。** 上表"默认"列只是不传该字段时实际出片的时长,计费并不跟着它走:漏传 `duration` 时,费用会回落到该模型的名义单价,而不是按出片时长计算,因而可能明显高于显式写清时长的同一请求。Veo 3.1 的落差最大 —— 漏传时按该模型单次计费的最高价扣,显式传 `duration: 4` 则按 4 秒档计费。
-
-  无论怎么传,实际扣除的积分都会在响应的 `creditsUsed` 中返回,请以该字段为准,不要自行推算。
+  实际扣除的积分始终以响应中的 `creditsUsed` 为准,不要自行推算。
 </ParamField>
 
 <ParamField body="tier" type="string">
@@ -118,11 +129,19 @@ POST /api/generate/v2
 <ParamField body="referenceVideo" type="string">
   仅用于 Seedance 2.0。用于"视频续写"模式的参考视频 URL。必须是可公开访问的 HTTPS URL（一般来自之前生成结果的 `videoUrl` 字段）。
 
-  传该字段时计费走"有参考视频"档（Mini 480p 7、720p 13；Fast 480p 8、720p 14；Pro 720p 16、1080p 28 积分/秒），并应用最低计费秒数（详见[模型](/zh/features/models)）。
+  上传的参考视频须 **2-15 秒**、文件 **不超过 50MB**，超出范围返回 `400` / `invalid_reference_video`。续写模式下输出分辨率最高 `1080p` —— Mini、Fast 支持 `480p`/`720p`，Pro 支持 `720p`/`1080p`；`4k` 仅对不带参考视频的生成开放。
+
+  传该字段时计费走"有参考视频"档（Mini 480p 7、720p 13；Fast 480p 8、720p 14；Pro 720p 16、1080p 28 积分/秒），按"参考视频 + 输出"合计秒数计算，并应用最低计费秒数（详见[模型](/zh/features/models)）。参考视频的实际时长由系统自动识别用于该计算——见下方 `referenceVideoDuration`。
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">
-  仅用于 Seedance 2.0 + 参考视频续写。参考视频本身的时长（秒），与 `duration` 一起用于确定实际计费秒数（详见[模型](/zh/features/models) 定价表）。**传 `referenceVideo` 时必须同时传该字段**——漏传会按 0 处理，可能导致计费明显低于预期且续写效果异常。
+  可选，仅用于 Seedance 2.0 + 参考视频续写。系统会自动识别上传的参考视频的真实时长并用于计费与裁剪，无需设置该字段。若传了，仅作为与识别值的诊断性比对，其余情况忽略。
+</ParamField>
+
+<ParamField body="idempotencyKey" type="string">
+  可选 UUID。用于防止重复提交——例如弱网超时后的重试。
+
+  同一账号用相同的 key 重复提交，会返回首次创建的生成任务而不是新建一个，也不会再次扣除积分；响应中会带 `deduped: true`。极少数情况下会返回 `409` / `idempotency_conflict`，换一个新 key 重试即可。
 </ParamField>
 
 ## 响应
@@ -149,6 +168,10 @@ POST /api/generate/v2
 
 <ResponseField name="aspectRatio" type="string">
   本次生成最终采用的宽高比。默认 `auto` 会选择合适的比例，提交时即在此返回 —— 无需等第一次轮询，可用于在界面上按正确比例预留占位。
+</ResponseField>
+
+<ResponseField name="deduped" type="boolean">
+  若本次响应命中了此前请求的同一个 `idempotencyKey`，该字段为 `true`——未再次扣除积分。
 </ResponseField>
 
 <ResponseField name="credits" type="object">
@@ -196,9 +219,17 @@ GET /api/generate/v2/status/:generationId
   "videoUrl": null,
   "mediaType": "image",
   "error": null,
-  "aspectRatio": "16:9"
+  "aspectRatio": "16:9",
+  "expectedWaitSeconds": 25,
+  "pollHintSeconds": 20
 }
 ```
+
+<Note>
+  - **`expectedWaitSeconds`** —— 该模型 + 分辨率的预估总等待秒数（从提交时算起）。
+  - **`pollHintSeconds`** —— 建议还需继续轮询的秒数，会逐步归零，归零即可停止轮询。用它来驱动轮询节奏，而不要写死固定超时——参考视频续写、更高档位耗时可能明显长于普通文生视频。
+  - 这两个字段只在 `status` 为 `"processing"` 时出现。
+</Note>
 
 ### 响应（图片已完成）
 
@@ -332,12 +363,11 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
     "aspectRatio": "adaptive",
     "resolution": "480p",
     "duration": 5,
-    "referenceVideo": "https://images.meigen.ai/generations/eagle-clip.mp4",
-    "referenceVideoDuration": 3
+    "referenceVideo": "https://images.meigen.ai/generations/eagle-clip.mp4"
   }'
 ```
 
-计费：这里没有传 `tier`，因此走默认 **Mini** 档 —— 480p 带参考视频单价 7 积分/秒，计费秒数 = max(3 + 5, 9) = 9 秒，共 **63 积分**。同样的请求走 `fast` 档则是 8 × 9 = 72 积分。输出视频长度 = `duration` = 5 秒。
+计费：这里没有传 `tier`，因此走默认 **Mini** 档 —— 480p 带参考视频单价 7 积分/秒。假设上传的参考视频实际时长为 3 秒（系统自动识别），计费秒数 = max(3 + 5, 9) = 9 秒，共 **63 积分**。同样的请求走 `fast` 档则是 8 × 9 = 72 积分。输出视频长度 = `duration` = 5 秒。
 
 ### 让系统自动选比例（Auto）
 

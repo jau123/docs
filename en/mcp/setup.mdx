@@ -19,6 +19,10 @@ description: "Install MeiGen MCP for Claude Code, Cursor, VS Code, Windsurf, Cod
 
 ## Installation
 
+<Tip>
+  Prefer zero installation? The [remote MCP endpoint](/en/mcp/remote) needs no Node.js, no `npx`, and no local config file — just point any MCP host at `https://www.meigen.ai/api/mcp` over HTTP.
+</Tip>
+
 ### Claude Code Plugin (Recommended)
 
 <Steps>
@@ -47,6 +51,10 @@ description: "Install MeiGen MCP for Claude Code, Cursor, VS Code, Windsurf, Cod
     - *"Enhance this prompt: a cat in space"*
   </Step>
 </Steps>
+
+<Note>
+  Also listed on the community [wshobson/agents](https://github.com/wshobson/agents) marketplace. That listing doesn't bundle MCP server config — after installing, add the JSON block from [Other MCP-Compatible Hosts](#other-mcp-compatible-hosts) to `.mcp.json` yourself.
+</Note>
 
 ### Cursor / VS Code / Windsurf / Roo Code
 
@@ -86,12 +94,14 @@ mcp_servers:
     args: ["-y", "meigen@latest"]
     env:
       MEIGEN_API_TOKEN: "meigen_sk_..."
-    timeout: 600          # video generation can take 5–10 min
-    connect_timeout: 120  # first npx download can be slow
+    timeout: 2700          # long videos (e.g. reference-video continuation) can exceed 15 min
+    connect_timeout: 120   # first npx download can be slow
 ```
 
 <Warning>
-  The `timeout: 600` and `connect_timeout: 120` overrides are important — Hermes defaults (120s / 60s) are tuned for short-running tools and will time out on video generation or first-run npx downloads.
+  Set `timeout` to **2700**, not the Hermes default (120s). Long video generations — especially reference-video continuation — can run past 15 minutes. A shorter timeout disconnects Hermes while the job is still running server-side, after credits have already been deducted. `connect_timeout: 120` covers the first slow `npx` download.
+
+  If a session does disconnect mid-generation, don't resubmit — call `check_generation` with the `generationId` from your original request to resume tracking it. Resubmitting starts a new generation and deducts credits again.
 </Warning>
 
 ### Standalone CLI (no MCP host required)
@@ -272,9 +282,11 @@ Once installed, ask your AI assistant in plain language — for example, "Genera
   </Accordion>
 
   <Accordion title="Generation timeout" icon="circle-exclamation">
-    Generation times vary by model and provider. MeiGen Cloud image models typically finish in 5–60 seconds; video generation takes 1–8 minutes. ComfyUI depends on your GPU.
+    Generation times vary by model — MeiGen Cloud image models typically finish in well under a minute; video generation takes longer, especially with reference-video continuation. Polling isn't capped by a fixed 5- or 8-minute client timeout — it follows the server's own progress signal, with only a 45-minute safety valve against a fully hung connection.
 
-    Timeouts: `generate_image` waits up to 5 minutes, `generate_video` up to 8 minutes, and both the standalone CLI and ComfyUI up to 5 minutes.
+    If your session disconnects or polling gets interrupted, don't resubmit the same request — call `check_generation` with the `generationId` from your original request to resume tracking it. Resubmitting starts a new generation and deducts credits again.
+
+    ComfyUI generation is still capped at 5 minutes (depends on your local GPU).
   </Accordion>
 
   <Accordion title="Changes to config not taking effect" icon="circle-exclamation">

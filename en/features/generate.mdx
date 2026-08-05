@@ -22,6 +22,16 @@ Selecting a different model automatically updates the available aspect ratios, r
 
 ---
 
+## Skills
+
+Need a guided, multi-step workflow instead of a single prompt? **Skills** turns one product photo into a full set of e-commerce visuals — product detail pages, white-background shots, marketing posters — through a step-by-step wizard.
+
+<Card title="Skills" icon="wand-magic-sparkles" href="/en/features/skills">
+  Guided AI workflows for product photography and marketing visuals
+</Card>
+
+---
+
 ## Prompt Editor
 
 ### Writing Effective Prompts
@@ -111,6 +121,18 @@ style with shallow depth of field
 <Tip>
   Enhancement works best on brief prompts (under 30 words). Skip it for prompts that already have detailed visual descriptions — the AI may over-process them.
 </Tip>
+
+### AI Edit
+
+Give the AI a one-line instruction to make a precise change to your current prompt — not a full rewrite.
+
+1. Click **AI Edit** above the prompt editor
+2. Describe the change, e.g. *"make the lighting warmer"* or *"change the cat to a dog"*
+3. The AI applies just that change and leaves the rest of the prompt untouched
+
+<Note>
+  AI Edit shares a daily quota with [Prompt Enhancement](#prompt-enhancement) and Storyboard, and doesn't spend generation credits.
+</Note>
 
 ### Keyboard Shortcuts
 
@@ -269,7 +291,7 @@ You can use the generated prompt as-is, or edit it to create variations of the o
 
 MeiGen offers several video models — the current list and full specs are on the [Models](/en/features/models) page:
 
-- **Seedance 2.0** — three tiers, per-second pricing, 4–15 seconds, supports reference-video continuation
+- **Seedance 2.0** — three tiers, per-second pricing, 4–15 seconds, supports reference-video continuation (2–15s reference video, up to 50MB)
 - **Veo 3.1** — two tiers, per-generation pricing, 4 / 6 / 8 seconds, audio always on
 - **Grok Video 1.5** — per-second pricing, 4–15 seconds, a first-frame image is required
 - **Agnes Video 2.0** — per-second pricing, fixed 5 seconds, covered by daily free credits
@@ -332,7 +354,7 @@ You can also drag gallery cards directly as frame images.
 | **Resolution** | Mini / Fast: 480p, 720p. Pro: 480p, 720p, 1080p, 4K (default 480p) | Depends on the selected tier; 480p saves credits |
 | **Duration** | 4–15 seconds (default 4) | Slider or input |
 | **Audio** | Auto-generated | Always on |
-| **Reference video** | Yes | Used as visual conditioning input for "video continuation" (see the [Extending a Video](#extending-a-video) section below) |
+| **Reference video** | Yes | Used as visual conditioning input for "video continuation" — must be 2–15 seconds, up to 50MB; MeiGen detects the actual length automatically (see [Extending a Video](#extending-a-video) below) |
 
 **Pricing**: per-second; full formula (including the minimum-billable table for continuation) is in the [Models](/en/features/models) page. The sidebar shows the exact total before you submit.
 
@@ -368,6 +390,12 @@ After generating an image, hover over the completed card and click the **Animate
 ### Extending a Video
 
 Seedance 2.0 only. Upload an existing video as visual conditioning input to guide the model toward generating a new segment that semantically continues the original.
+
+<Note>
+  **Reference video requirements**: 2–15 seconds long, up to 50MB. MeiGen detects the actual length automatically for billing and trimming — you don't need to specify it.
+
+  **Resolution**: continuation tops out at **1080p**. Mini / Fast offer 480p and 720p; Pro offers 720p and 1080p. 4K is only available when generating without a reference video.
+</Note>
 
 #### Three entry points
 
@@ -414,17 +442,17 @@ Typical generation times by model:
 
 | Model | Typical Time |
 | --- | --- |
-| Grok Imagine Quality | ~9 seconds (1K) / ~17 seconds (2K) |
+| Grok Imagine Quality | ~9 seconds |
 | Z Image Turbo | ~11 seconds |
-| Nanobanana 2 | ~20 seconds |
-| Flux 2 Klein | ~21 seconds |
-| Nanobanana Pro | ~30 seconds |
-| Agnes Image 2.1 Flash | ~30 seconds |
-| Seedream 4.5 | ~32 seconds |
-| GPT Image 2.0 | ~35 seconds |
+| Flux 2 Klein | ~23 seconds |
+| Nanobanana 2 | ~24 seconds |
+| GPT Image 2.0 | ~29 seconds |
+| Agnes Image 2.1 Flash | ~31 seconds |
+| Seedream 4.5 | ~33 seconds |
+| Midjourney V8.1 | ~33 seconds |
+| Nanobanana Pro | ~34 seconds |
 | Seedream 5.0 Lite | ~42 seconds |
-| Midjourney V8.1 | ~50 seconds |
-| Seedream 5.0 Pro | ~2 min (1K) / ~2.5 min (2K) |
+| Seedream 5.0 Pro | ~1 min 43 sec |
 | Grok Video 1.5 (video) | ~35 seconds |
 | Agnes Video 2.0 (video) | ~2 min |
 | Seedance 2.0 (video) | ~2–3 min (Mini, default) / ~2–4 min (Fast) / ~3–6 min (Pro, longer at 4K) |

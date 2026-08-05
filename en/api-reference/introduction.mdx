@@ -78,7 +78,8 @@ Image generation is **asynchronous**. The flow is:
 
 - **Recommended interval**: 3 seconds between status checks
 - **Stop when**: `status` is `completed` or `failed`
-- **Timeout**: allow up to 6 minutes for image models and up to 12 minutes for video. A job that overruns comes back as `failed` and the credits are refunded in full — the output is discarded, so a late result never arrives. Short of that, the opposite applies: if your client stops polling early, the job still completes and is still charged. Poll until `status` is terminal (`completed` / `failed`), and treat the wall-clock values above only as a backstop. The slowest cases are Seedance 2.0 and Veo 3.1 at high resolution / long duration. Per-model typical times are listed on the [Models](/en/features/models) page.
+- While `status` is `processing`, the response includes `expectedWaitSeconds` (estimated remaining wait for this model and resolution) and `pollHintSeconds` (how many more seconds to keep polling — `0` means you can stop). Use these instead of a fixed timeout: actual time varies by model, resolution, and duration. Per-model typical times are listed on the [Models](/en/features/models) page.
+- If your client stops polling early, the job still completes and is still charged — always poll until `status` reaches a terminal state.
 
 ## Caching
 
@@ -103,16 +104,34 @@ Each generation deducts credits from your account. Image models charge per image
 | 400 | Bad request — invalid parameters |
 | 401 | Unauthorized — invalid or missing token |
 | 402 | Payment required — insufficient credits |
+| 403 | Forbidden — model not available on this platform |
 | 404 | Not found |
-| 500 | Server error |
+| 409 | Conflict — idempotency key already used, retry with a new one |
+| 5xx | Server error — retry later; credits for a failed generation are automatically refunded |
 
 For `POST /api/generate/v2`, error bodies include extra fields useful for debugging, and most carry a machine-readable `code` alongside the human-readable `error`:
 
 | `code` | Status | Meaning |
 | --- | --- | --- |
-| `premium_model_paywall` | 402 | The selected model requires purchased credits |
 | `insufficient_credits` | 402 | Not enough usable credits for this request |
-| `invalid_reference_url` | 400 | A `referenceImages` / `referenceVideo` entry is not an accepted URL or base64 value |
+| `premium_model_paywall` | 402 | The selected model requires purchased credits (daily free credits don't apply) |
+| `unsupported_duration` | 400 | This model doesn't support the requested duration |
+| `unsupported_tier` | 400 | This model doesn't support the requested tier |
+| `unsupported_resolution` | 400 | This model/tier doesn't support the requested resolution |
+| `first_frame_required` | 400 | This model requires a first-frame image |
+| `reference_video_not_supported` | 400 | This model/tier/resolution doesn't support reference-video continuation |
+| `invalid_reference_video` | 400 | The reference video couldn't be read, or its duration is out of range — it must be 2–15 seconds, at most 50MB, and a URL hosted on the platform |
+| `invalid_reference_url` | 400 | A `referenceImages` entry is not an accepted URL or base64 value |
+| `frame_reference_limit` | 400 | `referenceMode: "frame"` allows at most 2 images — use `referenceMode: "content"` for more |
+| `too_many_references` | 400 | Reference image count exceeds this model's limit |
+| `too_many_characters` | 400 | At most 3 `[character:...]` references per generation |
+| `character_not_found` | 400 | The referenced character doesn't exist or isn't owned by your account |
+| `characters_not_supported` | 400 | This model doesn't support character references |
+| `character_tier_required` | 400 | This character requires a higher tier |
+| `model_not_available` | 403 | This model isn't available on the current platform |
+| `idempotency_conflict` | 409 | Retry the request with a new `idempotencyKey` |
+
+Any other error — including all `5xx` responses — means the service is temporarily unavailable. Retry later; the credits for a failed generation are automatically refunded.
 
 Errors without a `code` (such as an unsupported aspect ratio) should be handled by status code and `error` text.
 

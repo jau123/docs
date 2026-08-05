@@ -1,6 +1,6 @@
 ---
 title: "MCP 服务器概览"
-description: "在 Claude Code、Cursor、Codex、Windsurf、Hermes Agent 和 OpenClaw 中生成 AI 图片与视频 — MeiGen 开源 MCP 服务器，支持 GPT Image 2、Nano Banana 2、Midjourney V8.1、Seedream、Grok Imagine、Flux 2、Seedance、Veo 3.1、Agnes 以及本地 ComfyUI 工作流。"
+description: "在 Claude Code、Cursor、Codex、Windsurf、Hermes Agent 和 OpenClaw 中生成 AI 图片与视频 — MeiGen 开源 MCP 服务器，支持 GPT Image 2、Nano Banana 2、Nanobanana Pro、Midjourney V8.1、Seedream、Grok Imagine、Grok Video 1.5、Flux 2、Z Image Turbo、Seedance、Veo 3.1、Agnes 以及本地 ComfyUI 工作流。"
 ---
 
 **MeiGen** 是一个开源的 MCP (Model Context Protocol) 服务器，赋予 AI 编程助手生成**图片和视频**的能力。它支持多种生成后端 — 使用 MeiGen 的云端模型、你本地的 ComfyUI 服务器，或任何 OpenAI 兼容 API。
@@ -49,6 +49,7 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 | --- | --- | --- |
 | **generate_image** | 使用任意已配置的提供商生成图片 | 是 |
 | **generate_video** | 通过 MeiGen 平台生成视频 — 支持文生视频、首/末帧图生视频，以及参考视频续写 | 是(MeiGen) |
+| **check_generation** | 按 ID 查询异步生成任务的状态 — 连接中断后续查进度，无需重新提交 | 是(MeiGen) |
 | **enhance_prompt** | 将简短的想法转化为详细、专业的提示词 | 否 |
 | **search_gallery** | 对 MeiGen 社区提示词画廊做语义搜索，带图片预览 — 搜索 API 不可达时回落到插件内置的离线提示词库 | 否 |
 | **get_inspiration** | 获取画廊条目的完整提示词和图片 | 否 |
@@ -58,6 +59,8 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 
 <Note>
   视频能力因模型而异 — 画质档位、可选时长与分辨率、音频、参考视频续写，以及是否必须提供首帧图。部分模型仅支持图生视频。当前清单用 `list_models` 查，或见[模型对比](/zh/features/models)。
+
+  `generate_video` 必须显式指定 `model` — 平台没有默认模型。其 `referenceVideoDuration` 参数已废弃,传了会被忽略;上传参考视频后时长会自动识别。
 </Note>
 
 ---
@@ -75,7 +78,7 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
     将 MCP server 加到 `~/.codex/config.toml`。标准 stdio MCP,无额外管道。
   </Card>
   <Card title="Hermes Agent" icon="robot">
-    原生支持 MCP — 加到 `~/.hermes/config.yaml`,视频生成需 `timeout: 600`。
+    原生支持 MCP — 加到 `~/.hermes/config.yaml`,视频生成需 `timeout: 2700`。
   </Card>
   <Card title="OpenClaw" icon="puzzle-piece">
     从 [ClawHub](https://clawhub.ai/plugins/meigen-ai-design) 安装插件 — 包含技能、命令和 MCP 服务器。
@@ -106,6 +109,9 @@ npx meigen gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
 <CardGroup cols={3}>
   <Card title="安装指南" icon="wrench" href="/zh/mcp/setup">
     安装插件并配置你偏好的提供商。
+  </Card>
+  <Card title="远程 MCP" icon="cloud" href="/zh/mcp/remote">
+    零安装方案 — 通过 HTTP 连接,不需要 Node.js。
   </Card>
   <Card title="ComfyUI 指南" icon="server" href="/zh/mcp/comfyui">
     设置本地 ComfyUI 生成及自定义工作流。
