@@ -1,13 +1,13 @@
 ---
 title: "Generate Image or Video"
-description: "Generate an image or video using an AI model"
+description: "Submit an asynchronous MeiGen image or video generation request with model, reference-media, duration, resolution, and billing options."
 ---
 
 ```
 POST /api/generate/v2
 ```
 
-Submits a generation request. The output is generated asynchronously — use the [status endpoint](#check-generation-status) to poll for completion. The same endpoint serves both image models (GPT Image 2, Nanobanana, Seedream, Midjourney, etc.) and video models (Seedance 2.0, Veo 3.1, Grok Video, etc.) — select via `modelId`.
+Submits a generation request. The output is generated asynchronously — use the [status endpoint](#check-generation-status) to poll for completion. The same endpoint serves both image models (GPT Image 2, Nanobanana, Seedream, Midjourney, etc.) and video models (Seedance 2.5, Seedance 2.0, Veo 3.1, Grok Video, etc.) — select via `modelId`.
 
 ## Request
 
@@ -23,7 +23,7 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="prompt" type="string" required>
   The text description of the image or video to generate. To reference a saved character, include `[character:<uuid>]` inline — e.g. `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`. Up to 3 character references per generation.
 
-  Supported on image models that accept reference images (all except Flux 2 Klein and Z Image Turbo) and on Seedance 2.0 for video. An unsupported model, a nonexistent or inaccessible character, or too many references returns `400` (`characters_not_supported`, `character_not_found`, `too_many_characters`); some characters require a higher `tier` (`character_tier_required`).
+  Supported on image models that accept reference images (all except Flux 2 Klein and Z Image Turbo) and on **Seedance 2.0 only** for video. Seedance 2.5 does not accept character assets. An unsupported model, a nonexistent or inaccessible character, or too many references returns `400` (`characters_not_supported`, `character_not_found`, `too_many_characters`); some characters require a higher `tier` (`character_tier_required`).
 </ParamField>
 
 <ParamField body="modelId" type="string">
@@ -31,7 +31,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   **[List Models](/en/api-reference/endpoint/models) is the authoritative source for valid IDs.** Models are added and retired over time, so resolve IDs at runtime rather than hard-coding a copy of the catalogue. Every model that endpoint returns can be used here, including with an API token.
 
-  Frequently used values: `gpt-image-2`, `nanobanana-2`, `midjourney-v8.1` (images); `seedance-2-0`, `veo-3.1` (video).
+  Frequently used values: `gpt-image-2`, `nanobanana-2`, `midjourney-v8.1` (images); `seedance-2-5`, `seedance-2-0`, `veo-3.1` (video).
 
   > `rhart-1.5` (GPT image 1.5) was retired on 2026-04-22 — use `gpt-image-2` instead. `midjourney-v7` was replaced by `midjourney-v8.1` on 2026-05-09 (legacy `midjourney-v7` requests still accepted for backward compatibility).
 </ParamField>
@@ -41,8 +41,9 @@ Submits a generation request. The output is generated asynchronously — use the
 
   - Default `auto` (recommended): a suitable ratio is picked for you.
   - Or pass an explicit value — must be one of the ratios returned in `supported_ratios` from the [List Models](/en/api-reference/endpoint/models) endpoint. Common image ratios: `1:1`, `3:4`, `4:3`, `16:9`, `9:16`, `21:9`, `5:4`, `4:5`.
-  - Seedance 2.0 also accepts `adaptive`, which matches the dimensions of `referenceImages` or `referenceVideo`. Only use `adaptive` when at least one of those is provided; behavior without a reference is undefined.
-  - **On Seedance 2.0, an omitted or unrecognised `aspectRatio` resolves to `adaptive`.** Since `adaptive` has nothing to adapt to on a pure text-to-video request, always pass an explicit ratio when you are generating without a reference image or reference video.
+  - Seedance 2.5 and 2.0 also accept `adaptive`, which follows the input media. Use it for first/last-frame and `referenceVideo` requests.
+  - For Seedance 2.5 text-to-video or `referenceMode: content`, pass an explicit supported ratio when you need a specific frame shape.
+  - **On Seedance 2.0, an omitted or unrecognised `aspectRatio` resolves to `adaptive`.** Pure text-to-video has nothing to adapt to, so always pass an explicit ratio when generating without a reference image or reference video.
 
   The final ratio used is returned both in this endpoint's response and in the status endpoint's `aspectRatio` field.
 </ParamField>
@@ -50,7 +51,7 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="resolution" type="string">
   The output resolution. Availability depends on the model. If omitted, the selected model's default is used.
 
-  Available values depend on the model: image models use `1K` / `2K` / `3K` / `4K`; video models use `480p` / `720p` / `1080p` / `4k` (note the lowercase `k` on video). Not every video model offers every value — `4k` is limited to Seedance 2.0's `pro` tier and Veo 3.1, and on Seedance `1080p` also requires the `pro` tier. See [Models](/en/features/models) for each model's supported resolutions and defaults. With `referenceVideo` continuation (Seedance 2.0), the ceiling is `1080p` — `4k` only applies to generation without a reference video.
+  Available values depend on the model: image models use `1K` / `2K` / `3K` / `4K`; video models use `480p` / `720p` / `1080p` / `4k` (note the lowercase `k` on video). Seedance 2.5 supports 480p / 720p only. Seedance 2.0 adds 1080p / 4k on `pro`; Veo 3.1 also supports 4k. With Seedance 2.0 `referenceVideo`, the ceiling is 1080p. See [Models](/en/features/models) for the complete matrix.
 </ParamField>
 
 <ParamField body="quality" type="string" default="low">
@@ -60,27 +61,27 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="referenceImages" type="string[]">
   Array of reference images. Each entry must be either a publicly accessible HTTP(S) URL, or inline base64 data in the form `data:image/png;base64,...`. Local file paths (e.g. `C:/Users/...`) and `file://` URIs are rejected with `400` / `invalid_reference_url`.
 
-  Maximum count is per-model — always read `max_reference_images` from [List Models](/en/api-reference/endpoint/models). At the time of writing:
+  Maximum count is per-model. For image models and video first/last-frame input, read `max_reference_images` from [List Models](/en/api-reference/endpoint/models). Seedance `content` mode instead uses `extra_config.maxContentReferenceImages`. At the time of writing:
 
   | Limit | Models |
   | --- | --- |
   | 10 | Seedream 5.0 Pro |
   | 5 | GPT Image 2.0, Nanobanana 2, Nanobanana Pro, Seedream 5.0 Lite, Seedream 4.5 |
   | 3 | Grok Imagine Quality |
-  | 2 | Seedance 2.0, Veo 3.1 — default `frame` mode (first/last frame), see `referenceMode` below |
+  | 2 | Seedance 2.5, Seedance 2.0, Veo 3.1 — default `frame` mode (first/last frame), see `referenceMode` below |
   | 1 | Midjourney V8.1, Agnes Image 2.1 Flash, Agnes Video 2.0, Grok Video 1.5 (**required** — image-to-video only) |
   | 0 | Flux 2 Klein, Z Image Turbo |
 
-  On Seedance 2.0, switching `referenceMode` to `content` raises the limit to 9.
+  In `content` mode, Seedance 2.5 accepts up to 30 images through the API and Seedance 2.0 accepts up to 9. The MeiGen Web and App interfaces intentionally expose a smaller two-image product workflow.
 </ParamField>
 
 <ParamField body="referenceMode" type="string" default="frame">
-  Video models only. How `referenceImages` are interpreted.
+  Seedance 2.5 and Seedance 2.0 only. Controls how those providers interpret `referenceImages`.
 
-  - `frame` (default) — first/last-frame reference. Max 2 images.
-  - `content` — content reference, not tied to a frame position. Seedance 2.0 accepts up to 9; other video models keep the `frame`-mode limit of 2.
+  - `frame` (default) — first/last-frame reference, up to 2 images.
+  - `content` — content reference, not tied to a frame position. Read the current API limit from `extra_config.maxContentReferenceImages` (30 for Seedance 2.5 and 9 for Seedance 2.0).
 
-  Exceeding the limit returns `400` — `frame_reference_limit` in `frame` mode, `too_many_references` in `content` mode.
+  Do not send this field for Veo, Grok, or Agnes video models; their providers do not implement content-reference mode and keep their normal frame behavior. Exceeding a supported limit returns `400` — `frame_reference_limit` in Seedance frame mode or `too_many_references` for content/other per-model limits.
 </ParamField>
 
 <ParamField body="niji7Options" type="object">
@@ -94,6 +95,7 @@ Submits a generation request. The output is generated asynchronously — use the
   | iw | number | 1 | 0–2 | |
   | sref | string | — | URL or text | |
   | sw | number | 100 | 0–1000 | |
+  | profile | string | — | Alphanumeric code | Midjourney personalization profile; works alongside `sref` |
   | quality | string | `4` | `1` or `4` | Defaults to High (4× compute, no extra cost) |
 </ParamField>
 
@@ -109,6 +111,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   | Model | Accepted values | Default |
   | --- | --- | --- |
+  | Seedance 2.5 | 4–30 | 4 |
   | Seedance 2.0 | 4–15 | 4 |
   | Veo 3.1 | 4, 6, 8 only | 4 |
   | Grok Video 1.5 | 4–15 | 4 |
@@ -123,19 +126,22 @@ Submits a generation request. The output is generated asynchronously — use the
   - Seedance 2.0: `mini` (default), `fast` or `pro`
   - Veo 3.1: `fast` (default) or `pro`
 
-  Higher tiers render at higher fidelity for a higher per-second price. If omitted, the model's own default tier is used — note that Seedance 2.0 defaults to `mini`, its cheapest tier. See [Models](/en/features/models) for the full pricing matrix.
+  Seedance 2.5 has no tier; omit this field. Higher tiers render at higher fidelity for a higher price. If omitted, the model's own default tier is used — Seedance 2.0 defaults to `mini`. See [Models](/en/features/models) for the full pricing matrix.
 </ParamField>
 
 <ParamField body="referenceVideo" type="string">
-  For Seedance 2.0 only. Reference video URL for "video continuation" mode. Must be a publicly accessible HTTPS URL (typically a previous generation result's `videoUrl`).
+  Reference video URL for Seedance 2.5 or Seedance 2.0 continuation. It must be a publicly accessible HTTPS URL (typically a previous generation result's `videoUrl`).
 
-  The source video must be **2–15 seconds** long and **50MB or smaller**; outside that range returns `400` / `invalid_reference_video`. Continuation output resolution tops out at `1080p` — Mini and Fast support `480p`/`720p`, Pro supports `720p`/`1080p`. `4k` is only available without a reference video.
+  | Model | Reference input | Output | With-video rates |
+  | --- | --- | --- | --- |
+  | Seedance 2.5 | 2–30s, ≤200MB | 4–30s; 480p / 720p | 11 / 24 credits/sec |
+  | Seedance 2.0 | 2–15s, ≤50MB | 4–15s; tier-specific, up to 1080p | Mini 7/13, Fast 8/14, Pro 16/28 credits/sec |
 
-  When this field is present, billing uses the "with reference video" tier (Mini 480p 7, 720p 13; Fast 480p 8, 720p 14; Pro 720p 16, 1080p 28 credits/sec) on the combined reference + output seconds, with the minimum-billable-seconds floor applied (see [Models](/en/features/models)). The reference video's actual duration is detected automatically for this calculation — see `referenceVideoDuration` below.
+  For both models, `billable seconds = max(reference duration + output duration, minimum-billable floor)`. See [Models](/en/features/models) for the complete rate tables and examples. The system detects the reference video's actual duration automatically.
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">
-  Optional, for Seedance 2.0 + reference-video continuation only. The system detects the uploaded reference video's actual duration automatically and uses that for billing and clipping — you don't need to set this field. If sent, it's only used as a diagnostic cross-check against the detected value and otherwise ignored.
+  Deprecated compatibility hint; omit it in new integrations. If supplied, it must be a finite non-negative number and may be compared with the detected value for diagnostics, but it does not control billing or clipping. The server-probed duration is authoritative for Seedance 2.5 / 2.0 continuation.
 </ParamField>
 
 <ParamField body="idempotencyKey" type="string">
@@ -334,7 +340,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-### Seedance video (text-to-video)
+### Seedance 2.5 video (text-to-video)
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \
@@ -342,16 +348,16 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "A majestic eagle soaring over a misty mountain valley at sunrise, cinematic camera movement",
-    "modelId": "seedance-2-0",
+    "modelId": "seedance-2-5",
     "aspectRatio": "16:9",
     "resolution": "720p",
     "duration": 5
   }'
 ```
 
-Pricing: no `tier` is passed, so this runs on Seedance's default **Mini** tier — 720p at 16 credits/sec × 5 sec = **80 credits**. Passing `"tier": "fast"` (20 credits/sec → 100 credits) or `"pro"` costs more; see [Models](/en/features/models).
+Pricing: Seedance 2.5 has no tier. 720p costs 39 credits/sec × 5 sec = **195 credits**.
 
-### Seedance video continuation (with reference video)
+### Seedance 2.5 continuation (with reference video)
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \
@@ -359,7 +365,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "Continue the scene as the eagle dives toward a river below",
-    "modelId": "seedance-2-0",
+    "modelId": "seedance-2-5",
     "aspectRatio": "adaptive",
     "resolution": "480p",
     "duration": 5,
@@ -367,7 +373,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-Pricing: no `tier` is passed, so this runs on the default **Mini** tier — 480p with-reference-video rate 7 credits/sec. Assuming the uploaded reference video is 3 seconds long (detected automatically), billable seconds = max(3 + 5, 9) = 9 sec, total **63 credits**. On `fast` the same request costs 8 × 9 = 72 credits. Output video length = `duration` = 5 seconds.
+Pricing: 480p with-reference-video rate is 11 credits/sec. Assuming the uploaded reference is 2 seconds long (detected automatically), billable seconds = max(2 + 5, 9) = 9 sec, total **99 credits**. Output length remains `duration` = 5 seconds.
 
 ### Auto ratio selection
 

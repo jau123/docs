@@ -1,6 +1,6 @@
 ---
 title: "AI Model Comparison"
-description: "Compare AI image & video models on MeiGen — GPT Image 2.0, Seedream 5.0 Pro, Midjourney V8.1, Nano Banana 2, Seedream 5.0 Lite, Flux 2 Klein, Agnes Image 2.1 Flash, Seedance 2.0, Veo 3.1, Agnes Video 2.0. Features, pricing, aspect ratios side by side."
+description: "Compare current MeiGen image and video models, including GPT Image 2, Nano Banana, Seedance 2.5, Seedance 2.0, and Veo 3.1. See capabilities, pricing, and limits."
 ---
 
 MeiGen supports multiple AI models for image and video generation. Use the comparison table below to pick one, then scroll to its section for detailed specs.
@@ -20,6 +20,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Flux 2 Klein** | 2 | Fast (~23s) | None | ✓ | General-purpose base model, text rendering |
 | **Z Image Turbo** | 2 | Fastest (~11s) | None | ✓ | Quick drafts, prototyping |
 | **Agnes Image 2.1 Flash** | 1 | Fast (~30s) | 1 | ✓ | Cheapest model, high-volume drafts, covered by daily free credits |
+| **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec) | Video, ~2-3min | First/last frame or content reference | ✓ | 4–30s, 480p/720p, generated audio, reference-video continuation |
 | **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio |
 | **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video, ~35s | First frame (required) | Web only | First-frame image-to-video only, 4–15s, ratio follows input, audio |
 | **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-8min | Up to 2 (first/last frame) | Web only | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
@@ -230,6 +231,50 @@ The cheapest model on MeiGen at 1 credit per image, and the only basic-tier **im
 
 ## Video Models
 
+### Seedance 2.5
+
+| | |
+| --- | --- |
+| **Model ID** | `seedance-2-5` |
+| **Provider** | ByteDance |
+| **Credits** | Per-second pricing (see below) |
+| **Duration** | 4–30 seconds (default 4) |
+| **Reference images** | Web/App: up to 2 as first/last frame or content reference. REST API: up to 30 content references (`referenceMode: content`) |
+| **Reference video** | 2–30 seconds, up to 200MB; actual duration is detected automatically |
+| **Resolutions** | 480p, 720p (default 480p) |
+| **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
+| **Audio** | Auto-generated |
+| **Tiers** | None — do not send `tier` |
+
+Seedance 2.5 is the long-duration Seedance model on MeiGen. It supports text-to-video, first/last-frame image-to-video, content-reference images, and reference-video continuation. The Web and App pickers currently accept two content references; the REST API accepts up to 30. Frame references and reference-video continuation use `adaptive` ratio so the output follows the input media; text-to-video and content-reference requests can use an explicit supported ratio.
+
+#### Pricing
+
+| Resolution | Direct | With reference video |
+| --- | --- | --- |
+| 480p | 18 credits/sec | 11 credits/sec |
+| 720p | 39 credits/sec | 24 credits/sec |
+
+Direct generation bills only the selected output duration. With a reference video:
+
+`billable seconds = max(reference video duration + selected output duration, ceil(selected output duration × 5 / 3))`
+
+The minimum-billable floor is 7 seconds for a 4-second output, 9 for 5 seconds, and 50 for 30 seconds. Output length is always the selected 4–30 seconds; the billing floor does not lengthen the generated clip.
+
+| Scenario | Calculation | Total |
+| --- | --- | --- |
+| 480p × 5s direct | 18 × 5 | **90** |
+| 720p × 5s direct | 39 × 5 | **195** |
+| 480p, 2s reference + 5s output | 11 × max(2+5, 9) | **99** |
+| 720p, 2s reference + 5s output | 24 × max(2+5, 9) | **216** |
+| 480p × 30s direct | 18 × 30 | **540** |
+
+<Note>
+  If generation fails, the **full** credit amount is automatically refunded.
+</Note>
+
+---
+
 ### Seedance 2.0
 
 | | |
@@ -238,15 +283,15 @@ The cheapest model on MeiGen at 1 credit per image, and the only basic-tier **im
 | **Provider** | ByteDance |
 | **Credits** | Per-second pricing (see below) |
 | **Duration** | 4-15 seconds (default 4) |
-| **Reference images** | Up to 2 as first/last frame (default), or up to 9 as content reference (`referenceMode: content`) |
+| **Reference images** | Web/App: up to 2 as first/last frame or content reference. REST API: up to 9 content references (`referenceMode: content`) |
 | **Reference video** | All three tiers. Upload must be 2–15s and ≤50MB — the platform detects the actual duration automatically |
 | **Resolutions** | Direct: Mini/Fast 480p/720p, Pro 480p/720p/1080p/4K. With reference video: Mini/Fast 480p/720p, Pro 720p/1080p (no 480p, no 4K) |
 | **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
 | **Audio** | Auto-generated |
 
-ByteDance's latest video generation model. Supports text-to-video, image-to-video (first/last frame or content reference), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions. Seedance 2.0 is also the only video model with **character assets**: save a character once, then reference it with `@` in your prompt to keep the same subject across shots.
+Seedance 2.0 is the three-tier Seedance option. It supports text-to-video, image-to-video (first/last frame or content reference), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions. Seedance 2.0 is also the only video model with **character assets**: save a character once, then reference it with `@` in your prompt to keep the same subject across shots.
 
-Two reference-image modes: **first/last frame** (default, up to 2 images) sets the opening and/or closing frame; **content reference** (`referenceMode: content`, up to 9 images) guides style or subject instead of fixing a frame position.
+Two reference-image modes: **first/last frame** (default, up to 2 images) sets the opening and/or closing frame; **content reference** guides style or subject instead of fixing a frame position. The Web and App content-reference pickers accept up to 2 images, while the REST API accepts up to 9 with `referenceMode: content`.
 
 **Three tiers**, picked from the tier switch (Mini / Fast / Pro) in the video sidebar. Same Seedance 2.0 model, same params, just different rendering quality and price:
 - **Mini** (default): cheapest and most lightweight; 480p / 720p
@@ -350,7 +395,7 @@ xAI's image-to-video model. A starting (first-frame) image is **required** — p
 | **Aspect ratios** | Auto, 16:9, 9:16 |
 | **Audio** | Auto-generated (always on) |
 
-Google's video generation model. Creates short clips with AI-generated audio synced to the prompt. **Auto** aspect ratio infers the output ratio from your prompt or reference image. Pick this for premium visual quality with native audio; for longer durations (>8s) or wider ratio support, use Seedance 2.0.
+Google's video generation model. Creates short clips with AI-generated audio synced to the prompt. **Auto** aspect ratio infers the output ratio from your prompt or reference image. Pick this for premium visual quality with native audio; for longer durations (>8s), use Seedance 2.5.
 
 **Two tiers** — pick one from the tier switch (Fast / Pro) in the video sidebar. Same Veo 3.1 model, same params, just different rendering quality and price:
 - **Fast** (default) — quick turnaround, balanced quality
@@ -395,7 +440,7 @@ Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 
 | **Resolutions** | 480p |
 | **Aspect ratios** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
 
-The only basic-tier video model — and the only one your daily free credits cover. Supports text-to-video and single-image first-frame image-to-video at a fixed 5 seconds / 480p. For higher resolution or longer clips, use Seedance 2.0 or Veo 3.1.
+The only basic-tier video model — and the only one your daily free credits cover. Supports text-to-video and single-image first-frame image-to-video at a fixed 5 seconds / 480p. For longer clips, use Seedance 2.5; for higher resolutions, use Seedance 2.0 Pro or Veo 3.1.
 
 #### Pricing
 
@@ -438,12 +483,16 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
     Seedance bills **per second**, not per image — and uploading a reference video uses a separate rate table with a minimum-billable floor. See the **Seedance 2.0** section above for the full rates and formula.
   </Accordion>
 
+  <Accordion title="Seedance 2.5 — No Mini / Fast / Pro tier" icon="circle-info">
+    Seedance 2.5 has one quality level and supports 480p / 720p. Do not send `tier`; use Seedance 2.0 Pro when you specifically need 1080p or 4K.
+  </Accordion>
+
   <Accordion title="Seedance 2.0 Mini — 480p / 720p only" icon="triangle-exclamation">
     The Mini tier (the default) is the lightweight option, capped at 720p. For 1080p or 4K output, switch to **Pro** — note that reference-video continuation on Pro tops out at 1080p (4K needs direct generation with no reference video).
   </Accordion>
 
   <Accordion title="Grok Video 1.5 — First frame required" icon="triangle-exclamation">
-    Grok Video 1.5 is image-to-video only — you **must** upload a starting (first-frame) image. Pure text-to-video is not supported. The output aspect ratio follows your input image. If you want text-to-video, use Seedance 2.0 or Veo 3.1.
+    Grok Video 1.5 is image-to-video only — you **must** upload a starting (first-frame) image. Pure text-to-video is not supported. The output aspect ratio follows your input image. If you want text-to-video, use Seedance 2.5, Seedance 2.0, or Veo 3.1.
   </Accordion>
 
   <Accordion title="Grok Video 1.5 — 480p / 720p only" icon="triangle-exclamation">
@@ -451,7 +500,7 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
   </Accordion>
 
   <Accordion title="Veo 3.1 — Limited aspect ratios" icon="triangle-exclamation">
-    Veo 3.1 only supports 16:9 / 9:16 (plus Auto). Square (1:1), 4:3 / 3:4 portrait, and other ratios are not available. For wider ratio support, use Seedance 2.0.
+    Veo 3.1 only supports 16:9 / 9:16 (plus Auto). Square (1:1), 4:3 / 3:4 portrait, and other ratios are not available. For wider ratio support, use Seedance 2.5 or Seedance 2.0.
   </Accordion>
 
   <Accordion title="Veo 3.1 — 4k costs no extra credits, but needs a paid account" icon="circle-info">

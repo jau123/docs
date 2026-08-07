@@ -1,6 +1,6 @@
 ---
 title: "REST API Overview"
-description: "MeiGen REST API — integrate AI image & video generation into your app. Supports GPT Image 2, Nanobanana 2, Midjourney, Seedream, Seedance, Veo. Unified endpoints with bearer token auth."
+description: "Integrate MeiGen image and video generation with the REST API. Learn authentication, model discovery, asynchronous jobs, billing, and result polling."
 ---
 
 The MeiGen API lets you generate images and videos programmatically.
@@ -120,7 +120,7 @@ For `POST /api/generate/v2`, error bodies include extra fields useful for debugg
 | `unsupported_resolution` | 400 | This model/tier doesn't support the requested resolution |
 | `first_frame_required` | 400 | This model requires a first-frame image |
 | `reference_video_not_supported` | 400 | This model/tier/resolution doesn't support reference-video continuation |
-| `invalid_reference_video` | 400 | The reference video couldn't be read, or its duration is out of range — it must be 2–15 seconds, at most 50MB, and a URL hosted on the platform |
+| `invalid_reference_video` | 400 | The reference video couldn't be read or violates the selected model's limits. Read `capabilities.video.referenceVideo`: Seedance 2.5 accepts 2–30s / ≤200MB; Seedance 2.0 accepts 2–15s / ≤50MB. The URL must be hosted on the platform |
 | `invalid_reference_url` | 400 | A `referenceImages` entry is not an accepted URL or base64 value |
 | `frame_reference_limit` | 400 | `referenceMode: "frame"` allows at most 2 images — use `referenceMode: "content"` for more |
 | `too_many_references` | 400 | Reference image count exceeds this model's limit |

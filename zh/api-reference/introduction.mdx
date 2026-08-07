@@ -1,6 +1,6 @@
 ---
 title: "REST API 概览"
-description: "MeiGen REST API — 将 AI 图片与视频生成集成到你的应用。支持 GPT Image 2、Nanobanana 2、Midjourney、Seedream、Seedance、Veo 等模型，统一接口，Bearer Token 认证。"
+description: "通过 MeiGen REST API 集成图片与视频生成，了解认证、模型发现、异步任务、计费与结果轮询。"
 ---
 
 MeiGen API 允许你以编程方式生成图片和视频。
@@ -120,7 +120,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | `unsupported_resolution` | 400 | 该模型/档位不支持这个分辨率 |
 | `first_frame_required` | 400 | 该模型必须提供首帧图 |
 | `reference_video_not_supported` | 400 | 该模型/档位/分辨率不支持参考视频续写 |
-| `invalid_reference_video` | 400 | 参考视频无法读取或时长超范围——须 2–15 秒、不超过 50MB，且为平台内的视频链接 |
+| `invalid_reference_video` | 400 | 参考视频无法读取或不符合所选模型限制。请读取 `capabilities.video.referenceVideo`：Seedance 2.5 为 2–30 秒、≤200MB；Seedance 2.0 为 2–15 秒、≤50MB；链接必须来自平台内 |
 | `invalid_reference_url` | 400 | `referenceImages` 中存在不合法的 URL 或 base64 值 |
 | `frame_reference_limit` | 400 | `referenceMode: "frame"` 最多 2 张图，改用 `referenceMode: "content"` 可传更多 |
 | `too_many_references` | 400 | 参考图数量超出该模型上限 |

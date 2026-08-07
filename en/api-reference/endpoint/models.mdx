@@ -1,6 +1,6 @@
 ---
 title: "List Models"
-description: "Get available AI models and their configurations"
+description: "List active MeiGen models and read model IDs, pricing, durations, resolutions, and reference-media capabilities."
 ---
 
 ```
@@ -38,7 +38,7 @@ Every model returned by this endpoint can be used with `POST /api/generate/v2`, 
 </ResponseField>
 
 <ResponseField name="credits_per_generation" type="number">
-  A nominal fallback value. **For video models, do not quote it to end users** — derive the real cost from `extra_config.pricingPerSec` × `duration`, or from `extra_config.pricingPerCall[tier][duration]` for Veo 3.1. Always send `duration` explicitly for Veo 3.1: if it is omitted, billing falls back to this nominal value. The authoritative charge is `creditsUsed` in the generate response.
+  A nominal fallback value. **For video models, do not quote it to end users.** Use `extra_config.pricingPerSec` × `duration`, `extra_config.pricingPerCall[tier][duration]` for Veo 3.1, or the reference-video rules below. The authoritative charge is `creditsUsed` in the generate response.
 </ResponseField>
 
 <ResponseField name="supported_ratios" type="string[]">
@@ -46,7 +46,7 @@ Every model returned by this endpoint can be used with `POST /api/generate/v2`, 
 </ResponseField>
 
 <ResponseField name="max_reference_images" type="number">
-  Maximum number of reference images accepted (`0` means the model does not accept references).
+  For image models, the maximum number of reference images accepted (`0` means none). For video models, this is the first/last-frame slot limit. Seedance content-reference mode uses `extra_config.maxContentReferenceImages` instead.
 </ResponseField>
 
 <ResponseField name="media_type" type="string">
@@ -58,7 +58,7 @@ Every model returned by this endpoint can be used with `POST /api/generate/v2`, 
 </ResponseField>
 
 <ResponseField name="capabilities" type="object">
-  Stable, forward-compatible capability contract. `capabilities.video` describes a video model's shape — output duration options, reference-video continuation range (seconds and upload size), and whether a first frame is required; `null` for image models. **New integrations should read `capabilities.video` instead of parsing `extra_config`** — the latter is kept only for backward compatibility with older clients.
+  Stable, forward-compatible capability contract. `capabilities.video` is always an object: check `capabilities.video.valid` to distinguish video models (`true`) from image models (`false`). When valid, it describes output duration options, reference-video continuation limits, billing mode, and whether a first frame is required. **Do not test `if (capabilities.video)`** because the object is also present on image models. New integrations should read this contract instead of reconstructing it from `extra_config`.
 </ResponseField>
 
 <ResponseField name="extra_config" type="object">
@@ -70,10 +70,11 @@ Every model returned by this endpoint can be used with `POST /api/generate/v2`, 
   | `tierResolutions` | Seedance 2.0 | Resolutions actually available in each tier, keyed by tier. Takes precedence over the top-level `resolutions` |
   | `tiers` | Seedance 2.0 / Veo 3.1 | Available tiers, selected via `tier` (Seedance 2.0: `mini` / `fast` / `pro`; Veo 3.1: `fast` / `pro`) |
   | `durations` | Video models | Allowed values for `duration` (seconds) |
-  | `pricingPerSec` | Seedance 2.0 / Grok Video 1.5 / Agnes Video 2.0 | Per-second rate, keyed by resolution — or by tier then resolution on models that expose tiers |
+  | `pricingPerSec` | Seedance 2.5 / Seedance 2.0 / Grok Video 1.5 / Agnes Video 2.0 | Per-second direct-generation rate, keyed by resolution — or by tier then resolution on models that expose tiers |
   | `pricingPerCall` | Veo 3.1 | Credits per generation, looked up by tier then `duration`. Mutually exclusive with `pricingPerSec`; when present it takes precedence |
-  | `pricingPerSecWithVideo` | Seedance 2.0 | Per-second rate with `referenceVideo`, keyed by tier then resolution |
-  | `minBillableTable` | Seedance 2.0 | Minimum billable seconds keyed by `duration` (continuation only) |
+  | `pricingPerSecWithVideo` | Seedance 2.5 / Seedance 2.0 | Per-second rate with `referenceVideo`, keyed by resolution — or by tier then resolution |
+  | `minBillableTable` | Seedance 2.5 / Seedance 2.0 | Minimum billable seconds keyed by output `duration`; bill `max(reference + output, minimum)` |
+  | `maxContentReferenceImages` | Seedance 2.5 / Seedance 2.0 | Maximum images accepted when `referenceMode` is `content`; separate from the first/last-frame slots in `max_reference_images` |
 
   The pricing-related keys above are part of the contract. Other keys may appear and are informational.
 </ResponseField>
@@ -97,39 +98,47 @@ curl https://www.meigen.ai/api/models
       "max_reference_images": 5,
       "media_type": "image",
       "extra_config": {},
-      "estimatedTiming": { "p50": 34, "p90": 69 },
-      "capabilities": { "video": null }
+      "estimatedTiming": { "p50": 32, "p90": 57 },
+      "capabilities": {
+        "video": {
+          "outputDuration": null,
+          "referenceVideo": { "enabled": false, "minSeconds": 0, "maxSeconds": 0, "maxUploadBytes": 0 },
+          "billing": null,
+          "requiresFirstFrame": false,
+          "valid": false
+        }
+      }
     },
     {
-      "id": "seedance-2-0",
-      "name": "Seedance 2.0",
+      "id": "seedance-2-5",
+      "name": "Seedance 2.5",
       "provider": "ByteDance",
-      "credits_per_generation": 60,
+      "credits_per_generation": 72,
       "supported_ratios": ["adaptive", "16:9", "4:3", "1:1", "3:4", "9:16", "21:9"],
       "max_reference_images": 2,
       "media_type": "video",
       "extra_config": {
-        "tiers": ["mini", "fast", "pro"],
-        "resolutions": ["480p", "720p", "1080p"],
-        "tierResolutions": {
-          "mini": ["480p", "720p"],
-          "fast": ["480p", "720p"],
-          "pro": ["480p", "720p", "1080p", "4k"]
-        },
-        "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        "resolutions": ["480p", "720p"],
+        "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+        "maxContentReferenceImages": 30,
+        "pricingPerSec": { "480p": 18, "720p": 39 },
+        "pricingPerSecWithVideo": { "480p": 11, "720p": 24 },
+        "minBillableTable": { "4": 7, "5": 9, "6": 10, "7": 12, "8": 14, "9": 15, "10": 17, "11": 19, "12": 20, "13": 22, "14": 24, "15": 25, "16": 27, "17": 29, "18": 30, "19": 32, "20": 34, "21": 35, "22": 37, "23": 39, "24": 40, "25": 42, "26": 44, "27": 45, "28": 47, "29": 49, "30": 50 }
       },
-      "estimatedTiming": { "p50": 131, "p90": 205 },
+      "estimatedTiming": { "p50": 118, "p90": 165.2 },
       "capabilities": {
         "video": {
-          "outputDuration": { "kind": "enum", "values": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "default": 4 },
+          "outputDuration": { "kind": "range", "min": 4, "max": 30, "step": 1, "default": 4 },
           "referenceVideo": {
             "enabled": true,
             "minSeconds": 2,
-            "maxSeconds": 15,
-            "maxUploadBytes": 52428800,
-            "resolutionsByTier": { "mini": ["480p", "720p"], "fast": ["480p", "720p"], "pro": ["720p", "1080p"] }
+            "maxSeconds": 30,
+            "maxUploadBytes": 209715200,
+            "resolutions": ["480p", "720p"]
           },
-          "requiresFirstFrame": false
+          "billing": { "mode": "per_second", "requestDefaultSeconds": 4, "referenceSeconds": "reference_plus_output_with_minimum_table" },
+          "requiresFirstFrame": false,
+          "valid": true
         }
       }
     }
@@ -138,5 +147,5 @@ curl https://www.meigen.ai/api/models
 ```
 
 <Note>
-  Example shows two representative models with a partial `extra_config` / `capabilities.video` for brevity. The live endpoint returns all active models with their full configuration. Responses are cached for 1 hour (plus stale-while-revalidate), so newly added or retired models can take up to an hour to appear.
+  Example shows two representative models with a partial `extra_config` for brevity. Timing values are an illustrative production snapshot and may change as estimates are recalibrated. The live endpoint returns all active models with their current full configuration. Responses are cached for 1 hour (plus stale-while-revalidate), so newly added or retired models can take up to an hour to appear.
 </Note>

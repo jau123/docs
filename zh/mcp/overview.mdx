@@ -1,6 +1,6 @@
 ---
 title: "MCP 服务器概览"
-description: "在 Claude Code、Cursor、Codex、Windsurf、Hermes Agent 和 OpenClaw 中生成 AI 图片与视频 — MeiGen 开源 MCP 服务器，支持 GPT Image 2、Nano Banana 2、Nanobanana Pro、Midjourney V8.1、Seedream、Grok Imagine、Grok Video 1.5、Flux 2、Z Image Turbo、Seedance、Veo 3.1、Agnes 以及本地 ComfyUI 工作流。"
+description: "通过 MeiGen 开源 MCP 服务在 Claude Code、Cursor、Codex、Windsurf、Hermes Agent 和 OpenClaw 中生成 AI 图片与视频，支持 Seedance 2.5 等线上模型与本地 ComfyUI。"
 ---
 
 **MeiGen** 是一个开源的 MCP (Model Context Protocol) 服务器，赋予 AI 编程助手生成**图片和视频**的能力。它支持多种生成后端 — 使用 MeiGen 的云端模型、你本地的 ComfyUI 服务器，或任何 OpenAI 兼容 API。
@@ -60,7 +60,9 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 <Note>
   视频能力因模型而异 — 画质档位、可选时长与分辨率、音频、参考视频续写，以及是否必须提供首帧图。部分模型仅支持图生视频。当前清单用 `list_models` 查，或见[模型对比](/zh/features/models)。
 
-  `generate_video` 必须显式指定 `model` — 平台没有默认模型。其 `referenceVideoDuration` 参数已废弃,传了会被忽略;上传参考视频后时长会自动识别。
+  Seedance 2.5 的模型 ID 是 `seedance-2-5`，支持 4–30 秒、480p/720p 输出和参考视频续写，没有 `tier` 参数。
+
+  `generate_video` 必须显式指定 `model`——平台没有默认模型。`referenceVideoDuration` 是已弃用且会被校验的兼容提示，不会决定计费时长；请省略它并传 `referenceVideo`，服务端会自动探测真实时长。
 </Note>
 
 ---
