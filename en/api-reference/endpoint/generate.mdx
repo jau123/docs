@@ -55,7 +55,7 @@ Submits a generation request. The output is generated asynchronously — use the
 </ParamField>
 
 <ParamField body="quality" type="string" default="low">
-  GPT Image 2.0 only. Accepts `low` / `medium` / `high`. Other models ignore this parameter.
+  GPT Image 2.0 accepts `low` / `medium` / `high`; Grok Imagine Image 2.0 accepts `low` (Standard, default) / `medium`. Other models ignore this parameter.
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">
@@ -67,7 +67,7 @@ Submits a generation request. The output is generated asynchronously — use the
   | --- | --- |
   | 10 | Seedream 5.0 Pro |
   | 5 | GPT Image 2.0, Nanobanana 2, Nanobanana Pro, Seedream 5.0 Lite, Seedream 4.5 |
-  | 3 | Grok Imagine Quality |
+  | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5, Seedance 2.0, Veo 3.1 — default `frame` mode (first/last frame), see `referenceMode` below |
   | 1 | Midjourney V8.1, Agnes Image 2.1 Flash, Agnes Video 2.0, Grok Video 1.5 (**required** — image-to-video only) |
   | 0 | Flux 2 Klein, Z Image Turbo |

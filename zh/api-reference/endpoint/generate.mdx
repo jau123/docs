@@ -55,7 +55,7 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="quality" type="string" default="low">
-  仅用于 GPT Image 2.0。可选 `low` / `medium` / `high`。其他模型会忽略该参数。
+  GPT Image 2.0 可选 `low` / `medium` / `high`；Grok Imagine Image 2.0 可选 `low`（Standard，默认）/ `medium`。其他模型会忽略该参数。
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">
@@ -67,7 +67,7 @@ POST /api/generate/v2
   | --- | --- |
   | 10 | Seedream 5.0 Pro |
   | 5 | GPT Image 2.0、Nanobanana 2、Nanobanana Pro、Seedream 5.0 Lite、Seedream 4.5 |
-  | 3 | Grok Imagine Quality |
+  | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5、Seedance 2.0、Veo 3.1 —— 默认 `frame` 模式（首/尾帧），见下方 `referenceMode` |
   | 1 | Midjourney V8.1、Agnes Image 2.1 Flash、Agnes Video 2.0、Grok Video 1.5(**必传** —— 仅支持图生视频) |
   | 0 | Flux 2 Klein、Z Image Turbo |

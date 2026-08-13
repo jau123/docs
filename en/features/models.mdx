@@ -15,7 +15,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Seedream 5.0 Pro** | 10 (1K) / 20 (2K) | Slow (~1min 45s) | 10 | Web only | Multi-reference composition (up to 10 refs), character consistency |
 | **Seedream 5.0 Lite** | 5 | Medium (~42s) | 5 | Web only | Photorealism, 3K output |
 | **Seedream 4.5** | 5 | Fast (~32s) | 5 | Web only | Product photos, marketing |
-| **Grok Imagine Quality** | 10 (1K) / 14 (2K) | Fastest (~9s) | 3 | Web only | High-quality generation, text-to-image + image-to-image |
+| **Grok Imagine Image 2.0** | 10–14 (Standard) / 14–18 (Medium) | Fast (~25s) | 3 | Web only | Precise editing, high-quality generation, text-to-image + image-to-image |
 | **Midjourney V8.1** | 15 (1K) / 20 (2K) | Fast (~33s) | 1 | ✓ | Photorealistic, universal aesthetics |
 | **Flux 2 Klein** | 2 | Fast (~23s) | None | ✓ | General-purpose base model, text rendering |
 | **Z Image Turbo** | 2 | Fastest (~11s) | None | ✓ | Quick drafts, prototyping |
@@ -141,18 +141,26 @@ The previous generation Seedream model. Still produces solid results, particular
 
 ---
 
-### Grok Imagine Quality
+### Grok Imagine Image 2.0
 
 | | |
 | --- | --- |
 | **Model ID** | `grok-image` |
 | **Provider** | xAI |
-| **Credits** | 10 (1K) / 14 (2K) per image |
+| **Credits** | By resolution × quality — see table below |
 | **Reference images** | Up to 3 |
 | **Resolutions** | 1K, 2K — default 1K |
+| **Quality** | Standard (default) / Medium |
 | **Aspect ratios** | 1:1, 3:2, 2:3, 4:3, 3:4, 16:9, 9:16 |
 
-xAI's high-quality image generation model. Supports both text-to-image and image-to-image (up to 3 reference images for editing or guided generation). 2K is paid-only.
+**Credit matrix:**
+
+| | Standard | Medium |
+| --- | --- | --- |
+| **1K** | 10 | 14 |
+| **2K** | 14 | 18 |
+
+xAI's Grok Imagine 2.0 image model. Supports both text-to-image and image-to-image (up to 3 reference images for editing or guided generation), with a focus on precise editing, infographics, ads, and UI/UX mockups. A premium model — daily free credits don't apply.
 
 ---
 
