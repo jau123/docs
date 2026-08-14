@@ -66,7 +66,7 @@ Submits a generation request. The output is generated asynchronously — use the
   | Limit | Models |
   | --- | --- |
   | 10 | Seedream 5.0 Pro |
-  | 5 | GPT Image 2.0, Nanobanana 2, Nanobanana Pro, Seedream 5.0 Lite, Seedream 4.5 |
+  | 5 | GPT Image 2.0, Nanobanana 2, Nanobanana Pro, Seedream 4.5 |
   | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5, Seedance 2.0, Veo 3.1 — default `frame` mode (first/last frame), see `referenceMode` below |
   | 1 | Midjourney V8.1, Agnes Image 2.1 Flash, Agnes Video 2.0, Grok Video 1.5 (**required** — image-to-video only) |
@@ -315,7 +315,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "Similar style landscape but with autumn colors",
-    "modelId": "seedream-5.0-lite",
+    "modelId": "seedream-4.5",
     "aspectRatio": "16:9",
     "referenceImages": ["https://example.com/reference.jpg"]
   }'
