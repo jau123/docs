@@ -23,7 +23,7 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="prompt" type="string" required>
   The text description of the image or video to generate. To reference a saved character, include `[character:<uuid>]` inline — e.g. `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`. Up to 3 character references per generation.
 
-  Supported on image models that accept reference images (all except Flux 2 Klein and Z Image Turbo) and on **Seedance 2.0 only** for video. Seedance 2.5 does not accept character assets. An unsupported model, a nonexistent or inaccessible character, or too many references returns `400` (`characters_not_supported`, `character_not_found`, `too_many_characters`); some characters require a higher `tier` (`character_tier_required`).
+  Supported on image models that accept reference images (all except Flux 2 Klein) and on **Seedance 2.5 / 2.0** for video. Character images consume the same content-reference image budget as user-uploaded images. An unsupported model, a nonexistent or inaccessible character, or too many references returns `400` (`characters_not_supported`, `character_not_found`, `too_many_characters`); some characters require a higher `tier` (`character_tier_required`).
 </ParamField>
 
 <ParamField body="modelId" type="string">
@@ -65,14 +65,23 @@ Submits a generation request. The output is generated asynchronously — use the
 
   | Limit | Models |
   | --- | --- |
-  | 10 | Seedream 5.0 Pro |
-  | 5 | GPT Image 2.0, Nanobanana 2, Nanobanana Pro, Seedream 4.5 |
+  | 16 | GPT Image 2.0 |
+  | 14 | Nanobanana 2, Nanobanana Pro |
+  | 10 | Seedream 5.0 Pro, Seedream 4.5 |
   | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5, Seedance 2.0, Veo 3.1 — default `frame` mode (first/last frame), see `referenceMode` below |
   | 1 | Midjourney V8.1, Agnes Image 2.1 Flash, Agnes Video 2.0, Grok Video 1.5 (**required** — image-to-video only) |
-  | 0 | Flux 2 Klein, Z Image Turbo |
+  | 0 | Flux 2 Klein |
 
-  In `content` mode, Seedance 2.5 accepts up to 30 images through the API and Seedance 2.0 accepts up to 9. The MeiGen Web and App interfaces intentionally expose a smaller two-image product workflow.
+  In `content` mode, Seedance 2.5 accepts up to 30 images and Seedance 2.0 accepts up to 9. When character tokens are present, their resolved images count toward the same limit.
+</ParamField>
+
+<ParamField body="frameReferenceImages" type="string[]">
+  Optional structured Seedance input for the first and last frame, in that order. Maximum 2. Use this together with `contentReferenceImages` when you need frame control and content guidance in the same request. Structured fields take precedence over the legacy `referenceImages` / `referenceMode` pair.
+</ParamField>
+
+<ParamField body="contentReferenceImages" type="string[]">
+  Optional structured Seedance content references: up to 30 for Seedance 2.5 or 9 for Seedance 2.0. These can coexist with `frameReferenceImages`, `referenceVideo`, and saved-character references. Image and video limits are counted separately; saved-character images count toward this image limit.
 </ParamField>
 
 <ParamField body="referenceMode" type="string" default="frame">
@@ -137,7 +146,7 @@ Submits a generation request. The output is generated asynchronously — use the
   | Seedance 2.5 | 2–30s, ≤200MB | 4–30s; 480p / 720p | 11 / 24 credits/sec |
   | Seedance 2.0 | 2–15s, ≤50MB | 4–15s; tier-specific, up to 1080p | Mini 7/13, Fast 8/14, Pro 16/28 credits/sec |
 
-  For both models, `billable seconds = max(reference duration + output duration, minimum-billable floor)`. See [Models](/en/features/models) for the complete rate tables and examples. The system detects the reference video's actual duration automatically.
+  For both models, `billable seconds = max(reference duration + output duration, minimum-billable floor)`. See [Models](/en/features/models) for the complete rate tables and examples. The system detects the reference video's actual duration automatically. A reference video can be submitted together with content-reference images; their limits are independent.
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">

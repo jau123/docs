@@ -23,7 +23,7 @@ POST /api/generate/v2
 <ParamField body="prompt" type="string" required>
   要生成的图片或视频的文本描述。要引用已创建的角色，在文本中内嵌 `[character:<uuid>]` ——例如 `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`。每次生成最多引用 3 个角色。
 
-  支持范围：所有接受参考图的图片模型（除 Flux 2 Klein、Z Image Turbo 外）+ 视频侧**仅 Seedance 2.0**。Seedance 2.5 不支持角色资产。模型不支持、角色不存在或无权访问、引用数超限均返回 `400`（`characters_not_supported`、`character_not_found`、`too_many_characters`）；部分角色需要更高的 `tier`（`character_tier_required`）。
+  支持范围：所有接受参考图的图片模型（Flux 2 Klein 除外）+ 视频侧 **Seedance 2.5 / 2.0**。角色图片与用户上传图片共用内容参考图预算。模型不支持、角色不存在或无权访问、引用数超限均返回 `400`（`characters_not_supported`、`character_not_found`、`too_many_characters`）；部分角色需要更高的 `tier`（`character_tier_required`）。
 </ParamField>
 
 <ParamField body="modelId" type="string">
@@ -65,14 +65,23 @@ POST /api/generate/v2
 
   | 上限 | 模型 |
   | --- | --- |
-  | 10 | Seedream 5.0 Pro |
-  | 5 | GPT Image 2.0、Nanobanana 2、Nanobanana Pro、Seedream 4.5 |
+  | 16 | GPT Image 2.0 |
+  | 14 | Nanobanana 2、Nanobanana Pro |
+  | 10 | Seedream 5.0 Pro、Seedream 4.5 |
   | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5、Seedance 2.0、Veo 3.1 —— 默认 `frame` 模式（首/尾帧），见下方 `referenceMode` |
   | 1 | Midjourney V8.1、Agnes Image 2.1 Flash、Agnes Video 2.0、Grok Video 1.5(**必传** —— 仅支持图生视频) |
-  | 0 | Flux 2 Klein、Z Image Turbo |
+  | 0 | Flux 2 Klein |
 
-  `content` 模式下，Seedance 2.5 的 API 最多接受 30 张图片，Seedance 2.0 最多 9 张。MeiGen Web 与 App 界面出于产品体验仍只开放两张内容参考图。
+  `content` 模式下，Seedance 2.5 最多接受 30 张图片，Seedance 2.0 最多 9 张；使用角色时，角色解析出的图片也计入同一上限。
+</ParamField>
+
+<ParamField body="frameReferenceImages" type="string[]">
+  可选的 Seedance 结构化首尾帧输入，顺序为首帧、末帧，最多 2 张。需要同时控制首尾帧与内容参考时，可与 `contentReferenceImages` 一起使用。结构化字段优先于旧的 `referenceImages` / `referenceMode` 组合。
+</ParamField>
+
+<ParamField body="contentReferenceImages" type="string[]">
+  可选的 Seedance 结构化内容参考图：Seedance 2.5 最多 30 张，Seedance 2.0 最多 9 张。可与 `frameReferenceImages`、`referenceVideo` 和角色引用同时使用。图片与视频分别计数；角色图片计入本图片上限。
 </ParamField>
 
 <ParamField body="referenceMode" type="string" default="frame">
@@ -137,7 +146,7 @@ POST /api/generate/v2
   | Seedance 2.5 | 2–30 秒、≤200MB | 4–30 秒；480p / 720p | 11 / 24 积分/秒 |
   | Seedance 2.0 | 2–15 秒、≤50MB | 4–15 秒；按档位，最高 1080p | Mini 7/13、Fast 8/14、Pro 16/28 积分/秒 |
 
-  两个模型都按 `计费秒数 = max(参考视频时长 + 输出时长, 最低计费秒数)`。完整费率和示例见[模型](/zh/features/models)。系统会自动识别参考视频真实时长。
+  两个模型都按 `计费秒数 = max(参考视频时长 + 输出时长, 最低计费秒数)`。完整费率和示例见[模型](/zh/features/models)。系统会自动识别参考视频真实时长。参考视频可与内容参考图一起提交，两者上限互不占用。
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">
