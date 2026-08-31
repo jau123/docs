@@ -61,6 +61,17 @@ POST /api/generate/v2
 <ParamField body="referenceImages" type="string[]">
   参考图数组。每一项必须是可公开访问的 HTTP(S) URL，或形如 `data:image/png;base64,...` 的内联 base64 数据。本地文件路径（如 `C:/Users/...`）与 `file://` URI 会被拒绝，返回 `400` / `invalid_reference_url`。
 
+  <Note>
+    **Agnes Video 2.5 Flash —— 图生视频会忽略 `aspectRatio`。** 该模型的输出比例由首帧图本身
+    决定。对托管在 `images.meigen.ai` 上的图片（你在 MeiGen 生成或上传过的），我们会先在
+    CDN 边缘把首帧裁到你请求的 `aspectRatio`，因此输出与你选的比例一致；对其他来源
+    （外部 URL 或 `data:` base64），图片原样透传，**输出比例跟随你的图片，而不是
+    `aspectRatio`**。
+
+    如果外部图片也需要精确的输出比例，请在发送前自行裁到该比例，或改传此前生成产物的
+    `imageUrl`（本来就在我们 CDN 上）。
+  </Note>
+
   最大数量按模型不同。图片模型和视频首帧/末帧输入请读[模型列表](/zh/api-reference/endpoint/models)返回的 `max_reference_images`；Seedance 的 `content` 模式改读 `extra_config.maxContentReferenceImages`。撰写时的实况：
 
   | 上限 | 模型 |
@@ -70,7 +81,7 @@ POST /api/generate/v2
   | 10 | Seedream 5.0 Pro、Seedream 4.5 |
   | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5、Seedance 2.0、Veo 3.1 —— 默认 `frame` 模式（首/尾帧），见下方 `referenceMode` |
-  | 1 | Midjourney V8.1、Agnes Image 2.1 Flash、Agnes Video 2.0、Grok Video 1.5(**必传** —— 仅支持图生视频) |
+  | 1 | Midjourney V8.1、Agnes Image 2.1 Flash、Agnes Video 2.5 Flash、Grok Video 1.5(**必传** —— 仅支持图生视频) |
   | 0 | Flux 2 Klein |
 
   `content` 模式下，Seedance 2.5 最多接受 30 张图片，Seedance 2.0 最多 9 张；使用角色时，角色解析出的图片也计入同一上限。
@@ -124,7 +135,7 @@ POST /api/generate/v2
   | Seedance 2.0 | 4-15 | 4 |
   | Veo 3.1 | 仅 4、6、8 | 4 |
   | Grok Video 1.5 | 4-15 | 4 |
-  | Agnes Video 2.0 | 仅 5(固定) | 5 |
+  | Agnes Video 2.5 Flash | 仅 5(固定) | 5 |
 
   实际扣除的积分始终以响应中的 `creditsUsed` 为准,不要自行推算。
 </ParamField>
@@ -182,7 +193,13 @@ POST /api/generate/v2
 </ResponseField>
 
 <ResponseField name="aspectRatio" type="string">
-  本次生成最终采用的宽高比。默认 `auto` 会选择合适的比例，提交时即在此返回 —— 无需等第一次轮询，可用于在界面上按正确比例预留占位。
+  本次生成**所请求**的宽高比。默认 `auto` 会选择合适的比例，提交时即在此返回 —— 无需等第一次轮询，可用于在界面上按正确比例预留占位。
+
+  <Note>
+    除一种情况外，此值都与实际产物一致：**Agnes Video 2.5 Flash 的图生视频，且首帧图是
+    我们无法预裁的来源**（外部 URL 或 `data:` base64）—— 此时输出比例跟随你的首帧图。
+    若该场景下构图很关键，请直接读取返回视频的实际尺寸，不要依赖此字段。
+  </Note>
 </ResponseField>
 
 <ResponseField name="deduped" type="boolean">

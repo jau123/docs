@@ -22,7 +22,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio |
 | **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video, ~35s | First frame (required) | ✓ | First-frame image-to-video only, 4–15s, ratio follows input, audio |
 | **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-8min | Up to 2 (first/last frame) | Web only | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
-| **Agnes Video 2.0** | 10 per video (480p, 2/sec × 5s) | Video, ~2min | First frame (single image) | ✓ | Fixed 5s / 480p, the only video model covered by daily free credits |
+| **Agnes Video 2.5 Flash** | 10 per video (720p, 2/sec × 5s) | Video, ~2min | First frame (single image) | ✓ | Fixed 5s / 720p, the only video model covered by daily free credits |
 
 > ✓ = available on the iOS/Android app and web. Web only = browser only for now.
 >
@@ -400,7 +400,7 @@ Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 
 
 ---
 
-### Agnes Video 2.0
+### Agnes Video 2.5 Flash
 
 | | |
 | --- | --- |
@@ -411,16 +411,24 @@ Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 
 | **Duration** | 5 seconds (fixed) |
 | **Reference images** | 1 (first frame, image-to-video) |
 | **Reference video** | Not supported |
-| **Resolutions** | 480p |
+| **Resolutions** | 720p |
 | **Aspect ratios** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
 
-The only basic-tier video model — and the only one your daily free credits cover. Supports text-to-video and single-image first-frame image-to-video at a fixed 5 seconds / 480p. For longer clips, use Seedance 2.5; for higher resolutions, use Seedance 2.0 Pro or Veo 3.1.
+The only basic-tier video model — and the only one your daily free credits cover. Supports text-to-video and single-image first-frame image-to-video at a fixed 5 seconds / 720p. For longer clips, use Seedance 2.5; for higher resolutions, use Seedance 2.0 Pro or Veo 3.1.
+
+<Note>
+  **Image-to-video ignores the requested aspect ratio** — the output follows the first frame.
+  Images you generated or uploaded on MeiGen are cropped to your selected ratio at the CDN
+  edge first, so the result matches your choice. Images from anywhere else (API callers may
+  pass any public URL or `data:` base64) are used as-is, and the output ratio follows that
+  image.
+</Note>
 
 #### Pricing
 
 | Resolution | Rate |
 | --- | --- |
-| 480p | 2 credits/sec |
+| 720p | 2 credits/sec |
 
 Duration is fixed at 5 seconds, so every generation costs **10 credits**.
 
