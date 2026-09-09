@@ -1,6 +1,6 @@
 ---
 title: "Skills — E-commerce AI Workflows"
-description: "MeiGen Skills: guided AI workflows for e-commerce — product detail images, white-background product photos, and marketing posters. A dedicated entry point alongside general generation."
+description: "Create product detail images, white-background photos, and marketing posters with guided workflows."
 ---
 
 **Skills** is a set of guided, e-commerce-focused workflows — a separate entry point from general [image and video generation](/en/features/generate). Instead of writing a prompt from scratch, you fill in a short form for your use case and MeiGen produces the finished asset.
@@ -32,7 +32,6 @@ Turn a casual product photo into a clean, white-background product image.
 **You provide:**
 
 - Product photo (required)
-- Subject to isolate — only needed with multiple subjects in one photo; otherwise MeiGen auto-detects the main product
 
 ## Marketing Poster
 
@@ -54,4 +53,14 @@ Skills output lands in your regular [generation history](/en/features/generate#g
 
 ## Credits
 
-Skills spend credits the same way as general generation — the cost depends on the model and number of images. See current rates on the [model comparison page](https://www.meigen.ai/model-comparison).
+These workflows have **their own Skill prices**, separate from the general image generator. Their GPT Image 2.5 configuration uses **Sunburst at 2K**; the workflow selects the model for you.
+
+| Workflow | Option | Credits per generated image |
+| --- | --- | --- |
+| Product Detail Images | Fast / Pro | 5 / 18 |
+| Marketing Poster | Fast / Pro | 5 / 18 |
+| White Background (White mode only) | Fixed quality | 5 |
+
+Fast uses Standard quality; Pro uses High quality. A multi-image set costs the per-image price multiplied by the number of images. Check the workflow's displayed total and availability before submitting; these prices do not apply to a general `gpt-image-2.5` API request. AI Backgrounds in Smart or Custom mode uses another model and the price shown in its interface. Other Skills may also use different models and prices.
+
+For general generation, see the [model comparison page](https://www.meigen.ai/model-comparison).

@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "MeiGen Docs",
-  "description": "Official MeiGen documentation for AI image and video generation with GPT Image 2, Nano Banana, Seedance 2.5, the REST API, and MCP integrations.",
+  "description": "Guides and API reference for creating images and videos with MeiGen.",
   "colors": {
     "primary": "#7C3AED",
     "light": "#A78BFA",

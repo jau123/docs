@@ -1,6 +1,6 @@
 ---
 title: "AI Image & Video Generator"
-description: "Generate AI images and videos on MeiGen with GPT Image 2, Nano Banana, Seedance 2.5, and other live models. Learn references, duration, pricing, and video continuation."
+description: "Create images and videos with references, quality settings, credit estimates, and generation history."
 ---
 
 MeiGen lets you generate images and videos using multiple AI models from a unified interface. On desktop, open the generation sidebar from the floating dock; on mobile, tap **Generate** in the bottom dock to open the generation sheet. Both surfaces offer the same models, reference images, `@` mentions, prompt enhancement, AI edit, and Storyboard — this guide applies to both unless a section says otherwise.
@@ -151,7 +151,7 @@ Upload reference images as visual context to guide the AI's output — for style
 - **Auto-compression** — images are automatically compressed to max 2MB / 2048px before upload
 - **Maximum source dimensions** — an image whose width or height exceeds **8000 pixels** is rejected before upload, with a message asking you to resize it. Everyday files stay well clear of this: a 4K photo is 3840px on its long edge, and an A4 scan at 300dpi is 2480×3508. Only print-scale source files (large-format banners, poster artwork at full print resolution) run into it — scale those down before uploading
 - **Thumbnail grid** — uploaded images appear as thumbnails with an × button to remove each one
-- **Per-model limits** — the maximum number of reference images varies by model (0–16; GPT Image 2.0 accepts the most at 16). Models that don't support references (currently Flux 2 Klein) hide this section entirely.
+- **Per-model limits** — the maximum number of reference images varies by model (0–16; GPT Image 2.5 and GPT Image 2 each accept up to 16). Models that don't support references (currently Flux 2 Klein) hide this section entirely.
 
 <Note>
   See the [Models](/en/features/models) page for the exact reference image limit of each model.
@@ -212,12 +212,12 @@ The default is **Auto** — no need to pick manually, a suitable ratio is chosen
 | 1:1 | Square | Social media profile, icons |
 | 3:4, 4:5, 2:3 | Portrait | Phone wallpaper, posters |
 | 9:16 | Tall portrait | Stories, Reels |
-| 9:21 | Ultra tall | Vertical banners (GPT Image 2.0) |
-| 1:3 | Ultra tall | Vertical banners (GPT Image 2.0 only) |
+| 9:21 | Ultra tall | Vertical banners (GPT Image 2.5 / 2) |
+| 1:3 | Ultra tall | Vertical banners (GPT Image 2.5 / 2) |
 | 1:4, 1:8 | Ultra tall | Scrolling banners (Nanobanana 2 only) |
 | 4:3, 3:2 | Landscape | Desktop wallpaper |
 | 16:9, 21:9 | Wide | Cinematic, ultrawide displays |
-| 3:1 | Ultra wide | Header banners (GPT Image 2.0 only) |
+| 3:1 | Ultra wide | Header banners (GPT Image 2.5 / 2) |
 | 4:1, 8:1 | Ultra wide | Panoramic banners (Nanobanana 2 only) |
 
 <Warning>
@@ -231,6 +231,7 @@ The resolution options come from the model you picked — the selector only offe
 | Model | Resolution options |
 | --- | --- |
 | Nanobanana 2, Nanobanana Pro, Seedream 4.5 | 2K / 4K (default 2K) |
+| GPT Image 2.5 | 1K / 2K / 4K (desktop starts at 2K; mobile at 1K) |
 | GPT Image 2.0 | 1K / 2K / 4K (default 2K) |
 | Grok Imagine Image 2.0, Midjourney V8.1, Seedream 5.0 Pro | 1K / 2K (default 1K) |
 | Flux 2 Klein, Agnes Image 2.1 Flash | Fixed — no resolution selector |
@@ -238,6 +239,21 @@ The resolution options come from the model you picked — the selector only offe
 <Note>
   **The highest option of each model is paid-only** and shows a lock icon for free users. On a 1K / 2K model that means 2K is locked; on a 2K / 4K model it's 4K; on a 2K / 3K model it's 3K. The same rule applies to 4k on video (Seedance 2.0 Pro and Veo 3.1).
 </Note>
+
+---
+
+### GPT Image 2.5 Quality and Variant
+
+Choose **GPT Image 2.5** when it is available in your model list. It has five quality levels: **Standard, Medium, High, Extra High, Max**. The API values are `low`, `medium`, `high`, `xhigh`, and `max`.
+
+- **Sunburst — quality priority:** the default variant, for generation and editing where preserving details matters.
+- **Flare — speed priority:** an alternative when turnaround matters. It accepts the same reference images and quality settings.
+
+Both variants cost the same. References and aspect ratio do not add credits; the price depends on resolution and quality. An attached reference does not switch the variant automatically. Describe whether each reference provides a subject, a style, or the image to edit, and specify what must stay unchanged.
+
+Configured starting settings are **2K Standard / 6 credits on desktop** and **1K Standard / 4 credits on mobile**, both with Sunburst. The current platform default is the model marked `is_default` in [List Models](/en/api-reference/endpoint/models). See the [full price table](/en/features/models) before choosing a higher quality.
+
+GPT Image 2 retains its own three quality levels and prices. Retrying a 2.5 generation restores its resolution, quality, and variant; changing the model may reset unsupported options.
 
 ---
 
@@ -484,7 +500,7 @@ MeiGen uses a dual credit system:
 - **Daily credits**: a free daily allowance that resets at 00:00 UTC, usable on **basic models** — currently **Flux 2 Klein** and **Agnes Image 2.1 Flash** for images, and **Agnes Video 2.5 Flash** for video (the only video model daily credits cover). They are grouped under **Basic Models** in the model picker.
 - **Purchased credits**: your non-expiring balance, shown as **Credits** in the sidebar. It covers everything outside the daily allowance — credits you topped up, plus any bonus credits granted to your account (sign-up welcome bonus, referral rewards). Usable on all models.
 
-Generating with premium models (GPT Image 2.0, Nanobanana 2 / Pro, Seedream, Midjourney V8.1, Grok Imagine Image 2.0, Seedance 2.5 / 2.0, Veo 3.1, Grok Video 1.5, and so on) requires welcome or purchased credits — daily credits never apply to them, whether or not you have purchased before.
+Generating with premium models (GPT Image 2.5, GPT Image 2.0, Nanobanana 2 / Pro, Seedream, Midjourney V8.1, Grok Imagine Image 2.0, Seedance 2.5 / 2.0, Veo 3.1, Grok Video 1.5, and so on) requires welcome or purchased credits — daily credits never apply to them, whether or not you have purchased before.
 
 **API Token calls** only use purchased credits, regardless of the model; daily credits never apply to the API path.
 
@@ -520,7 +536,7 @@ The credit cost is shown on the Generate button before you submit. Hover over th
   </Accordion>
 
   <Accordion title="What's the difference between Cutout and Animate?" icon="scissors">
-    **Cutout** removes the background from a still image, creating a transparent PNG. **Animate** converts the still image into a short video clip using the video generation model. With GPT Image 2.0 you can also ask for a transparent background directly in your prompt.
+    **Cutout** removes the background from a still image, creating a transparent PNG. **Animate** converts the still image into a short video clip using the video generation model. GPT Image 2 and 2.5 also accept explicit requests for transparent backgrounds in the prompt; the alpha channel depends on intent detection and the output. Cutout removes the background from an existing image.
   </Accordion>
 
   <Accordion title="Why does the resolution selector show a lock icon?" icon="lock">

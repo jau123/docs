@@ -1,6 +1,6 @@
 ---
 title: "模型列表"
-description: "列出 MeiGen 当前启用模型，读取模型 ID、定价、时长、分辨率与参考素材能力。"
+description: "查询可用模型 ID、默认设置、积分价格和生成能力。"
 ---
 
 ```
@@ -9,7 +9,7 @@ GET /api/models
 
 返回所有可用于生成的活跃 AI 模型列表。公开端点，无需认证。
 
-本端点返回的所有模型都可用于 `POST /api/generate/v2`，API Token 调用同样不受限。部分模型只在特定 MeiGen 端展示（例如不在移动 App 内展示），但这从不影响 API 可用性。
+默认活跃列表只包含公开生成模型，不包含技能专属计费项；此类工作流请通过技能界面使用。当前图片默认模型由 `is_default` 标记。只有活跃列表返回 GPT Image 2.5 后，才可请求该模型。
 
 ## 查询参数
 
@@ -18,7 +18,7 @@ GET /api/models
 </ParamField>
 
 <ParamField query="active" type="string" default="true">
-  传 `false` 可一并返回已下线模型。已下线模型不能用于生成，此参数仅用于解析历史 `modelId`。
+  传 `false` 可一并返回未启用模型，包括已下线或尚未开放的模型。出现在扩展列表中不代表可调用；生成时请使用默认活跃列表。
 </ParamField>
 
 ## 响应
@@ -27,6 +27,10 @@ GET /api/models
 
 <ResponseField name="id" type="string">
   模型唯一标识符。生成时用作 `modelId`。
+</ResponseField>
+
+<ResponseField name="is_default" type="boolean">
+  是否为该媒体类型的当前平台默认模型。不要根据排序、型号名称或文档示例推断默认值。
 </ResponseField>
 
 <ResponseField name="name" type="string">
@@ -38,7 +42,7 @@ GET /api/models
 </ResponseField>
 
 <ResponseField name="credits_per_generation" type="number">
-  名义兜底值。**视频模型请不要拿它给终端用户报价。** 直接生成使用 `extra_config.pricingPerSec` × `duration`，Veo 3.1 查 `extra_config.pricingPerCall[tier][duration]`；参考视频还需应用下方计费规则。最终扣费以生成响应中的 `creditsUsed` 为准。
+  名义兜底值，不能作为所有配置的价格。GPT Image 2.5 与 GPT Image 2 应读取 `extra_config.pricing[resolution][quality]`。视频使用 `extra_config.pricingPerSec` × `duration`、Veo 3.1 的 `pricingPerCall[tier][duration]` 或参考视频计费规则。实扣以生成响应中的 `creditsUsed` 为准。
 </ResponseField>
 
 <ResponseField name="supported_ratios" type="string[]">
@@ -67,6 +71,11 @@ GET /api/models
   | 字段 | 适用模型 | 说明 |
   | --- | --- | --- |
   | `resolutions` | 图片 / 视频 | `resolution` 允许的取值（图片 `"1K"` / `"2K"` / `"3K"` / `"4K"`，视频 `"480p"` / `"720p"` / `"1080p"` / `"4k"`）|
+  | `qualities` | 支持质量选项的图片模型 | `quality` 的合法值；GPT Image 2.5 为 `low`、`medium`、`high`、`xhigh`、`max` |
+  | `defaultQuality` | 支持质量选项的图片模型 | 省略 `quality` 或传 `auto` 时使用；GPT Image 2.5 配置为 `low` |
+  | `variants` / `defaultVariant` | GPT Image 2.5 | `modelVariant` 的合法值（`sunburst`、`flare`）与配置默认值（`sunburst`） |
+  | `defaultResolution` | 图片 / 视频 | 请求省略 `resolution` 时使用的分辨率 |
+  | `pricing` | 按配置计价的图片模型 | 按分辨率与质量取积分，如 `pricing["2K"]["low"]`；部分模型每个分辨率直接对应一个数字 |
   | `tierResolutions` | Seedance 2.0 | 各档位实际可用的分辨率，按档位分级。优先于顶层 `resolutions` |
   | `tiers` | Seedance 2.0 / Veo 3.1 | 可选档位，通过 `tier` 选择（Seedance 2.0：`mini` / `fast` / `pro`；Veo 3.1：`fast` / `pro`）|
   | `durations` | 视频模型 | `duration` 允许的取值（秒）|
@@ -90,15 +99,27 @@ curl https://www.meigen.ai/api/models
   "success": true,
   "models": [
     {
-      "id": "gemini-3-pro-image-preview",
-      "name": "Nanobanana Pro",
-      "provider": "Google",
-      "credits_per_generation": 10,
-      "supported_ratios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "4:5", "5:4", "21:9"],
-      "max_reference_images": 14,
+      "id": "gpt-image-2.5",
+      "name": "GPT Image 2.5",
+      "provider": "OpenAI",
+      "is_default": false,
+      "credits_per_generation": 6,
+      "supported_ratios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "5:4", "4:5", "21:9", "9:21", "3:1", "1:3"],
+      "max_reference_images": 16,
       "media_type": "image",
-      "extra_config": {},
-      "estimatedTiming": { "p50": 32, "p90": 57 },
+      "extra_config": {
+        "resolutions": ["1K", "2K", "4K"],
+        "defaultResolution": "2K",
+        "qualities": ["low", "medium", "high", "xhigh", "max"],
+        "defaultQuality": "low",
+        "variants": ["sunburst", "flare"],
+        "defaultVariant": "sunburst",
+        "pricing": {
+          "1K": { "low": 4, "medium": 6, "high": 12, "xhigh": 18, "max": 28 },
+          "2K": { "low": 6, "medium": 9, "high": 22, "xhigh": 30, "max": 48 },
+          "4K": { "low": 12, "medium": 16, "high": 36, "xhigh": 50, "max": 88 }
+        }
+      },
       "capabilities": {
         "video": {
           "outputDuration": null,
@@ -147,5 +168,5 @@ curl https://www.meigen.ai/api/models
 ```
 
 <Note>
-  示例只列出两个代表模型，`extra_config` 也只展示部分字段。耗时数字是某次生产快照，会随系统重新校准而变化；实际端点返回全部启用模型及其当前完整配置。响应缓存 1 小时（另有 stale-while-revalidate），因此新上线或已下线的模型最长可能 1 小时后才可见。
+  示例展示两种模型配置，`extra_config` 为节选，不代表模型当前已启用或设为默认。视频耗时为历史示例，估算可能更新。实时端点返回当前活跃模型及完整配置；响应缓存 1 小时（另有 stale-while-revalidate），新增或下线状态可能延迟出现。
 </Note>

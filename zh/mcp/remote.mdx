@@ -1,6 +1,6 @@
 ---
 title: "远程 MCP 服务器"
-description: "连接 MeiGen 官方托管的远程 MCP 服务器(api/mcp)—— 零安装、无需 Node.js,图片与视频模型始终保持最新。支持 Claude Code、Cursor 及任意 Streamable HTTP MCP 客户端。"
+description: "通过 HTTP 连接托管 MCP 服务，无需安装本地软件包。"
 ---
 
 MeiGen 同时提供**远程 MCP 服务器** —— 没有本地进程,不用装 npm 包,不需要安装或维护任何东西。任意支持 MCP 的客户端指向下面的地址即可开始生成。
@@ -76,6 +76,25 @@ claude mcp add --transport http meigen https://www.meigen.ai/api/mcp --header "A
 <Note>
   远程版**不提供**:`enhance_prompt`、`manage_preferences`、`comfyui_workflow`。这三个仅本地版才有 —— 见下方对比。
 </Note>
+
+---
+
+### GPT Image 2.5 选项
+
+当 `list_models` 返回 `gpt-image-2.5` 时，`generate_image` 支持五档质量，以及 `modelVariant: "sunburst"`（质量优先，默认）或 `"flare"`（速度优先）。两者积分相同。工具参数示例：
+
+```json
+{
+  "prompt": "A studio product photo of a ceramic coffee mug, soft window light",
+  "modelId": "gpt-image-2.5",
+  "resolution": "2K",
+  "quality": "low",
+  "modelVariant": "flare",
+  "attemptId": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+示例使用 2K Standard，消耗 6 积分。通过 `referenceImages` 添加公开参考图 URL，即可编辑或提供视觉参考。新生成使用新的 `attemptId`（8–128 字符）；只有失败或超时后重试完全相同的请求才复用。取得生成 ID 后，用 `check_generation` 继续查询进度。完整矩阵见[模型价格](/zh/features/models)。
 
 ---
 

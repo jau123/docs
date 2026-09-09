@@ -1,13 +1,13 @@
 ---
 title: "生成图片或视频"
-description: "提交异步图片或视频生成请求，配置模型、参考素材、时长、分辨率与计费参数。"
+description: "提交图片或视频任务，设置模型参数、参考素材和幂等重试。"
 ---
 
 ```
 POST /api/generate/v2
 ```
 
-提交图片或视频生成请求。生成异步进行 — 使用[状态查询端点](#查询生成状态)轮询完成情况。同一端点同时支持图片模型（GPT Image 2、Nanobanana、Seedream、Midjourney 等）和视频模型（Seedance 2.5、Seedance 2.0、Veo 3.1、Grok Video 等），通过 `modelId` 选择。
+提交图片或视频生成请求。生成异步进行 — 使用[状态查询端点](#查询生成状态)轮询完成情况。同一端点同时支持图片模型（GPT Image 2.5、GPT Image 2、Nanobanana、Seedream、Midjourney 等）和视频模型（Seedance 2.5、Seedance 2.0、Veo 3.1、Grok Video 等），通过 `modelId` 选择。
 
 ## 请求
 
@@ -21,6 +21,8 @@ POST /api/generate/v2
 ### 请求体参数
 
 <ParamField body="prompt" type="string" required>
+  GPT Image 2 与 2.5 的长提示词会自动压缩以适配模型限制，请明确写出关键要求和需要保留的内容。
+
   要生成的图片或视频的文本描述。要引用已创建的角色，在文本中内嵌 `[character:<uuid>]` ——例如 `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`。每次生成最多引用 3 个角色。
 
   支持范围：所有接受参考图的图片模型（Flux 2 Klein 除外）+ 视频侧 **Seedance 2.5 / 2.0**。角色图片与用户上传图片共用内容参考图预算。模型不支持、角色不存在或无权访问、引用数超限均返回 `400`（`characters_not_supported`、`character_not_found`、`too_many_characters`）；部分角色需要更高的 `tier`（`character_tier_required`）。
@@ -31,7 +33,7 @@ POST /api/generate/v2
 
   **[模型列表](/zh/api-reference/endpoint/models)是模型 ID 的权威来源。** 模型会不断上新与下线，请在运行时动态解析 ID，不要在自己这边硬编码一份模型清单。该端点返回的所有模型都可用于本端点，API Token 调用同样不受限。
 
-  常用取值：图片 `gpt-image-2`、`nanobanana-2`、`midjourney-v8.1`；视频 `seedance-2-5`、`seedance-2-0`、`veo-3.1`。
+  常用取值：图片 `gpt-image-2.5`、`gpt-image-2`、`nanobanana-2`、`midjourney-v8.1`；视频 `seedance-2-5`、`seedance-2-0`、`veo-3.1`。
 
   > `rhart-1.5`（GPT image 1.5）已于 2026-04-22 下线，请改用 `gpt-image-2`。`midjourney-v7` 已于 2026-05-09 由 `midjourney-v8.1` 接替（出于向后兼容仍接受老 ID 调用）。
 </ParamField>
@@ -54,8 +56,16 @@ POST /api/generate/v2
   可选值取决于模型：图片模型用 `1K` / `2K` / `3K` / `4K`；视频模型用 `480p` / `720p` / `1080p` / `4k`（视频侧的 k 是小写）。Seedance 2.5 仅支持 480p / 720p；Seedance 2.0 的 `pro` 档增加 1080p / 4k，Veo 3.1 也支持 4k。Seedance 2.0 带 `referenceVideo` 时最高 1080p。完整矩阵见[模型对比](/zh/features/models)。
 </ParamField>
 
-<ParamField body="quality" type="string" default="low">
-  GPT Image 2.0 可选 `low` / `medium` / `high`；Grok Imagine Image 2.0 可选 `low`（Standard，默认）/ `medium`。其他模型会忽略该参数。
+<ParamField body="quality" type="string">
+  质量选项按模型区分。GPT Image 2.5 支持 `low`（Standard）、`medium`（Medium）、`high`（High）、`xhigh`（Extra High）、`max`（Max）。GPT Image 2 仅支持 `low` / `medium` / `high`。GPT Image 模型省略此字段或传 `auto` 时使用模型配置的默认值（当前为 `low`）。
+
+  Grok Imagine Image 2.0 支持 `low`（Standard，默认）/ `medium`。通过[模型列表](/zh/api-reference/endpoint/models)读取 `extra_config.qualities` 与 `extra_config.pricing`。GPT 不支持的质量值返回 `400` / `unsupported_quality`。
+</ParamField>
+
+<ParamField body="modelVariant" type="string">
+  仅 GPT Image 2.5 支持：`sunburst`（质量优先，配置默认值）或 `flare`（速度优先）。两者都支持图片生成和参考图编辑，同分辨率、同质量下同价。添加参考图不会自动改变此设置。
+
+  与 `modelId: "gpt-image-2.5"` 一起使用。不要把型号选项名称当作独立模型 ID，也不要为 GPT Image 2 或其他模型传此字段。非法组合返回 `400` / `unsupported_model_variant`。
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">
@@ -76,7 +86,7 @@ POST /api/generate/v2
 
   | 上限 | 模型 |
   | --- | --- |
-  | 16 | GPT Image 2.0 |
+  | 16 | GPT Image 2.5, GPT Image 2.0 |
   | 14 | Nanobanana 2、Nanobanana Pro |
   | 10 | Seedream 5.0 Pro、Seedream 4.5 |
   | 3 | Grok Imagine Image 2.0 |
@@ -221,8 +231,8 @@ POST /api/generate/v2
   "success": true,
   "generationId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "processing",
-  "creditsUsed": 10,
-  "modelId": "gpt-image-2",
+  "creditsUsed": 6,
+  "modelId": "gpt-image-2.5",
   "aspectRatio": "1:1",
   "credits": {
     "daily": 2,
@@ -321,7 +331,7 @@ GET /api/generate/v2/status/:generationId
 
 ### 基本生成
 
-省略 `modelId` 即使用默认模型（`gpt-image-2`）：
+省略 `modelId` 时使用当前图片默认模型。请读取[模型列表](/zh/api-reference/endpoint/models)的 `is_default`，默认值可能变化：
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \
@@ -332,6 +342,28 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
     "aspectRatio": "1:1"
   }'
 ```
+
+### 显式设置 GPT Image 2.5
+
+当[活跃模型列表](/zh/api-reference/endpoint/models)中返回 `gpt-image-2.5` 时，可使用此示例。
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "A studio product photo of a ceramic coffee mug, soft window light",
+    "modelId": "gpt-image-2.5",
+    "aspectRatio": "4:5",
+    "resolution": "2K",
+    "quality": "low",
+    "modelVariant": "sunburst"
+  }'
+```
+
+这次 2K Standard 请求消耗 **6 积分**。若要使用 4K Max 与速度优先，改为 `resolution: "4K"`、`quality: "max"`、`modelVariant: "flare"`（**88 积分**）。添加 `referenceImages` 即可编辑或使用视觉参考，不额外收取参考图积分。实扣以 `creditsUsed` 为准。
+
+只有重试相同请求时才复用同一个 `idempotencyKey`。修改质量或型号选项属于新请求，应使用新的 key。
 
 ### 带参考图片
 

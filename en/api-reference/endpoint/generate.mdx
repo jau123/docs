@@ -1,13 +1,13 @@
 ---
 title: "Generate Image or Video"
-description: "Submit an asynchronous MeiGen image or video generation request with model, reference-media, duration, resolution, and billing options."
+description: "Submit an image or video job with model options, reference media, and idempotent retries."
 ---
 
 ```
 POST /api/generate/v2
 ```
 
-Submits a generation request. The output is generated asynchronously — use the [status endpoint](#check-generation-status) to poll for completion. The same endpoint serves both image models (GPT Image 2, Nanobanana, Seedream, Midjourney, etc.) and video models (Seedance 2.5, Seedance 2.0, Veo 3.1, Grok Video, etc.) — select via `modelId`.
+Submits a generation request. The output is generated asynchronously — use the [status endpoint](#check-generation-status) to poll for completion. The same endpoint serves both image models (GPT Image 2.5, GPT Image 2, Nanobanana, Seedream, Midjourney, etc.) and video models (Seedance 2.5, Seedance 2.0, Veo 3.1, Grok Video, etc.) — select via `modelId`.
 
 ## Request
 
@@ -21,6 +21,8 @@ Submits a generation request. The output is generated asynchronously — use the
 ### Body Parameters
 
 <ParamField body="prompt" type="string" required>
+  Long prompts for GPT Image 2 and 2.5 are automatically shortened to fit model limits. Keep essential instructions and preservation constraints explicit.
+
   The text description of the image or video to generate. To reference a saved character, include `[character:<uuid>]` inline — e.g. `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`. Up to 3 character references per generation.
 
   Supported on image models that accept reference images (all except Flux 2 Klein) and on **Seedance 2.5 / 2.0** for video. Character images consume the same content-reference image budget as user-uploaded images. An unsupported model, a nonexistent or inaccessible character, or too many references returns `400` (`characters_not_supported`, `character_not_found`, `too_many_characters`); some characters require a higher `tier` (`character_tier_required`).
@@ -31,7 +33,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   **[List Models](/en/api-reference/endpoint/models) is the authoritative source for valid IDs.** Models are added and retired over time, so resolve IDs at runtime rather than hard-coding a copy of the catalogue. Every model that endpoint returns can be used here, including with an API token.
 
-  Frequently used values: `gpt-image-2`, `nanobanana-2`, `midjourney-v8.1` (images); `seedance-2-5`, `seedance-2-0`, `veo-3.1` (video).
+  Frequently used values: `gpt-image-2.5`, `gpt-image-2`, `nanobanana-2`, `midjourney-v8.1` (images); `seedance-2-5`, `seedance-2-0`, `veo-3.1` (video).
 
   > `rhart-1.5` (GPT image 1.5) was retired on 2026-04-22 — use `gpt-image-2` instead. `midjourney-v7` was replaced by `midjourney-v8.1` on 2026-05-09 (legacy `midjourney-v7` requests still accepted for backward compatibility).
 </ParamField>
@@ -54,8 +56,16 @@ Submits a generation request. The output is generated asynchronously — use the
   Available values depend on the model: image models use `1K` / `2K` / `3K` / `4K`; video models use `480p` / `720p` / `1080p` / `4k` (note the lowercase `k` on video). Seedance 2.5 supports 480p / 720p only. Seedance 2.0 adds 1080p / 4k on `pro`; Veo 3.1 also supports 4k. With Seedance 2.0 `referenceVideo`, the ceiling is 1080p. See [Models](/en/features/models) for the complete matrix.
 </ParamField>
 
-<ParamField body="quality" type="string" default="low">
-  GPT Image 2.0 accepts `low` / `medium` / `high`; Grok Imagine Image 2.0 accepts `low` (Standard, default) / `medium`. Other models ignore this parameter.
+<ParamField body="quality" type="string">
+  Quality is model-specific. GPT Image 2.5 accepts `low` (Standard), `medium` (Medium), `high` (High), `xhigh` (Extra High), and `max` (Max). GPT Image 2 accepts only `low` / `medium` / `high`. For GPT Image models, omit the field or use `auto` to follow the model's configured default (currently `low`).
+
+  Grok Imagine Image 2.0 accepts `low` (Standard, default) / `medium`. Read `extra_config.qualities` and `extra_config.pricing` from [List Models](/en/api-reference/endpoint/models). Unsupported GPT quality values return `400` / `unsupported_quality`.
+</ParamField>
+
+<ParamField body="modelVariant" type="string">
+  GPT Image 2.5 only: `sunburst` (quality priority, configured default) or `flare` (speed priority). Both support generation and reference-image editing, with the same price for the same resolution and quality. References do not change this setting automatically.
+
+  Use `modelId: "gpt-image-2.5"` with this field. Do not use the variant names as separate model IDs or pass `modelVariant` with GPT Image 2 or another model. Invalid combinations return `400` / `unsupported_model_variant`.
 </ParamField>
 
 <ParamField body="referenceImages" type="string[]">
@@ -77,7 +87,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   | Limit | Models |
   | --- | --- |
-  | 16 | GPT Image 2.0 |
+  | 16 | GPT Image 2.5, GPT Image 2.0 |
   | 14 | Nanobanana 2, Nanobanana Pro |
   | 10 | Seedream 5.0 Pro, Seedream 4.5 |
   | 3 | Grok Imagine Image 2.0 |
@@ -224,8 +234,8 @@ Submits a generation request. The output is generated asynchronously — use the
   "success": true,
   "generationId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "processing",
-  "creditsUsed": 10,
-  "modelId": "gpt-image-2",
+  "creditsUsed": 6,
+  "modelId": "gpt-image-2.5",
   "aspectRatio": "1:1",
   "credits": {
     "daily": 2,
@@ -324,7 +334,7 @@ When a generation fails, credits are automatically refunded. Poll `creditsStatus
 
 ### Basic generation
 
-Omit `modelId` to use the default (`gpt-image-2`):
+Omit `modelId` to use the current image default. Read `is_default` from [List Models](/en/api-reference/endpoint/models); the default can change:
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \
@@ -335,6 +345,28 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
     "aspectRatio": "1:1"
   }'
 ```
+
+### GPT Image 2.5 with explicit settings
+
+Use this example when `gpt-image-2.5` appears in the active [model list](/en/api-reference/endpoint/models).
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "A studio product photo of a ceramic coffee mug, soft window light",
+    "modelId": "gpt-image-2.5",
+    "aspectRatio": "4:5",
+    "resolution": "2K",
+    "quality": "low",
+    "modelVariant": "sunburst"
+  }'
+```
+
+This 2K Standard request costs **6 credits**. For 4K Max with speed priority, set `resolution: "4K"`, `quality: "max"`, and `modelVariant: "flare"` (**88 credits**). Add `referenceImages` to edit or use visual references without an extra reference-image charge. The authoritative charge is `creditsUsed`.
+
+Reuse the same `idempotencyKey` only when retrying the same request. A changed quality or variant is a new request and needs a new key.
 
 ### With reference image
 

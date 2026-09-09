@@ -1,6 +1,6 @@
 ---
 title: "REST API Overview"
-description: "Integrate MeiGen image and video generation with the REST API. Learn authentication, model discovery, asynchronous jobs, billing, and result polling."
+description: "Authenticate, discover models, submit asynchronous jobs, and retrieve generation results."
 ---
 
 The MeiGen API lets you generate images and videos programmatically.
@@ -35,6 +35,8 @@ For meigen.ai's own browser integration, a logged-in session access token is acc
 https://www.meigen.ai/api
 ```
 
+Before choosing a model, call [List Models](/en/api-reference/endpoint/models). The following example requires `gpt-image-2.5` to be active. GPT Image 2 remains available under its own ID and pricing when returned by that endpoint.
+
 ## Request Format
 
 All request bodies must be sent as JSON with the `Content-Type: application/json` header.
@@ -43,7 +45,7 @@ All request bodies must be sent as JSON with the `Content-Type: application/json
 curl -X POST https://www.meigen.ai/api/generate/v2 \
   -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "a minimalist logo", "modelId": "gpt-image-2"}'
+  -d '{"prompt": "a minimalist logo", "modelId": "gpt-image-2.5", "resolution": "2K", "quality": "low", "modelVariant": "sunburst"}'
 ```
 
 ## Response Format
@@ -115,6 +117,9 @@ For `POST /api/generate/v2`, error bodies include extra fields useful for debugg
 | --- | --- | --- |
 | `insufficient_credits` | 402 | Not enough usable credits for this request |
 | `premium_model_paywall` | 402 | The selected model requires purchased credits (daily free credits don't apply) |
+| `unsupported_quality` | 400 | The selected GPT Image model does not support this quality |
+| `unsupported_model_variant` | 400 | Invalid variant, or `modelVariant` supplied for a model other than GPT Image 2.5 |
+| `invalid_model` | 400 | Model is invalid, inactive, or reserved for a Skill workflow |
 | `unsupported_duration` | 400 | This model doesn't support the requested duration |
 | `unsupported_tier` | 400 | This model doesn't support the requested tier |
 | `unsupported_resolution` | 400 | This model/tier doesn't support the requested resolution |

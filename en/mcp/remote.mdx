@@ -1,6 +1,6 @@
 ---
 title: "Remote MCP Server"
-description: "Connect to MeiGen's hosted remote MCP server at api/mcp — zero install, no Node.js, always up to date with the latest image and video models. Works with Claude Code, Cursor, and any Streamable HTTP MCP host."
+description: "Connect to the hosted MCP server over HTTP without installing a local package."
 ---
 
 MeiGen also runs as a **remote MCP server** — no local process, no npm package, nothing to install or keep updated. Point any MCP-compatible host at the URL below and start generating.
@@ -76,6 +76,25 @@ The remote server exposes 6 tools:
 <Note>
   Not available remotely: `enhance_prompt`, `manage_preferences`, `comfyui_workflow`. These stay local-only — see the comparison below.
 </Note>
+
+---
+
+### GPT Image 2.5 options
+
+When `list_models` includes `gpt-image-2.5`, `generate_image` accepts all five quality levels and `modelVariant: "sunburst"` (quality priority, default) or `"flare"` (speed priority). The two variants have the same credit price. Example tool arguments:
+
+```json
+{
+  "prompt": "A studio product photo of a ceramic coffee mug, soft window light",
+  "modelId": "gpt-image-2.5",
+  "resolution": "2K",
+  "quality": "low",
+  "modelVariant": "flare",
+  "attemptId": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+The example costs 6 credits at 2K Standard. Add public reference-image URLs with `referenceImages` for editing or visual guidance. Use a fresh `attemptId` (8–128 characters) for a new generation; reuse it only when retrying the exact same request after a failure or timeout. After receiving a generation ID, use `check_generation` to continue tracking it. See [model pricing](/en/features/models) for the full matrix.
 
 ---
 

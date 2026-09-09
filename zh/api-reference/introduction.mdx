@@ -1,6 +1,6 @@
 ---
 title: "REST API 概览"
-description: "通过 MeiGen REST API 集成图片与视频生成，了解认证、模型发现、异步任务、计费与结果轮询。"
+description: "了解认证、模型发现、异步任务提交和生成结果查询。"
 ---
 
 MeiGen API 允许你以编程方式生成图片和视频。
@@ -35,6 +35,8 @@ Authorization: Bearer meigen_sk_YOUR_API_KEY
 https://www.meigen.ai/api
 ```
 
+选模型前先调用[模型列表](/zh/api-reference/endpoint/models)。以下示例要求 `gpt-image-2.5` 已启用。该端点仍返回 GPT Image 2 时，可继续使用旧模型 ID 与原有价格。
+
 ## 请求格式
 
 所有请求体必须以 JSON 格式发送，并设置 `Content-Type: application/json` 请求头。
@@ -43,7 +45,7 @@ https://www.meigen.ai/api
 curl -X POST https://www.meigen.ai/api/generate/v2 \
   -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"prompt": "a minimalist logo", "modelId": "gpt-image-2"}'
+  -d '{"prompt": "a minimalist logo", "modelId": "gpt-image-2.5", "resolution": "2K", "quality": "low", "modelVariant": "sunburst"}'
 ```
 
 ## 响应格式
@@ -115,6 +117,9 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | --- | --- | --- |
 | `insufficient_credits` | 402 | 本次请求的可用积分不足 |
 | `premium_model_paywall` | 402 | 所选模型需要购买积分（每日免费积分不适用） |
+| `unsupported_quality` | 400 | 所选 GPT Image 模型不支持此质量档位 |
+| `unsupported_model_variant` | 400 | 型号选项不合法，或为 GPT Image 2.5 以外的模型传了 `modelVariant` |
+| `invalid_model` | 400 | 模型不存在、未启用，或仅供技能工作流使用 |
 | `unsupported_duration` | 400 | 该模型不支持这个时长 |
 | `unsupported_tier` | 400 | 该模型不支持这个档位 |
 | `unsupported_resolution` | 400 | 该模型/档位不支持这个分辨率 |

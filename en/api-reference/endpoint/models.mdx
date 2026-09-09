@@ -1,6 +1,6 @@
 ---
 title: "List Models"
-description: "List active MeiGen models and read model IDs, pricing, durations, resolutions, and reference-media capabilities."
+description: "Read available model IDs, defaults, pricing, and generation capabilities."
 ---
 
 ```
@@ -9,7 +9,7 @@ GET /api/models
 
 Returns a list of all active AI models available for generation. Public endpoint, no authentication required.
 
-Every model returned by this endpoint can be used with `POST /api/generate/v2`, including via an API token. Some models are surfaced only on certain MeiGen surfaces (for example, not inside the mobile apps), but that never restricts API access.
+The default active list contains public generation models. Skill-specific billing entries are excluded; use the Skills interface for those workflows. Read `is_default` for the current image default. GPT Image 2.5 can be requested only after it appears in this active list.
 
 ## Query Parameters
 
@@ -18,7 +18,7 @@ Every model returned by this endpoint can be used with `POST /api/generate/v2`, 
 </ParamField>
 
 <ParamField query="active" type="string" default="true">
-  Pass `false` to include retired models as well. Retired models cannot be used for generation — this is only useful for resolving historical `modelId` values.
+  Pass `false` to include inactive models as well, including retired or not-yet-enabled models. Their presence in this expanded list does not make them callable; use the default active list for generation.
 </ParamField>
 
 ## Response
@@ -27,6 +27,10 @@ Every model returned by this endpoint can be used with `POST /api/generate/v2`, 
 
 <ResponseField name="id" type="string">
   The unique model identifier. Use this as `modelId` when generating.
+</ResponseField>
+
+<ResponseField name="is_default" type="boolean">
+  Whether this model is the current platform default for its media type. Do not infer the default from ordering, the model name, or a documentation example.
 </ResponseField>
 
 <ResponseField name="name" type="string">
@@ -38,7 +42,7 @@ Every model returned by this endpoint can be used with `POST /api/generate/v2`, 
 </ResponseField>
 
 <ResponseField name="credits_per_generation" type="number">
-  A nominal fallback value. **For video models, do not quote it to end users.** Use `extra_config.pricingPerSec` × `duration`, `extra_config.pricingPerCall[tier][duration]` for Veo 3.1, or the reference-video rules below. The authoritative charge is `creditsUsed` in the generate response.
+  A nominal fallback value. **Do not use it as the price for every configuration.** For GPT Image 2.5 and GPT Image 2, read `extra_config.pricing[resolution][quality]`. Use `extra_config.pricingPerSec` × `duration`, `extra_config.pricingPerCall[tier][duration]` for Veo 3.1, or the reference-video rules below. The authoritative charge is `creditsUsed` in the generate response.
 </ResponseField>
 
 <ResponseField name="supported_ratios" type="string[]">
@@ -67,6 +71,11 @@ Every model returned by this endpoint can be used with `POST /api/generate/v2`, 
   | Key | Used by | Description |
   | --- | --- | --- |
   | `resolutions` | Image / video | Allowed values for `resolution` (`"1K"` / `"2K"` / `"3K"` / `"4K"` for image, `"480p"` / `"720p"` / `"1080p"` / `"4k"` for video) |
+  | `qualities` | Image models with quality options | Accepted `quality` values; GPT Image 2.5 has `low`, `medium`, `high`, `xhigh`, `max` |
+  | `defaultQuality` | Image models with quality options | Used when `quality` is omitted or `auto`; GPT Image 2.5 is configured as `low` |
+  | `variants` / `defaultVariant` | GPT Image 2.5 | Accepted `modelVariant` values (`sunburst`, `flare`) and the configured default (`sunburst`) |
+  | `defaultResolution` | Image / video | Resolution used when the request omits `resolution` |
+  | `pricing` | Image models with variable prices | Credits by resolution then quality, for example `pricing["2K"]["low"]`; some models expose a number per resolution |
   | `tierResolutions` | Seedance 2.0 | Resolutions actually available in each tier, keyed by tier. Takes precedence over the top-level `resolutions` |
   | `tiers` | Seedance 2.0 / Veo 3.1 | Available tiers, selected via `tier` (Seedance 2.0: `mini` / `fast` / `pro`; Veo 3.1: `fast` / `pro`) |
   | `durations` | Video models | Allowed values for `duration` (seconds) |
@@ -90,15 +99,27 @@ curl https://www.meigen.ai/api/models
   "success": true,
   "models": [
     {
-      "id": "gemini-3-pro-image-preview",
-      "name": "Nanobanana Pro",
-      "provider": "Google",
-      "credits_per_generation": 10,
-      "supported_ratios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "4:5", "5:4", "21:9"],
-      "max_reference_images": 14,
+      "id": "gpt-image-2.5",
+      "name": "GPT Image 2.5",
+      "provider": "OpenAI",
+      "is_default": false,
+      "credits_per_generation": 6,
+      "supported_ratios": ["1:1", "3:2", "2:3", "16:9", "9:16", "4:3", "3:4", "5:4", "4:5", "21:9", "9:21", "3:1", "1:3"],
+      "max_reference_images": 16,
       "media_type": "image",
-      "extra_config": {},
-      "estimatedTiming": { "p50": 32, "p90": 57 },
+      "extra_config": {
+        "resolutions": ["1K", "2K", "4K"],
+        "defaultResolution": "2K",
+        "qualities": ["low", "medium", "high", "xhigh", "max"],
+        "defaultQuality": "low",
+        "variants": ["sunburst", "flare"],
+        "defaultVariant": "sunburst",
+        "pricing": {
+          "1K": { "low": 4, "medium": 6, "high": 12, "xhigh": 18, "max": 28 },
+          "2K": { "low": 6, "medium": 9, "high": 22, "xhigh": 30, "max": 48 },
+          "4K": { "low": 12, "medium": 16, "high": 36, "xhigh": 50, "max": 88 }
+        }
+      },
       "capabilities": {
         "video": {
           "outputDuration": null,
@@ -147,5 +168,5 @@ curl https://www.meigen.ai/api/models
 ```
 
 <Note>
-  Example shows two representative models with a partial `extra_config` for brevity. Timing values are an illustrative production snapshot and may change as estimates are recalibrated. The live endpoint returns all active models with their current full configuration. Responses are cached for 1 hour (plus stale-while-revalidate), so newly added or retired models can take up to an hour to appear.
+  Example shows two representative model configurations with a partial `extra_config` for brevity. It does not assert that either model is currently enabled or the default. Timing values are an illustrative production snapshot and may change as estimates are recalibrated. The live endpoint returns all active models with their current full configuration. Responses are cached for 1 hour (plus stale-while-revalidate), so newly added or retired models can take up to an hour to appear.
 </Note>

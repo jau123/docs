@@ -1,15 +1,20 @@
 ---
 title: "AI Model Comparison"
-description: "Compare current MeiGen image and video models, including GPT Image 2, Nano Banana, Seedance 2.5, Seedance 2.0, and Veo 3.1. See capabilities, pricing, and limits."
+description: "Compare image and video models, quality settings, reference limits, and credit prices."
 ---
 
 MeiGen supports multiple AI models for image and video generation. Use the comparison table below to pick one, then scroll to its section for detailed specs.
+
+<Note>
+  Availability and the current default come from [List Models](/en/api-reference/endpoint/models). Use a model only when it appears in the active list, and read `is_default` instead of assuming a permanent default. Prices below describe the listed configuration; confirm the displayed total before submitting.
+</Note>
 
 ## Quick Comparison
 
 | Model | Credits | Speed | Ref Images | App | Best For |
 | --- | --- | --- | --- | --- | --- |
-| **GPT Image 2.0** (default) | 2–80 (by resolution × quality) | Fast (~30s) | 16 | ✓ | Best accuracy & aesthetics, text rendering, transparent backgrounds |
+| **GPT Image 2.5** | 4–88 (by resolution × quality) | Depends on quality and variant | 16 | See availability note | Generation and editing, five quality levels, Sunburst / Flare |
+| **GPT Image 2.0** | 2–80 (by resolution × quality) | Fast (~30s) | 16 | ✓ | Instruction following, text rendering, multi-reference scenes |
 | **Nanobanana Pro** | 10 | Fast (~34s) | 14 | ✓ | High quality, complex scenes |
 | **Nanobanana 2** | 5 | Fast (~24s) | 14 | ✓ | General use, wide ratio support |
 | **Seedream 5.0 Pro** | 10 (1K) / 20 (2K) | Slow (~1min 45s) | 10 | Web only | Multi-reference composition (up to 10 refs), character consistency |
@@ -30,6 +35,40 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 
 ## Image Models
 
+### GPT Image 2.5
+
+For precise generation and editing. Select one public model ID and choose how to balance quality and speed.
+
+| | |
+| --- | --- |
+| **Model ID** | `gpt-image-2.5` |
+| **Provider** | OpenAI |
+| **Reference images** | Up to 16 |
+| **Resolutions** | 1K, 2K, 4K |
+| **Quality** | Standard / Medium / High / Extra High / Max |
+| **Variant** | Sunburst: quality priority (default); Flare: speed priority |
+| **Aspect ratios** | 1:1, 3:2, 2:3, 16:9, 9:16, 4:3, 3:4, 5:4, 4:5, 21:9, 9:21, 3:1, 1:3 |
+
+**Credits per image:**
+
+| Resolution | Standard (`low`) | Medium (`medium`) | High (`high`) | Extra High (`xhigh`) | Max (`max`) |
+| --- | --- | --- | --- | --- | --- |
+| **1K** | 4 | 6 | 12 | 18 | 28 |
+| **2K** | 6 | 9 | 22 | 30 | 48 |
+| **4K** | 12 | 16 | 36 | 50 | 88 |
+
+Sunburst and Flare cost the same at the same resolution and quality. Adding reference images or changing the aspect ratio does not add credits. Higher quality can take longer; there is no fixed completion-time guarantee.
+
+When selected, the configured starting settings are **2K Standard (6 credits) on desktop** and **1K Standard (4 credits) on mobile**, with Sunburst. Saved settings may differ.
+
+Both variants accept text-only prompts and reference images. For an edit, specify what to change and what to preserve. For a person, product, or style reference, explain the role of each image. Attaching a reference does not automatically switch variants.
+
+You can explicitly request a transparent background in your prompt. Whether the result has an alpha channel depends on intent detection and the generated output; use **Cutout** to remove the background from an existing image.
+
+GPT Image 2.5 uses welcome or purchased credits; daily free credits do not apply. 4K is paid-only. See [API parameters](/en/api-reference/endpoint/generate) for `quality` and `modelVariant`.
+
+---
+
 ### GPT Image 2.0
 
 | | |
@@ -40,7 +79,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Reference images** | Up to 16 |
 | **Resolutions** | 1K, 2K, 4K |
 | **Quality** | Standard / Medium / High |
-| **Transparent background** | Supported — just ask for it in your prompt |
+| **Transparent background** | Request it explicitly in your prompt; output depends on intent detection and generation |
 | **Aspect ratios** | 1:1, 3:2, 2:3, 16:9, 9:16, 4:3, 3:4, 5:4, 4:5, 21:9, 9:21, 3:1, 1:3 |
 
 **Credit matrix:**
@@ -53,9 +92,9 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 
 All resolutions consume welcome or purchased credits (premium model — daily free credits don't apply). 4K is paid-only. Aspect ratio does not affect pricing — credits depend only on resolution × quality.
 
-The current default model and MeiGen's **best overall image model**. Excels at instruction following, in-image text rendering, and complex multi-element scenes.
+GPT Image 2 remains a separate model with its original three quality levels and prices. It supports instruction following, in-image text, and multi-element scenes. Its `medium` and `high` settings are not interchangeable with the same labels on 2.5.
 
-**Transparent background** — ask for one in your prompt and the result is a PNG with an alpha channel, ready for logos, stickers and print-on-demand. No extra credits.
+You can explicitly request a transparent background in your prompt. Whether the result has an alpha channel depends on intent detection and the generated output. Use **Cutout** when you need to remove the background from an existing image.
 
 <Warning>
   **Stricter moderation**: prompts involving real people, celebrities, brand logos, or violent/adult content may be rejected. Rephrase to drop specific names or try a different model.
