@@ -20,7 +20,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Seedream 5.0 Pro** | 10 (1K) / 20 (2K) | Slow (~1min 45s) | 10 | Web only | Multi-reference composition (up to 10 refs), character consistency |
 | **Seedream 4.5** | 5 | Fast (~32s) | 10 | Web only | Product photos, marketing |
 | **Grok Imagine Image 2.0** | 10–14 (Standard) / 14–18 (Medium) | Fast (~25s) | 3 | ✓ | Precise editing, high-quality generation, text-to-image + image-to-image |
-| **Midjourney V8.1** | 15 (1K) / 20 (2K) | Fast (~33s) | 1 | ✓ | Photorealistic, universal aesthetics |
+| **Midjourney V8.2** | 15 (1K) / 20 (2K) | Fast (~33s) | 1 | ✓ | Photorealistic, universal aesthetics |
 | **Flux 2 Klein** | 2 | Fast (~23s) | None | Web only | General-purpose base model, text rendering |
 | **Agnes Image 2.5 Flash** | 1 | Fast (~30s) | 1 | ✓ | Cheapest model, high-volume drafts, covered by daily free credits |
 | **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec) | Video, ~2-3min | First/last frame or content reference | ✓ | 4–30s, 480p/720p, generated audio, reference-video continuation |
@@ -31,7 +31,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 
 > ✓ = available on the iOS/Android app and web. Web only = browser only for now.
 >
-> GPT image 1.5 was retired on 2026-04-22 (replaced by GPT Image 2.0). Midjourney V7 was replaced by V8.1 on 2026-05-09. Happyhorse 1.1 was retired on 2026-07-31. Seedream 5.0 Lite was retired on 2026-08-13 (Seedream 5.0 Pro and Seedream 4.5 remain available). Z Image Turbo was retired on 2026-08-21.
+> GPT image 1.5 was retired on 2026-04-22 (replaced by GPT Image 2.0). Midjourney V7 was replaced by V8.1 on 2026-05-09, then upgraded in place to V8.2 on 2026-09-02 (same model ID). Happyhorse 1.1 was retired on 2026-07-31. Seedream 5.0 Lite was retired on 2026-08-13 (Seedream 5.0 Pro and Seedream 4.5 remain available). Z Image Turbo was retired on 2026-08-21.
 
 ## Image Models
 
@@ -189,11 +189,11 @@ xAI's Grok Imagine 2.0 image model. Supports both text-to-image and image-to-ima
 
 ---
 
-### Midjourney V8.1
+### Midjourney V8.2
 
 | | |
 | --- | --- |
-| **Model ID** | `midjourney-v8.1` |
+| **Model ID** | `midjourney-v8.1` — stable identifier, not a version number. Upgraded in place to Midjourney V8.2 on 2026-09-02; existing integrations keep working unchanged. |
 | **Provider** | Midjourney |
 | **Credits** | 15 (1K) / 20 (2K) per generation |
 | **Reference images** | 1 (content or style reference) |
@@ -488,12 +488,12 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
     This base model generates images from text only. The reference image upload section is hidden while it is selected. If you need reference images, switch to another model.
   </Accordion>
 
-  <Accordion title="Midjourney V8.1 — Single reference image only" icon="triangle-exclamation">
-    Midjourney V8.1 accepts only 1 reference image, while other image models accept between 3 and 16. In exchange it offers more control over how the reference is used (content vs. style reference).
+  <Accordion title="Midjourney V8.2 — Single reference image only" icon="triangle-exclamation">
+    Midjourney V8.2 accepts only 1 reference image, while other image models accept between 3 and 16. In exchange it offers more control over how the reference is used (content vs. style reference).
   </Accordion>
 
-  <Accordion title="Midjourney V8.1 — Returns 4 candidate images" icon="info-circle">
-    Unlike other models that return a single image, Midjourney V8.1 returns 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (15 credits at 1K / 20 credits at 2K) for all 4 images.
+  <Accordion title="Midjourney V8.2 — Returns 4 candidate images" icon="info-circle">
+    Unlike other models that return a single image, Midjourney V8.2 returns 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (15 credits at 1K / 20 credits at 2K) for all 4 images.
   </Accordion>
 
   <Accordion title="GPT Image 2.0 — Stricter moderation" icon="triangle-exclamation">

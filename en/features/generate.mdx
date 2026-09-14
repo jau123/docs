@@ -38,7 +38,7 @@ Need a guided, multi-step workflow instead of a single prompt? **Skills** turns 
 
 - **Be specific** — describe composition, lighting, colors, textures, and perspective for the best results
 - **Short prompts work too** — use the Enhance button to expand brief descriptions into detailed prompts automatically
-- **Language** — most models accept English prompts. Midjourney V8.1 will auto-translate non-English prompts to English
+- **Language** — most models accept English prompts. Midjourney V8.2 will auto-translate non-English prompts to English
 
 ### Variable Tags
 
@@ -103,7 +103,7 @@ Click the translate icon (top right of the prompt editor) to translate your prom
 Click the **Enhance Prompt** button to automatically enhance your prompt based on the selected model:
 
 - **Polish mode** (most models) — preserves intent, adds visual details like composition, lighting, and materials
-- **Expand mode** (Midjourney V8.1) — expands into Midjourney-optimized language; non-English prompts are auto-translated
+- **Expand mode** (Midjourney V8.2) — expands into Midjourney-optimized language; non-English prompts are auto-translated
 
 <CodeGroup>
 ```text Input
@@ -165,9 +165,9 @@ You don't need to download images first. Drag any gallery card directly into the
   Combine gallery references with @ mentions for powerful multi-reference workflows. For example, drag two gallery cards as references, then write: "Combine the composition of @image1 with the color palette of @image2."
 </Tip>
 
-### Reference Types (Midjourney V8.1)
+### Reference Types (Midjourney V8.2)
 
-When using Midjourney V8.1 with a reference image, a dropdown appears to choose how the reference is interpreted:
+When using Midjourney V8.2 with a reference image, a dropdown appears to choose how the reference is interpreted:
 
 | Type | Description |
 | --- | --- |
@@ -233,7 +233,7 @@ The resolution options come from the model you picked — the selector only offe
 | Nanobanana 2, Nanobanana Pro, Seedream 4.5 | 2K / 4K (default 2K) |
 | GPT Image 2.5 | 1K / 2K / 4K (desktop starts at 2K; mobile at 1K) |
 | GPT Image 2.0 | 1K / 2K / 4K (default 2K) |
-| Grok Imagine Image 2.0, Midjourney V8.1, Seedream 5.0 Pro | 1K / 2K (default 1K) |
+| Grok Imagine Image 2.0, Midjourney V8.2, Seedream 5.0 Pro | 1K / 2K (default 1K) |
 | Flux 2 Klein, Agnes Image 2.5 Flash | Fixed — no resolution selector |
 
 <Note>
@@ -257,9 +257,9 @@ GPT Image 2 retains its own three quality levels and prices. Retrying a 2.5 gene
 
 ---
 
-## Midjourney V8.1 Advanced Options
+## Midjourney V8.2 Advanced Options
 
-When using Midjourney V8.1, the **Advanced Options** button lets you tune extra generation parameters. **Most users can leave everything at defaults.**
+When using Midjourney V8.2, the **Advanced Options** button lets you tune extra generation parameters. **Most users can leave everything at defaults.**
 
 <Accordion title="Parameter details (Stylize / Chaos / Raw / iw / sref / sw)" icon="sliders">
 
@@ -457,7 +457,7 @@ Typical generation times by model:
 | GPT Image 2.0 | ~29 seconds |
 | Agnes Image 2.5 Flash | ~31 seconds |
 | Seedream 4.5 | ~33 seconds |
-| Midjourney V8.1 | ~33 seconds |
+| Midjourney V8.2 | ~33 seconds |
 | Nanobanana Pro | ~34 seconds |
 | Seedream 5.0 Pro | ~1 min 43 sec |
 | Grok Video 1.5 (video) | ~35 seconds |
@@ -500,7 +500,7 @@ MeiGen uses a dual credit system:
 - **Daily credits**: a free daily allowance that resets at 00:00 UTC, usable on **basic models** — currently **Flux 2 Klein** and **Agnes Image 2.5 Flash** for images, and **Agnes Video 2.5 Flash** for video (the only video model daily credits cover). They are grouped under **Basic Models** in the model picker.
 - **Purchased credits**: your non-expiring balance, shown as **Credits** in the sidebar. It covers everything outside the daily allowance — credits you topped up, plus any bonus credits granted to your account (sign-up welcome bonus, referral rewards). Usable on all models.
 
-Generating with premium models (GPT Image 2.5, GPT Image 2.0, Nanobanana 2 / Pro, Seedream, Midjourney V8.1, Grok Imagine Image 2.0, Seedance 2.5 / 2.0, Veo 3.1, Grok Video 1.5, and so on) requires welcome or purchased credits — daily credits never apply to them, whether or not you have purchased before.
+Generating with premium models (GPT Image 2.5, GPT Image 2.0, Nanobanana 2 / Pro, Seedream, Midjourney V8.2, Grok Imagine Image 2.0, Seedance 2.5 / 2.0, Veo 3.1, Grok Video 1.5, and so on) requires welcome or purchased credits — daily credits never apply to them, whether or not you have purchased before.
 
 **API Token calls** only use purchased credits, regardless of the model; daily credits never apply to the API path.
 
@@ -514,7 +514,7 @@ The credit cost is shown on the Generate button before you submit. Hover over th
 | Images per request (Web UI) | 1 | Up to 4 |
 | API access | Available (purchased credits only) | Available (purchased credits only) |
 
-> The "Images per request" limit applies to the Web UI only. Each API call always returns 1 image (Midjourney V8.1 always returns 4 candidates per call).
+> The "Images per request" limit applies to the Web UI only. Each API call always returns 1 image (Midjourney V8.2 always returns 4 candidates per call).
 >
 > Creating an API token does not require a paid account — any account can issue one from Settings → API Keys. What API calls do require is purchased credits, since daily free credits never apply on the API path.
 

@@ -38,7 +38,7 @@ MeiGen 让你通过统一的界面使用多种 AI 模型生成图片和视频。
 
 - **要具体** — 描述构图、光线、色彩、质感和视角能获得最佳效果
 - **简短提示词也可以** — 使用增强按钮自动将简短描述扩展为详细提示词
-- **语言** — 大多数模型接受英文提示词。Midjourney V8.1 会自动将非英文提示词翻译为英文
+- **语言** — 大多数模型接受英文提示词。Midjourney V8.2 会自动将非英文提示词翻译为英文
 
 ### 变量标签
 
@@ -103,7 +103,7 @@ MeiGen 让你通过统一的界面使用多种 AI 模型生成图片和视频。
 通过**润色提示词**按钮根据当前模型自动增强提示词：
 
 - **润色模式**（大部分模型） — 保留原意，补充构图、光线、材质等视觉细节
-- **扩展模式**（Midjourney V8.1） — 扩展为 Midjourney 优化的语言；非英文 prompt 会自动翻译
+- **扩展模式**（Midjourney V8.2） — 扩展为 Midjourney 优化的语言；非英文 prompt 会自动翻译
 
 <CodeGroup>
 ```text 输入
@@ -165,9 +165,9 @@ style with shallow depth of field
   结合画廊参考和 @ 引用实现强大的多参考工作流。例如，拖入两张画廊卡片作为参考，然后编写："结合 @image1 的构图和 @image2 的配色方案。"
 </Tip>
 
-### 参考类型（Midjourney V8.1）
+### 参考类型（Midjourney V8.2）
 
-使用 Midjourney V8.1 并添加参考图片时，会出现下拉菜单选择参考的解读方式：
+使用 Midjourney V8.2 并添加参考图片时，会出现下拉菜单选择参考的解读方式：
 
 | 类型 | 描述 |
 | --- | --- |
@@ -233,7 +233,7 @@ style with shallow depth of field
 | Nanobanana 2、Nanobanana Pro、Seedream 4.5 | 2K / 4K（默认 2K） |
 | GPT Image 2.5 | 1K / 2K / 4K（桌面端初始 2K，移动端初始 1K） |
 | GPT Image 2.0 | 1K / 2K / 4K（默认 2K） |
-| Grok Imagine Image 2.0、Midjourney V8.1、Seedream 5.0 Pro | 1K / 2K（默认 1K） |
+| Grok Imagine Image 2.0、Midjourney V8.2、Seedream 5.0 Pro | 1K / 2K（默认 1K） |
 | Flux 2 Klein、Agnes Image 2.5 Flash | 固定分辨率，不显示选择器 |
 
 <Note>
@@ -257,9 +257,9 @@ GPT Image 2 保留自己的三档质量与价格。重试 2.5 任务时会恢复
 
 ---
 
-## Midjourney V8.1 高级选项
+## Midjourney V8.2 高级选项
 
-使用 Midjourney V8.1 时，可通过**高级选项**按钮自定义更多生图参数。**大部分用户保持默认即可**。
+使用 Midjourney V8.2 时，可通过**高级选项**按钮自定义更多生图参数。**大部分用户保持默认即可**。
 
 <Accordion title="参数详情（Stylize / Chaos / Raw / iw / sref / sw）" icon="sliders">
 
@@ -457,7 +457,7 @@ Seedance 2.5 和 Seedance 2.0 都支持参考视频续写。上传一段视频�
 | GPT Image 2.0 | 约 29 秒 |
 | Agnes Image 2.5 Flash | 约 31 秒 |
 | Seedream 4.5 | 约 33 秒 |
-| Midjourney V8.1 | 约 33 秒 |
+| Midjourney V8.2 | 约 33 秒 |
 | Nanobanana Pro | 约 34 秒 |
 | Seedream 5.0 Pro | 约 1 分 43 秒 |
 | Grok Video 1.5（视频）| 约 35 秒 |
@@ -500,7 +500,7 @@ MeiGen 采用双积分制：
 - **每日积分**：每天赠送的免费额度，UTC 00:00 重置，用于**基础模型** — 当前图片侧为 **Flux 2 Klein**、**Agnes Image 2.5 Flash**，视频侧为 **Agnes Video 2.5 Flash**（唯一被每日积分覆盖的视频模型）。它们在模型选择器里归在 **Basic Models** 分组下。
 - **购买积分**：侧边栏「Credits」那一行显示的永不过期余额。除每日免费额度外的积分都记在这里 — 包括充值获得的，以及发放到账户的赠送积分（注册赠送、推荐奖励）。可用于所有模型。
 
-生成高级模型（GPT Image 2.5、GPT Image 2.0、Nanobanana 2 / Pro、Seedream、Midjourney V8.1、Grok Imagine Image 2.0、Seedance 2.5 / 2.0、Veo 3.1、Grok Video 1.5 等）需要消耗赠送积分或购买积分 — 无论是否付过费，每日积分都不能用于高级模型。
+生成高级模型（GPT Image 2.5、GPT Image 2.0、Nanobanana 2 / Pro、Seedream、Midjourney V8.2、Grok Imagine Image 2.0、Seedance 2.5 / 2.0、Veo 3.1、Grok Video 1.5 等）需要消耗赠送积分或购买积分 — 无论是否付过费，每日积分都不能用于高级模型。
 
 **API Token 调用**只使用购买积分，不论调用哪个模型；每日积分在 API 路径永远不参与扣费。
 
@@ -514,7 +514,7 @@ MeiGen 采用双积分制：
 | 每次请求图片数（Web 界面）| 1 | 最多 4 |
 | API 访问 | 可用（仅购买积分）| 可用（仅购买积分） |
 
-> "每次请求图片数"限制仅作用于 Web 界面。API 每次调用始终返回 1 张图片（Midjourney V8.1 例外，每次固定返回 4 张候选）。
+> "每次请求图片数"限制仅作用于 Web 界面。API 每次调用始终返回 1 张图片（Midjourney V8.2 例外，每次固定返回 4 张候选）。
 >
 > 创建 API Token 不需要付费账户，任何账户都可以在「设置 → API Keys」中创建。API 调用真正需要的是购买积分 —— 每日免费积分在 API 路径上永远不参与扣费。
 

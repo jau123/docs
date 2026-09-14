@@ -35,7 +35,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   Frequently used values: `gpt-image-2.5`, `gpt-image-2`, `nanobanana-2`, `midjourney-v8.1` (images); `seedance-2-5`, `seedance-2-0`, `veo-3.1` (video).
 
-  > `rhart-1.5` (GPT image 1.5) was retired on 2026-04-22 — use `gpt-image-2` instead. `midjourney-v7` was replaced by `midjourney-v8.1` on 2026-05-09 (legacy `midjourney-v7` requests still accepted for backward compatibility).
+  > `rhart-1.5` (GPT image 1.5) was retired on 2026-04-22 — use `gpt-image-2` instead. `midjourney-v7` was replaced by `midjourney-v8.1` on 2026-05-09 (upgraded in place to V8.2 on 2026-09-02, same ID) (legacy `midjourney-v7` requests still accepted for backward compatibility).
 </ParamField>
 
 <ParamField body="aspectRatio" type="string" default="auto">
@@ -92,7 +92,7 @@ Submits a generation request. The output is generated asynchronously — use the
   | 10 | Seedream 5.0 Pro, Seedream 4.5 |
   | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5, Seedance 2.0, Veo 3.1 — default `frame` mode (first/last frame), see `referenceMode` below |
-  | 1 | Midjourney V8.1, Agnes Image 2.5 Flash, Agnes Video 2.5 Flash, Grok Video 1.5 (**required** — image-to-video only) |
+  | 1 | Midjourney V8.2, Agnes Image 2.5 Flash, Agnes Video 2.5 Flash, Grok Video 1.5 (**required** — image-to-video only) |
   | 0 | Flux 2 Klein |
 
   In `content` mode, Seedance 2.5 accepts up to 30 images and Seedance 2.0 accepts up to 9. When character tokens are present, their resolved images count toward the same limit.
@@ -116,7 +116,7 @@ Submits a generation request. The output is generated asynchronously — use the
 </ParamField>
 
 <ParamField body="niji7Options" type="object">
-  Advanced parameters for Midjourney V8.1. Ignored for other models. (Field name preserved for backward compatibility.)
+  Advanced parameters for Midjourney V8.2. Ignored for other models. (Field name preserved for backward compatibility.)
 
   | Field | Type | Default | Range | Notes |
   | --- | --- | --- | --- | --- |
@@ -131,7 +131,7 @@ Submits a generation request. The output is generated asynchronously — use the
 </ParamField>
 
 <ParamField body="referenceType" type="string" default="content">
-  For Midjourney V8.1 only. How to interpret the reference image.
+  For Midjourney V8.2 only. How to interpret the reference image.
 
   - `content` — use as subject matter reference
   - `style` — extract visual style only
@@ -309,7 +309,7 @@ Poll this endpoint to check if your image is ready.
 <Note>
   - **`aspectRatio`** is the final ratio applied to this generation (if you passed `auto`, this is the value that was actually used).
   - **`mediaType`** is `image` or `video`. For video generations `imageUrl/imageUrls` are `null`, and vice versa.
-  - Midjourney V8.1 returns 4 candidate images per generation. `imageUrls` contains all candidates; `imageUrl` always points to the first one. Other image models return a single image.
+  - Midjourney V8.2 returns 4 candidate images per generation. `imageUrls` contains all candidates; `imageUrl` always points to the first one. Other image models return a single image.
 </Note>
 
 ### Response (Failed)
@@ -382,7 +382,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-### Midjourney V8.1 with style reference
+### Midjourney V8.2 with style reference
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \

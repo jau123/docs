@@ -35,7 +35,7 @@ POST /api/generate/v2
 
   常用取值：图片 `gpt-image-2.5`、`gpt-image-2`、`nanobanana-2`、`midjourney-v8.1`；视频 `seedance-2-5`、`seedance-2-0`、`veo-3.1`。
 
-  > `rhart-1.5`（GPT image 1.5）已于 2026-04-22 下线，请改用 `gpt-image-2`。`midjourney-v7` 已于 2026-05-09 由 `midjourney-v8.1` 接替（出于向后兼容仍接受老 ID 调用）。
+  > `rhart-1.5`（GPT image 1.5）已于 2026-04-22 下线，请改用 `gpt-image-2`。`midjourney-v7` 已于 2026-05-09 由 `midjourney-v8.1` 接替（2026-09-02 原地升级为 V8.2，ID 不变）（出于向后兼容仍接受老 ID 调用）。
 </ParamField>
 
 <ParamField body="aspectRatio" type="string" default="auto">
@@ -91,7 +91,7 @@ POST /api/generate/v2
   | 10 | Seedream 5.0 Pro、Seedream 4.5 |
   | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5、Seedance 2.0、Veo 3.1 —— 默认 `frame` 模式（首/尾帧），见下方 `referenceMode` |
-  | 1 | Midjourney V8.1、Agnes Image 2.5 Flash、Agnes Video 2.5 Flash、Grok Video 1.5(**必传** —— 仅支持图生视频) |
+  | 1 | Midjourney V8.2、Agnes Image 2.5 Flash、Agnes Video 2.5 Flash、Grok Video 1.5(**必传** —— 仅支持图生视频) |
   | 0 | Flux 2 Klein |
 
   `content` 模式下，Seedance 2.5 最多接受 30 张图片，Seedance 2.0 最多 9 张；使用角色时，角色解析出的图片也计入同一上限。
@@ -115,7 +115,7 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="niji7Options" type="object">
-  Midjourney V8.1 高级参数。对其他模型无效。（字段名沿用历史命名，向后兼容。）
+  Midjourney V8.2 高级参数。对其他模型无效。（字段名沿用历史命名，向后兼容。）
 
   | 字段 | 类型 | 默认值 | 范围 | 说明 |
   | --- | --- | --- | --- | --- |
@@ -130,7 +130,7 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="referenceType" type="string" default="content">
-  仅用于 Midjourney V8.1。参考图片的解读方式。
+  仅用于 Midjourney V8.2。参考图片的解读方式。
 
   - `content` — 用作主题素材参考
   - `style` — 仅提取视觉风格
@@ -306,7 +306,7 @@ GET /api/generate/v2/status/:generationId
 <Note>
   - **`aspectRatio`** 是该次生成最终采用的比例（如果你传了 `auto`，这里是实际落地的值）。
   - **`mediaType`** 取值 `image` 或 `video`。视频生成时 `imageUrl/imageUrls` 为 `null`，反之亦然。
-  - Midjourney V8.1 每次返回 4 张候选图片，`imageUrls` 包含全部候选，`imageUrl` 始终指向第一张。其他图片模型返回单张。
+  - Midjourney V8.2 每次返回 4 张候选图片，`imageUrls` 包含全部候选，`imageUrl` 始终指向第一张。其他图片模型返回单张。
 </Note>
 
 ### 响应（失败）
@@ -379,7 +379,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   }'
 ```
 
-### Midjourney V8.1 风格参考
+### Midjourney V8.2 风格参考
 
 ```bash
 curl -X POST https://www.meigen.ai/api/generate/v2 \

@@ -20,7 +20,7 @@ MeiGen 支持多种 AI 模型用于图片和视频生成。先看下方对比表
 | **Seedream 5.0 Pro** | 10（1K）/ 20（2K）| 慢（约 1 分 45 秒） | 10 | 仅网页版 | 多参考图组合（最多 10 张）、角色一致性 |
 | **Seedream 4.5** | 5 | 快（约 32 秒） | 10 | 仅网页版 | 产品照片、营销 |
 | **Grok Imagine Image 2.0** | 10–14（Standard）/ 14–18（Medium）| 快（约 25 秒） | 3 | ✓ | 精准编辑、高质量生成、文生图 + 图生图 |
-| **Midjourney V8.1** | 15（1K）/ 20（2K）| 快（约 33 秒） | 1 | ✓ | 写实摄影、通用美学 |
+| **Midjourney V8.2** | 15（1K）/ 20（2K）| 快（约 33 秒） | 1 | ✓ | 写实摄影、通用美学 |
 | **Flux 2 Klein** | 2 | 快（约 23 秒） | 无 | 仅网页版 | 通用基础模型、文字渲染 |
 | **Agnes Image 2.5 Flash** | 1 | 快（约 30 秒） | 1 | ✓ | 全站最便宜、大批量草稿、每日免费积分可用 |
 | **Seedance 2.5** | 按秒（480p 18/秒，720p 39/秒）| 视频，约 2-3 分钟 | 首帧/末帧 或 内容参考 | ✓ | 4–30 秒、480p/720p、生成音频、参考视频续写 |
@@ -31,7 +31,7 @@ MeiGen 支持多种 AI 模型用于图片和视频生成。先看下方对比表
 
 > ✓ = iOS/Android App 与网页均可用；仅网页版 = 目前只能在浏览器使用。
 >
-> GPT image 1.5 已于 2026-04-22 下线，由 GPT Image 2.0 接替。Midjourney V7 已于 2026-05-09 由 V8.1 接替。Happyhorse 1.1 已于 2026-07-31 下线。Seedream 5.0 Lite 已于 2026-08-13 下线（Seedream 5.0 Pro 与 Seedream 4.5 仍可用）。Z Image Turbo 已于 2026-08-21 下线。
+> GPT image 1.5 已于 2026-04-22 下线，由 GPT Image 2.0 接替。Midjourney V7 已于 2026-05-09 由 V8.1 接替，并于 2026-09-02 原地升级为 V8.2（model ID 不变）。Happyhorse 1.1 已于 2026-07-31 下线。Seedream 5.0 Lite 已于 2026-08-13 下线（Seedream 5.0 Pro 与 Seedream 4.5 仍可用）。Z Image Turbo 已于 2026-08-21 下线。
 
 ## 图片模型
 
@@ -189,11 +189,11 @@ xAI Grok Imagine 2.0 图像模型。同时支持文生图和图生图（最多 3
 
 ---
 
-### Midjourney V8.1
+### Midjourney V8.2
 
 | | |
 | --- | --- |
-| **Model ID** | `midjourney-v8.1` |
+| **Model ID** | `midjourney-v8.1` —— 稳定标识符，不是版本号。已于 2026-09-02 原地升级为 Midjourney V8.2，现有集成无需改动。 |
 | **供应商** | Midjourney |
 | **积分** | 1K 每次 15 / 2K 每次 20 |
 | **参考图片** | 1 张（内容或风格参考） |
@@ -486,12 +486,12 @@ Google 的视频生成模型，生成带原生音频的短视频片段，音频�
     这个基础模型仅支持文生图。选择时参考图片上传区域会被隐藏。如果需要使用参考图片，请切换到其他模型。
   </Accordion>
 
-  <Accordion title="Midjourney V8.1 — 仅支持单张参考图片" icon="triangle-exclamation">
-    Midjourney V8.1 仅接受 1 张参考图片，其他图片模型则支持 3–16 张。作为交换，它提供了更多控制参考图片使用方式的选项（内容参考 vs 风格参考）。
+  <Accordion title="Midjourney V8.2 — 仅支持单张参考图片" icon="triangle-exclamation">
+    Midjourney V8.2 仅接受 1 张参考图片，其他图片模型则支持 3–16 张。作为交换，它提供了更多控制参考图片使用方式的选项（内容参考 vs 风格参考）。
   </Accordion>
 
-  <Accordion title="Midjourney V8.1 — 每次返回 4 张候选图" icon="info-circle">
-    与其他模型返回单张图片不同，Midjourney V8.1 每次生成会返回 4 张候选图片。所有候选图都会保存，可在图片详情对话框中浏览。4 张图片只收取一次费用（1K 15 积分 / 2K 20 积分）。
+  <Accordion title="Midjourney V8.2 — 每次返回 4 张候选图" icon="info-circle">
+    与其他模型返回单张图片不同，Midjourney V8.2 每次生成会返回 4 张候选图片。所有候选图都会保存，可在图片详情对话框中浏览。4 张图片只收取一次费用（1K 15 积分 / 2K 20 积分）。
   </Accordion>
 
   <Accordion title="GPT Image 2.0 — 内容审核较严" icon="triangle-exclamation">
