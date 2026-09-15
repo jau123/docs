@@ -5,9 +5,9 @@ description: "安装本地 MCP 服务，配置客户端、生成服务和输出�
 
 ## 前提条件
 
-- 已安装 **Node.js 18+**
-- 至少一个生成提供商(`generate_image` / `generate_video` 用):
-  - **MeiGen Cloud** — 从 [meigen.ai](https://www.meigen.ai) 获取 API Key（设置 → API Keys）
+- 本地包建议使用 **Node.js 22+**
+- 普通 `generate_image` 可配置以下后端之一；`generate_video` 和五项 Skills 必须使用 MeiGen Cloud：
+  - **MeiGen Cloud** — 用桌面浏览器在 [API Keys](https://www.meigen.ai/profile/api-keys) 获取 Key
   - **ComfyUI** — 运行中的 ComfyUI 服务器（[安装指南](https://github.com/comfyanonymous/ComfyUI)）
   - **OpenAI 兼容 API** — 自带 Key，支持 Together AI、Fireworks AI、OpenAI 等任意供应商
 
@@ -17,13 +17,30 @@ description: "安装本地 MCP 服务，配置客户端、生成服务和输出�
 
 ---
 
+## 复制给 AI 助手安装
+
+可复制给能编辑 MCP 配置的本地 Codex、Claude Code、Cursor 等助手：
+
+```text
+为当前宿主安装 MeiGen MCP，保留其他服务并复用已有 MeiGen 条目。
+优先使用 https://www.meigen.ai/api/mcp 的 Streamable HTTP；需要读取本地文件
+或本地专属工具时，使用 npx -y meigen@2.0.0。
+Codex 远程配置使用 bearer_token_env_var = "MEIGEN_API_TOKEN"；如果尚未设置
+Key，先省略认证并验证公开工具。指导我私密填写 Key，不让我把它发到聊天或 URL。
+重连后实际调用 list_skills 并报告结果；安装验证不要上传、生成或消耗积分。
+如果无法修改宿主配置，给出准确手动步骤并说明哪些尚未验证。
+ChatGPT 网页请使用独立的仅公开查询流程。
+```
+
+Codex HTTP 和 ChatGPT 网页的步骤见[远程接入](/zh/mcp/remote)。
+
 ## 安装
 
 <Tip>
-  想零安装?[远程 MCP 端点](/zh/mcp/remote)不需要 Node.js、不需要 `npx`、也不需要本地配置文件 — 任意 MCP 宿主通过 HTTP 指向 `https://www.meigen.ai/api/mcp` 即可。
+  想零安装?[远程 MCP 端点](/zh/mcp/remote)不需要 Node.js 或本地 `npx` 进程，但仍需配置支持 HTTP 的 MCP 宿主通过 HTTP 指向 `https://www.meigen.ai/api/mcp` 即可。
 </Tip>
 
-### Claude Code 插件（推荐）
+### Claude Code 插件
 
 <Steps>
   <Step title="安装插件">
@@ -38,7 +55,7 @@ description: "安装本地 MCP 服务，配置客户端、生成服务和输出�
     安装后**重启 Claude Code**（关闭并重新打开，或打开一个新的终端标签页）。
   </Step>
   <Step title="配置提供商">
-    启动一个新的 Claude Code 会话并运行 `/meigen:setup`。安装向导引导你完成提供商选择和 API Key 配置,自动适配 macOS / Linux / Windows shell。
+    启动一个新的 Claude Code 会话并运行 `/meigen:setup`。根据指引选择提供商，凭据由你自己在宿主私密设置或本地配置中填写，不发到对话。插件可附带 MCP 配置，请检查已有服务，避免重复添加。
 
     或直接设置环境变量(参见下方[提供商配置](#提供商配置))。
   </Step>
@@ -53,7 +70,7 @@ description: "安装本地 MCP 服务，配置客户端、生成服务和输出�
 </Steps>
 
 <Note>
-  也上架在社区市场 [wshobson/agents](https://github.com/wshobson/agents)。该市场不自带 MCP server 配置 — 装完需要自己把[其它 MCP 兼容宿主](#其它-mcp-兼容宿主)里的 JSON 加到 `.mcp.json`。
+  也上架在社区市场 [wshobson/agents](https://github.com/wshobson/agents)。第三方上架版本可能滞后，请检查实际安装包，仅在缺少 MCP 连接时补充配置。
 </Note>
 
 ### Cursor / VS Code / Windsurf / Roo Code
@@ -61,27 +78,31 @@ description: "安装本地 MCP 服务，配置客户端、生成服务和输出�
 一行命令写好每个编辑器的 MCP 配置文件:
 
 ```bash
-npx meigen init cursor      # 写 .cursor/mcp.json
-npx meigen init vscode      # 写 .vscode/mcp.json
-npx meigen init windsurf    # 写 ~/.codeium/windsurf/mcp_config.json
-npx meigen init roo         # 写 .roo/mcp.json
-npx meigen init claude      # 写 .mcp.json (Claude Code 项目级)
+npx -y meigen@2.0.0 init cursor      # 写 .cursor/mcp.json
+npx -y meigen@2.0.0 init vscode      # 写 .vscode/mcp.json
+npx -y meigen@2.0.0 init windsurf    # 写 ~/.codeium/windsurf/mcp_config.json
+npx -y meigen@2.0.0 init roo         # 写 .roo/mcp.json
+npx -y meigen@2.0.0 init claude      # 写 .mcp.json (Claude Code 项目级)
 ```
 
-配置写好后,在 shell 设置 `MEIGEN_API_TOKEN` 并重启宿主。**不支持 `/meigen:setup` slash 命令的宿主**,直接在 meigen server entry 的 `env` 块加 token。
+init 助手生成的配置会跟随 npm 最新发布。要固定本版本，请把生成的 args 改为 `meigen@2.0.0`；以固定版本执行 init 本身不会固定生成条目。请在 MCP 进程环境或宿主私密设置中配置凭据，然后重启。
 
-### OpenAI Codex CLI
+### Codex CLI、IDE 扩展和本地 Codex 桌面宿主
 
-Codex 用 TOML。在 `~/.codex/config.toml` 加:
+MeiGen Cloud 和 Skills 建议使用[远程 HTTP](/zh/mcp/remote)。需要本地进程时，将以下内容合并到 `~/.codex/config.toml`，**替代**远程条目：
 
 ```toml
 [mcp_servers.meigen]
 command = "npx"
-args = ["-y", "meigen@latest"]
-
-[mcp_servers.meigen.env]
-MEIGEN_API_TOKEN = "meigen_sk_..."
+args = ["-y", "meigen@2.0.0"]
+env_vars = ["MEIGEN_API_TOKEN"]
+startup_timeout_sec = 90
+tool_timeout_sec = 240
 ```
+
+在启动 Codex 的环境中设置 `MEIGEN_API_TOKEN`。未配置 Key 时先省略 `env_vars`，待变量存在后再加。Codex 不会自动加载项目 `.env.local`。也可先执行 `codex mcp add meigen -- npx -y meigen@2.0.0` 注册命令，再在已有表中补环境变量转发和超时。`meigen init codex` 不受支持。
+
+240 秒适用于 Skills；较长的通用视频生成可能需要更久。重启/重连后查看 `codex mcp list` 和 `/mcp`，并真实调用一次 `list_skills`。参考 [Codex 官方配置指南](https://developers.openai.com/codex/mcp)。ChatGPT 网页不共享这套本地安装，当前 MeiGen 认证方式下[仅支持公开查询](/zh/mcp/remote)。
 
 ### Hermes Agent (NousResearch)
 
@@ -91,7 +112,7 @@ Hermes 原生支持 MCP。在 `~/.hermes/config.yaml` 加:
 mcp_servers:
   meigen:
     command: "npx"
-    args: ["-y", "meigen@latest"]
+    args: ["-y", "meigen@2.0.0"]
     env:
       MEIGEN_API_TOKEN: "meigen_sk_..."
     timeout: 2700           # 长视频(如参考视频续写)可能超过 15 分钟
@@ -101,7 +122,7 @@ mcp_servers:
 <Warning>
   `timeout` 要设成 **2700**,不能用 Hermes 默认值(120s)。长视频生成 — 尤其参考视频续写 — 可能超过 15 分钟;超时太短会在任务仍在服务端运行、**积分已扣**的情况下把 Hermes 连接断掉。`connect_timeout: 120` 用来兜住首次 npx 下载慢的情况。
 
-  如果生成中途连接断了,不要重新提交 — 用原请求返回的 `generationId` 调 `check_generation` 续查进度。重新提交会新开一次生成,再扣一次积分。
+  生成中途连接断开时，用原 generationId 或已保存 UUID requestId 调 `check_generation`。恢复要求重交时保留原 ID 和精确参数，新 ID 才是新付费尝试。组合步骤可用 wait=false/download=false，详见[工作流恢复](/zh/mcp/composable-workflows)。
 </Warning>
 
 ### 独立 CLI 模式(不需要 MCP 宿主)
@@ -113,40 +134,26 @@ mcp_servers:
 export MEIGEN_API_TOKEN=meigen_sk_...
 
 # 生图
-npx meigen gen --prompt "阳光厨房里的三花猫"
+npx -y meigen@2.0.0 gen --prompt "阳光厨房里的三花猫"
 
 # 指定模型 + 比例
-npx meigen gen -p "logo design" -m midjourney-v8.1 -r 1:1
+npx -y meigen@2.0.0 gen -p "logo design" -m midjourney-v8.1 -r 1:1
 
 # 带参考图(本地路径自动上传)
-npx meigen gen -p "产品 hero shot" --ref ~/Desktop/bottle.jpg
+npx -y meigen@2.0.0 gen -p "产品 hero shot" --ref ~/Desktop/bottle.jpg
 
 # 只提交不等待 — 输出 generationId(适合 CI)
-npx meigen gen -p "..." --no-wait
+npx -y meigen@2.0.0 gen -p "..." --no-wait
 
 # JSON 输出(适合 jq 管道)
-npx meigen gen -p "..." --json | jq -r '.imageUrls[0]'
+npx -y meigen@2.0.0 gen -p "..." --json | jq -r '.imageUrls[0]'
 ```
 
 图像默认保存到 `~/Pictures/meigen/` — 改保存位置见[输出目录](#输出目录)。
 
 ### OpenClaw
 
-从 [ClawHub](https://clawhub.ai/plugins/meigen-ai-design) 安装完整插件（包含命令、技能和 MCP 服务器）：
-
-```bash
-openclaw bundles install clawhub:meigen-ai-design
-```
-
-或仅安装技能（不含命令/agents）：
-
-```bash
-npx clawhub@latest install creative-toolkit
-```
-
-<Note>
-  OpenClaw 使用 [Agent Skills](https://agentskills.io) 开放标准。无需配置 MCP — Skill 会处理一切。
-</Note>
+MeiGen 另以 `meigen-ai-design` bundle 与 `creative-toolkit` Skill 分发，两者是独立产物、版本也独立。支持的安装命令和当前包结构请参考[仓库安装指南](https://github.com/jau123/MeiGen-AI-Design-MCP#quick-start)。检查实际安装清单，仅配置一套 MCP 连接；安装独立 Skill 不等于已连接 MCP 服务。
 
 ### 其它 MCP 兼容宿主
 
@@ -157,7 +164,7 @@ npx clawhub@latest install creative-toolkit
   "mcpServers": {
     "meigen": {
       "command": "npx",
-      "args": ["-y", "meigen@latest"],
+      "args": ["-y", "meigen@2.0.0"],
       "env": {
         "MEIGEN_API_TOKEN": "meigen_sk_..."
       }
@@ -170,7 +177,7 @@ npx clawhub@latest install creative-toolkit
 
 ## 提供商配置
 
-配置一个或多个提供商。当多个提供商可用时，插件按以下顺序选择：MeiGen → ComfyUI → OpenAI 兼容。你可以在每次请求时覆盖此设置。
+以下提供商选择适用于普通图片生成；Skills 始终要求 MeiGen Key 和购买积分。可配置一个或多个提供商。当多个提供商可用时，插件按以下顺序选择：MeiGen → ComfyUI → OpenAI 兼容。你可以在每次请求时覆盖此设置。
 
 ### MeiGen Cloud
 
@@ -180,7 +187,7 @@ npx clawhub@latest install creative-toolkit
 | --- | --- |
 | `MEIGEN_API_TOKEN` | 以 `meigen_sk_` 开头的 API Key |
 
-获取 API Key：在 [meigen.ai](https://www.meigen.ai) 登录 → 点击头像 → **设置** → **API Keys** → 创建新 Key。
+用桌面浏览器在 [API Keys](https://www.meigen.ai/profile/api-keys) 创建 Key；同账号在[个人主页](https://www.meigen.ai/profile)点击**充值**，或使用[移动端充值页](https://www.meigen.ai/m/premium)。
 
 <Warning>
   API Key 只能使用**购买积分**，不能使用每日免费积分。在通过插件生成前，请确保你的账户有购买积分。
@@ -218,7 +225,7 @@ npx clawhub@latest install creative-toolkit
 
 ## 输出目录
 
-MCP 工具和独立 CLI 都会把生成结果落盘到本地。
+通用图片/视频生成和独立 CLI 可保存本地文件。专用 Skills 返回图片 URL/资源链接，需要本地文件时请明确下载。
 
 | 类型 | 默认位置 | 覆盖变量 | Linux 备选 |
 | --- | --- | --- | --- |
@@ -233,9 +240,9 @@ MCP 工具和独立 CLI 都会把生成结果落盘到本地。
 
 安装完成后，向你的 AI 助手提问：
 
-> "列出可用的模型"
+> "列出 MeiGen 当前可用的 Skills 和价格"
 
-如果配置正确，它会调用 `list_models` 工具并显示你所有已配置提供商的可用模型。
+确认真实 `list_skills` 调用成功，且未生成或扣点；另用 `list_models` 查看通用生成后端。仅保存配置不代表连接成功。
 
 ---
 
@@ -244,6 +251,14 @@ MCP 工具和独立 CLI 都会把生成结果落盘到本地。
 安装完成后，用自然语言向 AI 助手提问即可——例如"生成一幅水彩风景画，16:9 宽高比"。完整工具清单见[概览](/zh/mcp/overview)。
 
 ---
+
+## 从旧版本升级
+
+原有 MeiGen Key、`MEIGEN_API_TOKEN` 和私有 `~/.config/meigen/config.json` 可继续使用。固定旧 npm 版本的配置改为 `meigen@2.0.0` 后重启；跟随最新版本的配置也要重启，并核对实际版本/工具。本地 npm 提供 17 个工具，原九个工具保留；新增专用流程会改变 Agent 对 Skills 请求的工具选择。
+
+Claude/OpenClaw 指引和清单通过各自渠道更新，单独升级 npm 不会替换它们。远程用户不需要升级 npm，后端部署后刷新/重连即可；无需强制从本地切换远程。参考[源码与发布说明](https://github.com/jau123/MeiGen-AI-Design-MCP)。
+
+Skill 图片限制、中断恢复、缩图确认和价格变化见 [Skills API 指南](/zh/api-reference/skills/overview)。Skill 上传失败不能触发付费提交或状态轮询。
 
 ## 故障排除
 
@@ -258,7 +273,7 @@ MCP 工具和独立 CLI 都会把生成结果落盘到本地。
   </Accordion>
 
   <Accordion title="'Insufficient credits'（MeiGen）" icon="circle-exclamation">
-    API Key 只能使用购买积分，不能使用每日免费积分。请在 [meigen.ai](https://www.meigen.ai) 购买积分。
+    API Key 只能使用购买积分，不能使用每日免费积分。请用 Key 所属账号，在[个人主页](https://www.meigen.ai/profile)点击充值，或使用[移动充值页](https://www.meigen.ai/m/premium)。
   </Accordion>
 
   <Accordion title="ComfyUI 连接被拒绝" icon="circle-exclamation">
@@ -275,8 +290,8 @@ MCP 工具和独立 CLI 都会把生成结果落盘到本地。
   </Accordion>
 
   <Accordion title="插件未出现在工具列表中" icon="circle-exclamation">
-    1. 确保已安装 Node.js 18+
-    2. 尝试直接运行 `npx -y meigen` 检查是否有错误
+    1. 确保已安装 Node.js 22+
+    2. 尝试直接运行 `npx -y meigen@2.0.0` 检查是否有错误
     3. 重启编辑器
     4. 检查 MCP 配置 JSON 是否有效
   </Accordion>
@@ -284,7 +299,7 @@ MCP 工具和独立 CLI 都会把生成结果落盘到本地。
   <Accordion title="生成超时" icon="circle-exclamation">
     生成时间因模型而异 — MeiGen Cloud 图片模型通常一分钟以内完成;视频生成更久,参考视频续写尤其如此。轮询不再是固定 5 分钟或 8 分钟的客户端超时,而是跟随服务端自身的进度信号,仅保留 45 分钟的防挂起安全阀。
 
-    如果连接中断或轮询被打断,不要重新提交同一个请求 — 用原请求返回的 `generationId` 调 `check_generation` 续查进度。重新提交会新开一次生成,再扣一次积分。
+    连接或轮询中断时，用原 generationId 或已保存 UUID requestId 调 `check_generation` 恢复。保留精确参数和 ID，临时失败不能重新分配 ID。详见[工作流恢复](/zh/mcp/composable-workflows)。
 
     ComfyUI 生成仍固定 5 分钟上限(取决于你本地 GPU)。
   </Accordion>

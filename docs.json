@@ -36,6 +36,7 @@
                 "group": "MCP Plugin",
                 "pages": [
                   "en/mcp/overview",
+                  "en/mcp/composable-workflows",
                   "en/mcp/remote",
                   "en/mcp/setup",
                   "en/mcp/comfyui"
@@ -62,9 +63,21 @@
                 "group": "Endpoints",
                 "pages": [
                   "en/api-reference/endpoint/generate",
+                  "en/api-reference/endpoint/requests",
                   "en/api-reference/endpoint/models",
                   "en/api-reference/endpoint/images",
                   "en/api-reference/endpoint/tokens"
+                ]
+              },
+              {
+                "group": "Skills API",
+                "pages": [
+                  "en/api-reference/skills/overview",
+                  "en/api-reference/skills/remove-background",
+                  "en/api-reference/skills/product-detail",
+                  "en/api-reference/skills/marketing-poster",
+                  "en/api-reference/skills/ai-backgrounds",
+                  "en/api-reference/skills/upscale"
                 ]
               }
             ]
@@ -96,6 +109,7 @@
                 "group": "MCP 插件",
                 "pages": [
                   "zh/mcp/overview",
+                  "zh/mcp/composable-workflows",
                   "zh/mcp/remote",
                   "zh/mcp/setup",
                   "zh/mcp/comfyui"
@@ -122,9 +136,21 @@
                 "group": "接口文档",
                 "pages": [
                   "zh/api-reference/endpoint/generate",
+                  "zh/api-reference/endpoint/requests",
                   "zh/api-reference/endpoint/models",
                   "zh/api-reference/endpoint/images",
                   "zh/api-reference/endpoint/tokens"
+                ]
+              },
+              {
+                "group": "Skills API 工作流",
+                "pages": [
+                  "zh/api-reference/skills/overview",
+                  "zh/api-reference/skills/remove-background",
+                  "zh/api-reference/skills/product-detail",
+                  "zh/api-reference/skills/marketing-poster",
+                  "zh/api-reference/skills/ai-backgrounds",
+                  "zh/api-reference/skills/upscale"
                 ]
               }
             ]

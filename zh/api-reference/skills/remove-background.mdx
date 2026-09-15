@@ -1,0 +1,46 @@
+---
+title: "透明抠图"
+description: "从一张原图生成透明背景 PNG。"
+---
+
+`POST https://www.meigen.ai/api/skills/remove-bg/run`
+
+MCP: `remove_background`
+
+提供一张主体清晰的图片，无可选创意字段。此接口移除背景；白底或生成新场景使用 AI 换背景。每次一张付费结果，首张同样收费。
+
+提交前先阅读[通用认证、上传与恢复指南](/zh/api-reference/skills/overview)。此工作流需要 MeiGen API Key 和购买积分，不提供免费次数或每日积分。
+
+## 参数
+
+| 字段 | 契约 |
+| --- | --- |
+| `requestId` | 必填，新请求使用 UUID；精确参数恢复时保留原值。 |
+| `productImage` | 必填，已准备的图片 URL，无需提示词。 |
+
+## 请求示例
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "productImage": "https://images.meigen.ai/uploads/product.png"
+}
+```
+
+将请求体保存为 `request.json`，把示例图片 URL 换为真实素材，新请求使用新的 UUID。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/remove-bg/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## 结果与恢复
+
+通常同步返回 `success: true`、`imageUrl`、`charged`，可下载透明 PNG。提交中断后使用 `skill=remove-bg` 恢复，不要因没有收到响应就认为未扣点。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=remove-bg&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

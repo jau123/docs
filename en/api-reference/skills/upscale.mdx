@@ -1,0 +1,65 @@
+---
+title: "Image Upscale"
+description: "Enhance a still image with explicit resizing and price confirmation."
+---
+
+`POST https://www.meigen.ai/api/skills/upscale/run`
+
+MCP: `upscale_image`
+
+One original still image is required; the mode is optional. Use the original URL directly instead of first resizing through reference upload. This endpoint exposes image enhancement only: Web video enhancement and AI Expand are not part of this API. One accepted request produces one paid image.
+
+Use the [shared authentication, upload and recovery guide](/en/api-reference/skills/overview) before submitting. This workflow requires a MeiGen API key and purchased credits; no free attempts or daily credits apply.
+
+## Parameters
+
+| Field | Contract |
+| --- | --- |
+| `requestId` | Required UUID for a new request; retain it for exact-input recovery. |
+| `imageUrl` | Required original public HTTPS JPEG/PNG/WebP URL; no credentials, fragment or nonstandard port. Max 64 MiB / 64 MP; still images only. |
+| `mode` | crisp (default) preserves structure; creative regenerates detail in blurry images. |
+| `allowDownscale` | Default false. Set true only after the resizing tradeoff is accepted. |
+| `confirmedCredits` | Required by MCP on every call, including the first; optional for direct HTTP. Nonnegative integer from a live quote within the accepted user or workflow budget, for a pre-dispatch price check. It is not an atomic spending ceiling. Obtain the current price from the catalog. |
+
+## Request example
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "imageUrl": "https://your-public-host.example/original.png",
+  "mode": "crisp",
+  "allowDownscale": false
+}
+```
+
+Save the body as `request.json`; replace example image URLs with actual images and use a fresh UUID for a new request.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/upscale/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## Resizing and price confirmation
+
+The service prepares provider input within **4096px per edge, 16 million pixels and 10 MB**. An original above either pixel threshold returns **409 `upscale_resize_required`**, including `sourceWidth` and `sourceHeight`, before starting or charging a generation. Explain that it must be reduced, the output may be smaller than the original and clarity gains may be limited. After acceptance, submit a **new `requestId`** with the same source/mode and `allowDownscale: true`. Do not keep polling the rejected request.
+
+Use `confirmedCredits` to communicate an accepted price from `GET /api/skills?skill=upscale`. If the current preflight price exceeds it, the API returns **409 `price_changed`** with `quotedCredits` and `confirmedCredits`, without starting or charging a generation. Obtain acceptance of the new price, then use a **new `requestId`** with the accepted `confirmedCredits`. A changed parameter cannot be replayed under the original UUID. Existing jobs should be recovered instead of confirmed and submitted again.
+
+The service checks the initial price, model availability and full eligible balance **before downloading or decoding**, then checks the accepted price again **immediately before dispatch**. It is not an atomic spending ceiling or price lock: the billing transaction uses its live price, which can change between the check and charge. If a strict atomic ceiling is required, do not treat this field as one.
+
+A source image server returning 429 or 5xx is surfaced as a temporary 503. Check status first and recover with the **same requestId and original parameters** when retryable; do not create a new paid request for this network failure.
+
+For local npm files, the source limit is 64 MiB / 64 MP and encoding must fit **9,500,000 bytes without reducing pixel dimensions**. If it cannot fit, use an original public URL (up to 64 MiB / 64 MP). For attachments use `/api/skills/upload` or `upload_skill_image` with `purpose: "upscale"`; base64 remains limited to 3 MiB decoded. Static JPEG/PNG/WebP only; alpha is preserved, metadata is stripped.
+
+API image preparation requires a positive purchased-credit balance; a 402 means top up the same account before retrying. Already accepted jobs remain recoverable at zero balance. An encoding timeout is a temporary processing failure, not evidence of a corrupt image.
+
+## Result and recovery
+
+A successful submission returns `generationId`. Query `skill=upscale` for the completed image and confirmed refund status if it fails. Larger dimensions do not guarantee clearer detail.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=upscale&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

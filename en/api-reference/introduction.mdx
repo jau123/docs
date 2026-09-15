@@ -3,7 +3,7 @@ title: "REST API Overview"
 description: "Authenticate, discover models, submit asynchronous jobs, and retrieve generation results."
 ---
 
-The MeiGen API lets you generate images and videos programmatically.
+The MeiGen API lets you generate images and videos programmatically, plus [five dedicated image Skills](/en/api-reference/skills/overview). The Skills guide has its own upload, batch and requestId recovery contract; use it for those endpoints.
 
 <Tip>
   **Prefer natural language?** If you use Claude Code, Cursor, or OpenClaw, try the [MCP Server](/en/mcp/overview) for AI-native image generation without writing HTTP code.
@@ -15,7 +15,7 @@ API requests require a Bearer token. There are two authentication methods:
 
 ### API Token (Recommended)
 
-Use an API key that starts with `meigen_sk_`. Create one from your [account settings](https://www.meigen.ai) under **API Keys**.
+Use an API key that starts with `meigen_sk_`. Create one in a desktop browser on the [API Keys page](https://www.meigen.ai/profile/api-keys).
 
 ```bash
 Authorization: Bearer meigen_sk_YOUR_API_KEY
@@ -91,6 +91,7 @@ Some GET endpoints return cached responses:
 | --- | --- |
 | `GET /api/models` | 1 hour (plus stale-while-revalidate) |
 | `GET /api/images/:id` | 1 hour |
+| `GET /api/skills` | Up to 5 minutes; errors are not cached |
 | `POST` endpoints | No caching |
 
 Model list changes — a new model, a retired one, a changed default — can therefore take up to an hour to become visible. Plan your own refresh cadence accordingly.
@@ -100,6 +101,8 @@ Model list changes — a new model, a retired one, a changed default — can the
 Each generation deducts credits from your account. Image models charge per image (the amount can vary with resolution and quality); video models are billed per second or per generation, depending on the model. See the [Models](/en/features/models) page for the full per-model pricing table.
 
 ## Error Responses
+
+The table below covers general generation. For Skills, use the [code-specific recovery rules](/en/api-reference/skills/overview#billing-and-errors); a 409 or 5xx is not an instruction to automatically create a new paid request.
 
 | Status Code | Meaning |
 | --- | --- |
@@ -169,6 +172,9 @@ Errors without a `code` (such as an unsupported aspect ratio) should be handled 
 ## Endpoints
 
 <CardGroup cols={2}>
+  <Card title="Skills API" icon="wand-magic-sparkles" href="/en/api-reference/skills/overview">
+    Cutouts, details, posters, backgrounds and image enhancement.
+  </Card>
   <Card title="Generate Image" icon="wand-magic-sparkles" href="/en/api-reference/endpoint/generate">
     POST /api/generate/v2
   </Card>

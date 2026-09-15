@@ -3,7 +3,7 @@ title: "REST API 概览"
 description: "了解认证、模型发现、异步任务提交和生成结果查询。"
 ---
 
-MeiGen API 允许你以编程方式生成图片和视频。
+MeiGen API 支持以编程方式生成图片、视频，以及[五项专用图片 Skills](/zh/api-reference/skills/overview)。Skills 的上传、批次和 requestId 恢复契约独立，请查对应指南。
 
 <Tip>
   **偏好自然语言？** 如果你使用 Claude Code、Cursor 或 OpenClaw，可以试试 [MCP 服务器](/zh/mcp/overview)，无需写 HTTP 代码即可生成图片。
@@ -15,7 +15,7 @@ API 请求需要 Bearer token。有两种认证方式：
 
 ### API Token（推荐）
 
-使用以 `meigen_sk_` 开头的 API Key。在你的[账户设置](https://www.meigen.ai)中的 **API Keys** 下创建。
+使用以 `meigen_sk_` 开头的 API Key。用桌面浏览器在 [API Keys](https://www.meigen.ai/profile/api-keys) 创建。
 
 ```bash
 Authorization: Bearer meigen_sk_YOUR_API_KEY
@@ -91,6 +91,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | --- | --- |
 | `GET /api/models` | 1 小时（另有 stale-while-revalidate）|
 | `GET /api/images/:id` | 1 小时 |
+| `GET /api/skills` | 最多 5 分钟；错误不缓存 |
 | `POST` 端点 | 无缓存 |
 
 因此模型清单的变更——上新、下线、切换默认模型——最长可能 1 小时后才可见，请据此设计自己的刷新节奏。
@@ -100,6 +101,8 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 每次生成会从账户扣除积分。图片模型按张计费（单价可能随分辨率与画质变化）；视频模型按秒或按次计费，取决于具体模型。各模型完整定价表见[模型](/zh/features/models)页面。
 
 ## 错误响应
+
+以下表格面向通用生成。Skills 请遵守[按 code 区分的恢复规则](/zh/api-reference/skills/overview#计费与错误处理)，409 或 5xx 不代表应自动新建付费请求。
 
 | 状态码 | 含义 |
 | --- | --- |
@@ -169,6 +172,9 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 ## 端点
 
 <CardGroup cols={2}>
+  <Card title="Skills API" icon="wand-magic-sparkles" href="/zh/api-reference/skills/overview">
+    抠图、详情图、海报、背景与图片增强。
+  </Card>
   <Card title="生成图片" icon="wand-magic-sparkles" href="/zh/api-reference/endpoint/generate">
     POST /api/generate/v2
   </Card>

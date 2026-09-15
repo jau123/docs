@@ -3,7 +3,7 @@ title: "API Token"
 description: "在 MeiGen 账户后台创建和管理 API Token"
 ---
 
-前往 [meigen.ai → 设置 → API Keys](https://www.meigen.ai) 创建和撤销 Token。每个账号最多同时拥有 5 个活跃 Token。
+前往 [API Keys](https://www.meigen.ai/profile/api-keys)（桌面浏览器） 创建和撤销 Token。每个账号最多同时拥有 5 个活跃 Token。
 
 Token 格式：`meigen_sk_` 后接 32 个字符。完整值仅在创建时显示一次，请立即复制。
 
@@ -23,3 +23,5 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 <Warning>
   **API Token 只能消耗购买积分。** 每日免费积分不可用于 API 调用。
 </Warning>
+
+用 Key 所属账号在[个人主页](https://www.meigen.ai/profile)点击**充值**，或使用[移动充值页](https://www.meigen.ai/m/premium)。API Skills 不提供免费次数，抠图也一样。Key 私密保存，不发到聊天、URL 或共享文件。[Skills 认证与恢复](/zh/api-reference/skills/overview)中的 `check_skill` 必须使用原 Key。

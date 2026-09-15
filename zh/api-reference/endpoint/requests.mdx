@@ -1,0 +1,47 @@
+---
+title: "恢复生成请求"
+description: "用持久化 UUID 查询普通图片／视频尝试，不创建重复任务。"
+---
+
+```text
+GET /api/generate/v2/requests/{requestId}
+```
+
+`requestId` 是 [POST /api/generate/v2](/zh/api-reference/endpoint/generate) 中传入的 UUID `idempotencyKey`，不同于返回的 `generationId`。此接口需要鉴权，只读且不会派发生成。所属账号的任一有效 API Key 都可恢复其 API Token 尝试，包括宿主重启或更换 Key 后；不能将 Web session 免费积分任务转入 API Token 账务。
+
+提交前先将 UUID 与精确输入保存在持久化工作流状态中。提交响应丢失时查询原 UUID，不能新建。MCP 通过 `check_generation(requestId=...)` 包装此接口并添加统一结构化结果；下文原生 HTTP body 是回执，不是 MCP envelope。
+
+## 请求
+
+从保存的步骤读取 `REQUEST_ID`，Token 只放在私有环境或凭据设置中：
+
+```bash
+curl --fail-with-body --silent --show-error \
+  "https://www.meigen.ai/api/generate/v2/requests/$REQUEST_ID" \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```
+
+## 回执与恢复状态
+
+HTTP 200 可包含 `success`、`requestId`、`generationId`、`deduped`、`status`（`processing`、`completed`、`failed`）、`modelId`、`creditsUsed`、`creditsStatus`、`aspectRatio`、`mediaType`、`imageUrl`、`imageUrls`、`videoUrl`、`error` 和 `failureCode`，实际字段取决于任务状态。只有完成后的媒体 URL 才是可用结果；退款须依据 `creditsStatus`，不能只看一般错误文案。
+
+| HTTP／code | 含义与下一步 |
+| --- | --- |
+| 200／processing | 原任务正在运行。保存句柄，继续查询状态。 |
+| 503／`in_progress` | 存在提交占位。遵循 `retryAfterSeconds`；为 0 时可以用原 ID 和相同参数重交，此 GET 本身没有提交任何生成。 |
+| 404／`request_not_found` | 核实账号和保存的 ID。首次提交中断可沿用该 ID 和精确参数重交。 |
+| 503／`request_interrupted` | 查询／恢复状态暂时不明确。等待后重查，不能创建替代 ID。 |
+| 402／积分不足 | 未产生生成扣费。给所属账号充值后，在已批准范围内用原 ID 和相同参数重新提交；只轮询不会重启任务。 |
+| 400／输入无效 | 有意修正输入；改变参数需要新的已授权尝试和 ID。 |
+| 409／`idempotency_conflict` 或 `request_id_collision` | 不能自动换 ID 绕过冲突。核对原尝试、预期参数和账务上下文。 |
+| 410／`generation_unavailable` | 原生成已删除或不可用；不能复用此 ID 创建其它任务。 |
+
+其它已保存的扣费前拒绝可能保留原 HTTP 状态。遵循具体错误，不要无限查询已拒绝请求。实际 `Retry-After`／重试时间是权威依据。
+
+此行为用于普通图片／视频生成。五项 [Skills API](/zh/api-reference/skills/overview) 仍有各自的原 Key 回执和 `check_skill` 恢复规则，包括被拒绝付款尝试的不同处理方式。
+
+## 参数一致性与旧任务
+
+新的 API Token 尝试在应用默认值之前比对调用参数：对象字段顺序不影响结果，其它值必须一致。改变模型、提示词、图片 URL、时长或质量不属于原参数重试。保存已解析的参考图 URL，避免恢复时把未改变的素材重新上传成另一个 URL。
+
+旧任务可能没有完整原始输入指纹。兼容查询可以恢复它们，但无法追溯证明每次历史参数是否一致。新的逻辑尝试应持久化独立 UUID。预算和调度边界参见 [N 个脚本 → 首帧 → 视频](/zh/mcp/composable-workflows)。

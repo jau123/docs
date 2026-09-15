@@ -1,0 +1,65 @@
+---
+title: "图片增强"
+description: "增强静态图片，并明确处理缩图和价格确认。"
+---
+
+`POST https://www.meigen.ai/api/skills/upscale/run`
+
+MCP: `upscale_image`
+
+必须提供一张原始静态图片，模式可选。直接使用原图 URL，不先通过参考图上传缩小。本接口只开放图片增强，Web 视频增强和 AI 扩图不在 API 范围内。每个接收的请求生成一张付费图。
+
+提交前先阅读[通用认证、上传与恢复指南](/zh/api-reference/skills/overview)。此工作流需要 MeiGen API Key 和购买积分，不提供免费次数或每日积分。
+
+## 参数
+
+| 字段 | 契约 |
+| --- | --- |
+| `requestId` | 必填，新请求使用 UUID；精确参数恢复时保留原值。 |
+| `imageUrl` | 必填，原始公开 HTTPS JPEG/PNG/WebP URL，不含凭据、片段或非标准端口；最多 64 MiB / 6400 万像素，仅静态图片。 |
+| `mode` | crisp（默认）保留结构；creative 为模糊图片重建细节。 |
+| `allowDownscale` | 默认 false，仅在用户接受缩图取舍后设为 true。 |
+| `confirmedCredits` | MCP 每次调用均必填（含首次），直接 HTTP 可选。非负整数，来自用户或上层工作流已接受预算内的实时报价，用于派发前查价，不是原子扣费上限；当前价格从目录获取。 |
+
+## 请求示例
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "imageUrl": "https://your-public-host.example/original.png",
+  "mode": "crisp",
+  "allowDownscale": false
+}
+```
+
+将请求体保存为 `request.json`，把示例图片 URL 换为真实素材，新请求使用新的 UUID。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/upscale/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## 缩图与价格确认
+
+服务端准备的供应商输入须在**每边 4096px、1600 万像素、10 MB**以内。原图超过任一像素阈值时，在开始生成和扣点前返回 **409 `upscale_resize_required`**，包含 `sourceWidth`、`sourceHeight`。需要说明必须缩小，输出可能小于原图、清晰度提升也可能有限。接受后，以**新的 `requestId`**、相同原图/模式和 `allowDownscale: true` 提交，不要持续轮询被拒绝的请求。
+
+用 `confirmedCredits` 表达从 `GET /api/skills?skill=upscale` 查询并已接受的价格。若预检实时价格超过此值，接口在开始生成和扣点前返回 **409 `price_changed`**，包含 `quotedCredits` 和 `confirmedCredits`。确认接受新价格后，以**新的 `requestId`** 和已接受的 `confirmedCredits` 提交。参数变化不能沿用原 UUID 回放；已存在的任务应优先恢复，不要重新确认后再建单。
+
+服务端在**下载和解码前**检查初始报价、模型可用性和足额的可用积分，并在**预处理后、派发前**再次查价，不是原子消费上限或价格锁定：账本事务按实时价格扣费，查价与扣费之间仍可能变价。需要严格原子消费上限的客户端不能把此字段当作该保证。
+
+原图服务返回 429 或 5xx 时，本接口返回临时 503。先查状态，允许恢复时使用**原 requestId 和原参数**重试，不因该网络失败新建付费请求。
+
+本地 npm 文件的源限制为 64 MiB / 6400 万像素，编码必须在**不缩小像素尺寸**的前提下不超过 **9,500,000 字节**，否则使用原始公开 URL（最多 64 MiB / 6400 万像素）。附件通过 `/api/skills/upload` 或 `upload_skill_image` 发送，并设 `purpose: "upscale"`；base64 仍限解码后 3 MiB。只接受静态 JPEG/PNG/WebP，保留透明通道，去除元数据。
+
+API 图片预处理要求购买积分余额大于零；402 时先为同一账号充值再重试。已受理的任务在零余额时仍可恢复。编码超时属于临时处理失败，不代表原图损坏。
+
+## 结果与恢复
+
+提交成功返回 `generationId`。用 `skill=upscale` 查询完成图片，失败时核对退款状态。像素尺寸更大不保证内容细节更清晰。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=upscale&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

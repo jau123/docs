@@ -9,11 +9,35 @@ description: "连接 AI 助手，生成图片与视频、搜索画廊，并使�
   查看源代码、报告问题和贡献代码。
 </Card>
 
+## 作为上层工作流的工具
+
+保留上层脚本、提示词、模型／供应商、数量和已批准预算，创意助手可选。使用持久化 UUID `requestId`、`wait: false`、结构化结果及 `check_generation` 提交首帧／视频并恢复，无需逐步重复审批。有限并发调度、预览和下载由上层负责。详见[完整工作流合同与示例](/zh/mcp/composable-workflows)。
+
 ## 什么是 MCP？
 
-Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外部工具。当你将 MeiGen 安装为 MCP 服务器后，你的 AI 助手就能通过自然语言生成图片和视频、对 MeiGen 社区提示词画廊做语义搜索、增强提示词。搜索、灵感和提示词增强无需 API Key；插件还内置了一套提示词库，离线时搜索依然可用。
+Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外部工具。当你将 MeiGen 安装为 MCP 服务器后，你的 AI 助手就能通过自然语言生成图片和视频、对 MeiGen 社区提示词画廊做语义搜索、增强提示词。搜索、灵感和提示词增强无需 API Key；本地 npm 包内置提示词库，可作离线搜索回退；远程连接需要网络。
 
 ---
+
+## 五项专用图片工作流
+
+用自然语言要求抠图、商品详情图、营销海报、换背景或图片增强。Agent 应先读取 `list_skills`，准备真实材料，调用对应工具，再用 `check_skill` 查询结果；UUID 由 Agent 自行生成。已经指定的数量和质量就是你的指令，仅未定范围或 Upscale 警告需要进一步决定。
+
+| 工作流 | 必需材料 | 可选材料 | 输出 |
+| --- | --- | --- | --- |
+| 透明抠图 | 一张原图 | 无 | 一张透明 PNG |
+| 商品详情图 | 一张商品图及已选择的模块/数量 | 商品名、核实的卖点、Logo、模特图、两张额外角度图 | 1–6 张付费图 |
+| 营销海报 | 品牌、活动或主题 | 文案、Logo、三张商品图、风格参考图 | 一张付费海报 |
+| AI 换背景 | 一张商品图 | 模式；自定义模式必须提供背景描述 | 一张付费图 |
+| 图片增强 | 一张原始静态 JPEG/PNG/WebP | 清晰或创意模式 | 一张付费增强图 |
+
+Skills 只用购买积分，不提供免费次数或每日积分。BYOK/ComfyUI 不提供这些工作流。详见[完整 Skills API 与素材指南](/zh/api-reference/skills/overview)。
+
+海报的画面文案放在 `content`，设计要求放在 `extraNotes` 或 `customStyle`。`autoCopy: false` 忠实使用原文，选定语言仍可要求翻译。参见[海报字段用途与完整 MCP 调用示例](/zh/api-reference/skills/marketing-poster#mcp-调用示例)。
+
+## 选择连接
+
+使用 MeiGen Cloud 优先选择[远程 MCP](/zh/mcp/remote)：无需本地 npm 进程，通过无状态 Streamable HTTP 接入；服务端更新需要后端部署，客户端刷新工具后可用。需要自动读取本地文件、本地偏好、提示词增强或 ComfyUI 时选[本地 npm](/zh/mcp/setup)。Claude 插件的命令、Agent 和 Hook 是独立分发的附加功能，添加远程 URL 不会安装它们。
 
 ## 提供商
 
@@ -43,19 +67,26 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 
 ## 工具
 
-大部分 MCP 工具无需配置提供商即可使用：
+远程 Streamable HTTP 提供 **14 个工具**，本地 npm 提供 **17 个工具**。以下 14 个工具两种连接都有：
 
-| 工具 | 描述 | 需要提供商？ |
+| 工具 | 用途 | MeiGen Key |
 | --- | --- | --- |
-| **generate_image** | 使用任意已配置的提供商生成图片 | 是 |
-| **generate_video** | 通过 MeiGen 平台生成视频 — 支持文生视频、首/末帧图生视频，以及参考视频续写 | 是(MeiGen) |
-| **check_generation** | 按 ID 查询异步生成任务的状态 — 连接中断后续查进度，无需重新提交 | 是(MeiGen) |
-| **enhance_prompt** | 将简短的想法转化为详细、专业的提示词 | 否 |
-| **search_gallery** | 对 MeiGen 社区提示词画廊做语义搜索，带图片预览 — 搜索 API 不可达时回落到插件内置的离线提示词库 | 否 |
-| **get_inspiration** | 获取画廊条目的完整提示词和图片 | 否 |
-| **list_models** | 列出所有已配置提供商的可用模型 | 否 |
-| **manage_preferences** | 保存默认项（风格、宽高比、模型、提供商、自由文本风格备注）以及收藏的提示词 | 否 |
-| **comfyui_workflow** | 导入、查看、修改和删除 ComfyUI 工作流模板 | 否 |
+| `generate_image` | 通用图片生成，本地可使用已配置的后端 | MeiGen Cloud 需要 |
+| `generate_video` | MeiGen Cloud 视频生成 | 是 |
+| `check_generation` | 按 generationId 或 requestId 查询／恢复 | 按请求 ID 查询需要同账号 Key |
+| `list_models` | 当前模型与能力 | 否 |
+| `search_gallery` | 搜索公开提示词和图片预览 | 否 |
+| `get_inspiration` | 读取公开画廊条目 | 否 |
+| `list_skills` | 五项工作流、材料、实时价格和输入参数 | 否 |
+| `upload_skill_image` | 准备真实图片 URL 或附件字节 | 是 |
+| `remove_background` | 一张透明抠图 | 是 |
+| `generate_product_detail_images` | 1–6 张付费商品模块图 | 是 |
+| `generate_marketing_poster` | 一张营销海报 | 是 |
+| `generate_ai_background` | 一张纯白、智能或自定义背景图 | 是 |
+| `upscale_image` | 增强一张原始静态图片 | 是 |
+| `check_skill` | 私有 Skill 回执、模块状态和恢复 | 是，同一个Key |
+
+本地另有 `enhance_prompt`、`manage_preferences`、`comfyui_workflow`，它们不要求 MeiGen Key。本地画廊搜索可回退到内置提示词库，远程访问需要网络。多提供商配置适用于通用生成，所有专用 Skill 都需要 MeiGen Cloud 凭据和购买积分。远程 `check_generation` 按已知 generationId 公开查询；按 requestId 恢复需要所属账号的有效 Key。`check_skill` 必须使用原 API Key。
 
 <Note>
   视频能力因模型而异 — 画质档位、可选时长与分辨率、音频、参考视频续写，以及是否必须提供首帧图。部分模型仅支持图生视频。当前清单用 `list_models` 查，或见[模型对比](/zh/features/models)。
@@ -80,19 +111,19 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
     从插件市场安装 — 包含斜杠命令、智能 Agent 和自动化 Hook。
   </Card>
   <Card title="Cursor / VS Code / Windsurf / Roo Code" icon="window">
-    一行命令 `npx meigen init <host>` 为每个编辑器写好 MCP 配置文件。
+    一行命令 `npx -y meigen@2.0.0 init <host>` 为每个编辑器写好 MCP 配置文件。
   </Card>
   <Card title="OpenAI Codex CLI" icon="terminal">
-    将 MCP server 加到 `~/.codex/config.toml`。标准 stdio MCP,无额外管道。
+    使用 bearer_token_env_var 连接远程 HTTP，或配置本地 stdio 进程；两种方式见安装指南。
   </Card>
   <Card title="Hermes Agent" icon="robot">
     原生支持 MCP — 加到 `~/.hermes/config.yaml`,视频生成需 `timeout: 2700`。
   </Card>
   <Card title="OpenClaw" icon="puzzle-piece">
-    从 [ClawHub](https://clawhub.ai/plugins/meigen-ai-design) 安装插件 — 包含技能、命令和 MCP 服务器。
+    从 [ClawHub](https://clawhub.ai/plugins/meigen-ai-design) 安装插件 — 检查已安装 bundle 的清单，并只配置一次 MCP 连接。
   </Card>
   <Card title="任意 MCP 客户端" icon="plug">
-    标准 stdio MCP — 任意 MCP 兼容客户端指向 `npx -y meigen@latest` 即可。
+    标准 stdio MCP — 任意 MCP 兼容客户端指向 `npx -y meigen@2.0.0` 即可。
   </Card>
 </CardGroup>
 
@@ -104,11 +135,11 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 
 ```bash
 export MEIGEN_API_TOKEN=meigen_sk_...
-npx meigen gen --prompt "阳光厨房里的三花猫"
-npx meigen gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
+npx -y meigen@2.0.0 gen --prompt "阳光厨房里的三花猫"
+npx -y meigen@2.0.0 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
 ```
 
-`--json` 输出机器可读、`--no-wait` 仅提交不轮询、`--reference <path|url>` 传参考图。完整参数 `npx meigen gen --help`。
+`--json` 输出机器可读、`--no-wait` 仅提交不轮询、`--reference <path|url>` 传参考图。完整参数 `npx -y meigen@2.0.0 gen --help`。
 
 ---
 
@@ -128,3 +159,5 @@ npx meigen gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
     不用 MCP？通过 REST API 直接集成。
   </Card>
 </CardGroup>
+
+`upload_skill_image` 要求购买积分余额大于零，上传本身不扣生成积分。Upscale 附件设置 `purpose: "upscale"`。`upscale_image` 的每次 MCP 调用（含首次）都需要 `confirmedCredits`，取自 `list_skills` 的实时报价，且符合用户或上层工作流已接受的预算；已有明确授权可复用。

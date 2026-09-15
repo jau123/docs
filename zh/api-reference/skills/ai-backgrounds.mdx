@@ -1,0 +1,54 @@
+---
+title: "AI 换背景"
+description: "为商品制作纯白、智能选择或自定义背景。"
+---
+
+`POST https://www.meigen.ai/api/skills/white-bg/run`
+
+MCP: `generate_ai_background`
+
+必须提供一张商品图。纯白模式使用固定规格；智能模式选择合适场景；自定义模式遵循你的背景描述。一次生成一张付费图片，不是透明抠图，三种模式的价格可能不同。
+
+提交前先阅读[通用认证、上传与恢复指南](/zh/api-reference/skills/overview)。此工作流需要 MeiGen API Key 和购买积分，不提供免费次数或每日积分。
+
+## 参数
+
+| 字段 | 契约 |
+| --- | --- |
+| `requestId` | 必填，新请求使用 UUID；精确参数恢复时保留原值。 |
+| `productImage` | 必填，已准备的商品图。 |
+| `mode` | white、smart（默认）或 custom。 |
+| `customPrompt` | custom 模式必填，去空格后最多 300 字，描述背景、光线和场景。 |
+| `ratio` | 仅智能/自定义模式，默认 auto，其他支持值查询 inputSchema；纯白模式忽略。 |
+| `quality` | 仅智能/自定义模式：fast（1K，默认）或 hd（2K）；纯白模式忽略。 |
+
+## 请求示例
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "productImage": "https://images.meigen.ai/uploads/product.png",
+  "mode": "custom",
+  "customPrompt": "Soft daylight on a pale stone counter",
+  "ratio": "auto",
+  "quality": "fast"
+}
+```
+
+将请求体保存为 `request.json`，把示例图片 URL 换为真实素材，新请求使用新的 UUID。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/white-bg/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## 结果与恢复
+
+提交成功返回 `generationId`，用 `skill=white-bg` 查询并展示完成结果；需要透明背景时改用独立抠图接口。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=white-bg&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

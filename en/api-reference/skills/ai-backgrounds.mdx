@@ -1,0 +1,54 @@
+---
+title: "AI Backgrounds"
+description: "Create a white, automatically chosen or custom product background."
+---
+
+`POST https://www.meigen.ai/api/skills/white-bg/run`
+
+MCP: `generate_ai_background`
+
+One product photo is required. White mode creates a fixed-specification white background; smart selects a suitable scene; custom follows your background brief. This produces one paid image, not a transparent cutout. The three modes may have different prices.
+
+Use the [shared authentication, upload and recovery guide](/en/api-reference/skills/overview) before submitting. This workflow requires a MeiGen API key and purchased credits; no free attempts or daily credits apply.
+
+## Parameters
+
+| Field | Contract |
+| --- | --- |
+| `requestId` | Required UUID for a new request; retain it for exact-input recovery. |
+| `productImage` | Required prepared product photo. |
+| `mode` | white, smart (default), or custom. |
+| `customPrompt` | Required in custom mode, max 300 trimmed characters. Describe the background, lighting and setting. |
+| `ratio` | Smart/custom only. Default auto; other supported values from inputSchema. Ignored in white mode. |
+| `quality` | Smart/custom only: fast (1K, default) or hd (2K). Ignored in white mode. |
+
+## Request example
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "productImage": "https://images.meigen.ai/uploads/product.png",
+  "mode": "custom",
+  "customPrompt": "Soft daylight on a pale stone counter",
+  "ratio": "auto",
+  "quality": "fast"
+}
+```
+
+Save the body as `request.json`; replace example image URLs with actual images and use a fresh UUID for a new request.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/white-bg/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## Result and recovery
+
+A successful submission returns `generationId`. Query `skill=white-bg` and show the completed result. Use the separate cutout endpoint when transparency is required.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=white-bg&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

@@ -1,0 +1,47 @@
+---
+title: "Recover a Generation Request"
+description: "Look up an ordinary image/video attempt by its persisted UUID without creating another job."
+---
+
+```text
+GET /api/generate/v2/requests/{requestId}
+```
+
+`requestId` is the UUID sent as `idempotencyKey` in [POST /api/generate/v2](/en/api-reference/endpoint/generate). It is different from the returned `generationId`. This authenticated read-only endpoint never dispatches generation. Any active API key belonging to the same owning account can recover an API-token attempt, including after a host restart or key replacement. It cannot adopt a Web-session free-credit task into API-token billing.
+
+Keep the UUID and exact input in durable workflow state before submitting. If the submission response is lost, look up that UUID; do not allocate a fresh one. MCP wraps this endpoint with `check_generation(requestId=...)` and adds its common structured envelope. The native HTTP body below is a receipt, not the MCP envelope.
+
+## Request
+
+Set `REQUEST_ID` from the saved workflow step and keep the token in private environment/credential settings:
+
+```bash
+curl --fail-with-body --silent --show-error \
+  "https://www.meigen.ai/api/generate/v2/requests/$REQUEST_ID" \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```
+
+## Receipt and recovery states
+
+HTTP 200 can include `success`, `requestId`, `generationId`, `deduped`, `status` (`processing`, `completed`, `failed`), `modelId`, `creditsUsed`, `creditsStatus`, `aspectRatio`, `mediaType`, `imageUrl`, `imageUrls`, `videoUrl`, `error` and `failureCode`. Availability depends on the job state. Only completed media URLs are usable artifacts. Confirm refunds from `creditsStatus`, not a generic failure message.
+
+| HTTP / code | Meaning and next step |
+| --- | --- |
+| 200 / processing | Existing job is running. Preserve its handle and continue status observation. |
+| 503 / `in_progress` | Submission reservation still exists. Follow `retryAfterSeconds`. A value of 0 permits retrying the original ID and identical inputs; this GET has not submitted anything. |
+| 404 / `request_not_found` | Verify the account and saved ID. An interrupted first submission can be retried with that same ID and exact inputs. |
+| 503 / `request_interrupted` | Read/recovery state is temporarily uncertain. Query again after waiting; never create a replacement ID. |
+| 402 / insufficient credits | No generation was charged. Top up the owning account, then resubmit the same ID and identical inputs within the approved scope. Polling alone will not restart it. |
+| 400 / invalid input | Correct inputs intentionally. Changed parameters require a new authorized attempt and ID. |
+| 409 / `idempotency_conflict` or `request_id_collision` | Do not bypass the conflict with a new ID automatically. Inspect the original attempt and intended inputs/billing context. |
+| 410 / `generation_unavailable` | The original generation is unavailable or deleted. This ID cannot be reused to create another job. |
+
+Other saved pre-charge rejections can retain their original HTTP status. Follow the specific error rather than polling a rejected request indefinitely. Real `Retry-After`/retry timing remains authoritative.
+
+This behavior is for ordinary image/video generation. The five [Skills APIs](/en/api-reference/skills/overview) retain their own original-key receipts and `check_skill` recovery rules, including their different handling of a rejected payment attempt.
+
+## Input consistency and legacy requests
+
+New API-token attempts compare caller inputs before defaults: object-key order does not matter, but other values must match. A changed model, prompt, image URL, duration or quality is not a retry of the same inputs. Persist resolved reference URLs so an unchanged source is not re-uploaded under a different URL during recovery.
+
+Legacy jobs may not contain the full original input fingerprint. Compatibility lookup can recover them, but cannot retroactively prove every historical parameter match. Use a persistent UUID for each new logical attempt. See [N scripts → frames → videos](/en/mcp/composable-workflows) for budget and scheduling boundaries.

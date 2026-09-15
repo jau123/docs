@@ -1,0 +1,46 @@
+---
+title: "Remove Background"
+description: "Create a transparent PNG cutout from one source image."
+---
+
+`POST https://www.meigen.ai/api/skills/remove-bg/run`
+
+MCP: `remove_background`
+
+Provide one image with a clearly visible subject. There are no optional creative fields. This removes the background; use AI Backgrounds to create a white or generated scene. One paid result, including the first request.
+
+Use the [shared authentication, upload and recovery guide](/en/api-reference/skills/overview) before submitting. This workflow requires a MeiGen API key and purchased credits; no free attempts or daily credits apply.
+
+## Parameters
+
+| Field | Contract |
+| --- | --- |
+| `requestId` | Required UUID for a new request; retain it for exact-input recovery. |
+| `productImage` | Required prepared image URL. No prompt is needed. |
+
+## Request example
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "productImage": "https://images.meigen.ai/uploads/product.png"
+}
+```
+
+Save the body as `request.json`; replace example image URLs with actual images and use a fresh UUID for a new request.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/remove-bg/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## Result and recovery
+
+Normally returns `success: true`, `imageUrl` and `charged` synchronously. Download the transparent PNG. After an interrupted submission, recover with `skill=remove-bg`; do not assume that a missing response means no charge.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=remove-bg&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

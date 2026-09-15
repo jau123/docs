@@ -1,0 +1,129 @@
+---
+title: "Skills API"
+description: "Authentication, image preparation, live pricing and safe recovery for five image workflows."
+---
+
+Use dedicated workflows for [transparent cutouts](/en/api-reference/skills/remove-background), [product detail images](/en/api-reference/skills/product-detail), [marketing posters](/en/api-reference/skills/marketing-poster), [AI backgrounds](/en/api-reference/skills/ai-backgrounds), and [image enhancement](/en/api-reference/skills/upscale). These APIs use MeiGen Cloud; BYOK and ComfyUI cannot replace the MeiGen credential. Video enhancement and AI Expand are not exposed by this Skills API.
+
+## 1. Prepare your account
+
+Create a key in a desktop browser at [API Keys](https://www.meigen.ai/profile/api-keys). In the **same account**, open [Profile](https://www.meigen.ai/profile) and choose **Top Up**; mobile purchases use the [premium page](https://www.meigen.ai/m/premium). Key creation is not available in the mobile interface.
+
+All Skill generation spends **purchased credits (`purchased_credits`) only**, including the first cutout. There are no API free attempts or daily free credits. The [model comparison](https://www.meigen.ai/model-comparison) lists prices; it is not the checkout page.
+
+Keep your key in private local configuration or a secret store. The examples read `MEIGEN_API_TOKEN` from your local environment; do not paste the secret into a conversation, URL or committed file.
+
+| Endpoint | Authentication | Purpose |
+| --- | --- | --- |
+| `GET /api/skills` | Public | Current schemas, prices, materials and workflow guidance |
+| `POST /api/skills/upload` | Bearer API key | Prepare an image without starting generation |
+| `POST /api/skills/{skill}/run` | Bearer API key | Submit a paid workflow |
+| `GET /api/skills/status?skill=...&requestId=...` | Same API key as submission | Recover the receipt and query results |
+
+Request bodies are JSON. Each `/run` body is limited to **32 KiB**, rejects unknown fields and requires a UUID `requestId`. Upload has its own limits below. Skill IDs are `remove-bg`, `product-detail`, `brand-poster`, `white-bg`, and `upscale`.
+
+## 2. Discover the current contract
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills'
+curl -sS 'https://www.meigen.ai/api/skills?skill=product-detail'
+```
+
+Each entry supplies `endpoint`, `tool`, `materials`, `pricing`, `maxOutputImages` and `inputSchema`. Use these live values for enums and prices; a missing/null price means unavailable, not free. Successful catalogs may be cached for up to five minutes; errors are not cached. Cross-field rules are also enforced by the server.
+
+**HTTP and MCP differ for Product Detail:** direct HTTP defaults to three paid modules when `modules` is omitted. MCP requires an explicit `modules` field. Send the intended modules explicitly in either integration.
+
+For Upscale, both MCP transports require `confirmedCredits` on the initial call as well as retries, from the live quote within the accepted user or upstream workflow budget. Direct HTTP keeps it optional.
+
+## 3. Prepare images
+
+For cutouts, details, posters and backgrounds, all image fields accept only HTTPS URLs on `images.meigen.ai`, `images.meigen.art` or `pbs.twimg.com`, without credentials or a nonstandard port. Upload other sources first and use the returned `imageUrl`.
+
+**Upscale is different:** pass the original public JPEG/PNG/WebP URL directly to `/api/skills/upscale/run`. Do not shrink it through the ordinary reference-image upload first. For attachment bytes, upload with `purpose: "upscale"` to preserve dimensions.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/upload' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"sourceUrl":"https://your-public-host.example/product.png","purpose":"reference"}'
+```
+
+Replace the example URL with an actual directly downloadable image. The response includes `success`, `imageUrl`, `width`, `height` and `firstFrameOnly`. Store `imageUrl` and reuse it for the original request's recovery.
+
+| Field or path | Contract |
+| --- | --- |
+| `sourceUrl` | Public HTTPS image file; no cookies, credentials, redirects or private-network targets; public IPv4 connectivity required |
+| `imageBase64` | Actual raw base64 image bytes, no `data:` prefix; at most 3 MiB decoded |
+| Input choice | Exactly one of `sourceUrl` or `imageBase64` |
+| `purpose` | `reference` by default; `upscale` preserves pixel dimensions |
+| Reference source | At most 8 MiB / 64 million pixels; PNG, JPEG, WebP or GIF |
+| Prepared reference | Longest edge at most 4096px, at most 8 MiB; transparent pixels preserved; animated input uses its first frame |
+| Upscale source URL | Still JPEG/PNG/WebP, at most 64 MiB / 64 million pixels; no animation |
+| Local npm reference file | At most 32 MiB / 64 million pixels before preparation |
+| Local npm Upscale file | At most 64 MiB / 64 million pixels as a source; output transport must fit 9,500,000 bytes without resizing. If it cannot, use the original public URL |
+
+Temporary source-server 429/5xx responses surface as 503. Retry an upload after waiting; if the failure happened during Upscale submission, recover that submission with its original UUID and parameters.
+
+Uploads decode and re-encode images, remove metadata and preserve alpha where supported. Remote preparation requires a positive purchased-credit balance, checked before reading the body or processing images. Uploading does not create a generation or spend generation credits. For an upload 402, top up the same account and retry the same upload; there is no generation to poll. It is subject to a separate **1,000 upload requests per user per day** protection limit. An upload failure has no Skill receipt: fix or retry the upload rather than polling `/skills/status`.
+
+Hosts must be able to read actual attachment bytes or access the URL. Never invent a path, URL or base64 value. Upload URLs are not an archival storage promise: save your original and downloaded results.
+
+## 4. Submit and retain the request
+
+Each workflow page includes a request body. Generate a fresh UUID for a **new paid request** and save that UUID, the exact JSON body and the resulting job IDs before moving on. The example UUIDs are illustrative; do not reuse them for unrelated work.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/product-detail/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+Cutout normally returns `imageUrl` synchronously. Other workflows return `generationId` or Product Detail `items`; a successful submission is **not proof that rendering has completed**.
+
+## 5. Query and recover
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=product-detail&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```
+
+Use the original API key, Skill ID and UUID. Receipts are isolated by account and token; another key on the same account cannot read the receipt. Recommended polling interval is **10 seconds**.
+
+| Field | Meaning |
+| --- | --- |
+| `status` | `processing`, `completed`, `partial` or `failed` |
+| `submissionStatus` | Receipt state; distinct from rendering status |
+| `submission`, `submissionHttpStatus` | Original submission response and HTTP status |
+| `items[]` | Per-job `generationId`, `module`, `status`, `imageUrls`, `error`, `creditsUsed`, `creditsStatus` |
+| `retryable`, `retryParameters` | When recovery is allowed, exact original parameters and uploaded URLs to resubmit |
+
+Stop ordinary polling at a terminal result. Show completed images and explain failed/missing modules individually. Refunds must be read from `creditsStatus`; neither an HTTP failure nor a missing image alone proves a refund.
+
+After a disconnect or 5xx, **check first**. Retry only the same `requestId` and normalized inputs if recovery is allowed. Do not re-upload and silently substitute a new URL. A repeat of a recorded submission returns its existing result without another dispatch. Interrupted workers may hold a lease for about **330 seconds**; `409 in_progress` returns the remaining `retryAfterSeconds` for resubmission, while status checks can continue at the normal interval.
+
+A partial batch is recovered as-is; missing modules are not automatically generated again. A replacement batch or a new attempt after failure can charge again and requires intent to retry. A refunded cutout may also create a new paid attempt on retry.
+
+## Billing and errors
+
+Product Detail produces 1–6 images and reserves credits per accepted module; other workflows produce one image. Calculate the requested batch total using its current per-image price. Provider failures follow the existing credit ledger and refund rules.
+
+There is a **1,000 API requests per user, per Skill, per day** protection limit, in addition to any workflow limits. This is not a free allowance and purchasing credits does not remove it. Discovery and status do not spend generation credits; replaying a completed receipt does not consume another dispatch allowance.
+
+| Response | Action |
+| --- | --- |
+| 400 / 413 / 422 | Fix the input or source size. If the rejection includes a stored receipt (`batchId`), changed inputs require a new UUID |
+| 401 / 403 | Configure an active MeiGen key in the intended account; do not poll a rejected submission |
+| 402 | Top up the key owner's purchased balance; submit a new request only when you want to continue |
+| 409 `in_progress` | Check status; honor the remaining lease before resubmission |
+| 409 `idempotency_conflict` | Restore the original parameters and recover that request; do not automatically make a new paid request |
+| 409 `request_id_collision` | No Skill job was started for this rejected ID; use a new UUID without polling it |
+| 409 `upscale_resize_required` | Confirm the resizing tradeoff, then use a new UUID with `allowDownscale: true` |
+| 409 `price_changed` | Explain `quotedCredits`, obtain acceptance, then use a new UUID and accepted `confirmedCredits` |
+| 429 | Wait for the relevant limit; it is not a credit shortage |
+| 5xx / `request_interrupted` | The submission may have created jobs; check the original receipt before retrying |
+| Status 404 | Verify the original key, Skill and UUID. For an interrupted first submission, retry the original body and UUID |
+
+MCP adds a `nextAction` instruction to these results. Direct HTTP clients implement the same flow using the status/code and fields above; do not expect MCP-only `nextAction` or resource-link content in the HTTP response.
+
+A known accepted job that is no longer available returns **410 `generation_unavailable`** and its saved job ID. Stop polling; do not automatically resubmit or create a paid replacement. Missing records do not prove a refund. Partial batches retain available results and identify missing records separately.

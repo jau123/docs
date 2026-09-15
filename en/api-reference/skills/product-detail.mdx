@@ -1,0 +1,64 @@
+---
+title: "Product Detail Images"
+description: "Create one to six coordinated listing images with explicit modules."
+---
+
+`POST https://www.meigen.ai/api/skills/product-detail/run`
+
+MCP: `generate_product_detail_images`
+
+One actual product photo is required. Product name, verified selling points, logo, model photo and extra angles are optional. Resolve the desired output count before submitting. Each module produces one paid image; use the live per-image price times the selected count. Use modules: [] for custom modules only.
+
+Use the [shared authentication, upload and recovery guide](/en/api-reference/skills/overview) before submitting. This workflow requires a MeiGen API key and purchased credits; no free attempts or daily credits apply.
+
+## Parameters
+
+| Field | Contract |
+| --- | --- |
+| `requestId` | Required UUID for a new request; retain it for exact-input recovery. |
+| `productImage` | Required prepared main product photo. |
+| `modules` | Array: hero, detail, scene, material, usage, brand. No duplicates. HTTP default: hero/detail/scene. MCP: required. |
+| `customModules` | Optional array of {name, description}; name 1–40 and description 1–500 characters. Default []. Total with modules: 1–6. |
+| `productName / sellingPoints` | Optional; at most 200 / 2000 characters. Use verified product facts. |
+| `autoCopy` | Default true: compose copy. false: follow supplied copy; language can translate it. |
+| `platform` | Default amazon; supported IDs from inputSchema. |
+| `aspectRatio` | Default 4:5; supported ratios from inputSchema. |
+| `language / uiLocale` | Printed copy language, default auto; uiLocale is an optional fallback (max 35 characters). |
+| `quality` | low (Fast, default) or medium (Pro). |
+| `modelImage / logo` | Optional prepared image URLs. |
+| `extraProductImages` | Up to two additional prepared product angles. |
+| `extraRequirements` | Optional additional instructions, max 500 characters. |
+
+## Request example
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "productImage": "https://images.meigen.ai/uploads/product.png",
+  "productName": "Ceramic mug",
+  "modules": [
+    "hero",
+    "detail"
+  ],
+  "quality": "low",
+  "language": "en"
+}
+```
+
+Save the body as `request.json`; replace example image URLs with actual images and use a fresh UUID for a new request.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/product-detail/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## Result and recovery
+
+The response includes `items` with each module and its `generationId` or dispatch error, plus `expectedCount`. Query `skill=product-detail` for completed `imageUrls`. Handle `partial`, `paywallHitMidBatch` and per-item refund status; do not discard successful modules or automatically recreate missing ones.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=product-detail&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

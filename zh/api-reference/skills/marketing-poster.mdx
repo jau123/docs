@@ -1,0 +1,84 @@
+---
+title: "营销海报"
+description: "以品牌、活动、营销主题制作一张海报。"
+---
+
+`POST https://www.meigen.ai/api/skills/brand-poster/run`
+
+MCP: `generate_marketing_poster`
+
+必须提供主题，图片素材可选。请提供准确的时间、折扣与商品信息；要求保留文案时设 autoCopy 为 false。一次请求生成一张付费海报。
+
+提交前先阅读[通用认证、上传与恢复指南](/zh/api-reference/skills/overview)。此工作流需要 MeiGen API Key 和购买积分，不提供免费次数或每日积分。
+
+## 参数
+
+| 字段 | 契约 |
+| --- | --- |
+| `requestId` | 必填，新请求使用 UUID；精确参数恢复时保留原值。 |
+| `brand` | 必填主题，去空格后 1–60 字，也可填活动或话题。 |
+| `content` | 文案简述或画面文字，最多 500 字。`autoCopy: false` 忠实使用原文，选定语言仍可要求翻译；设计、风格和排版指令放 `extraNotes` 或 `customStyle`，除非用户明确要把指令印在图上。 |
+| `autoCopy` | 默认 true；false 忠实使用提供的文案，language 可要求翻译。 |
+| `extraNotes` | 补充已核实事实、明确指定的展示信息和设计排版要求，最多 500 字。“风格要复古”等设计指令不应当成逐字展示文案。 |
+| `ratio` | 默认 4:5，支持值查询 inputSchema。 |
+| `language / uiLocale` | 画面文案语言，默认 auto；uiLocale 可作后备，最多 35 字。 |
+| `quality` | low（Fast，默认）或 medium（Pro）。当前两档均使用 2K 输出规格；质量不等于分辨率，当前规格和价格查询实时目录。 |
+| `logo` | 可选，需准确复现的 Logo 图片。 |
+| `styleImage` | 可选，主要视觉风格依据；不复制其中的商品、文案或布局，文字风格只作兼容补充。 |
+| `productImages` | 最多三张已准备的商品或主体图，用于保留真实身份和外观。 |
+| `styleId / customStyle` | 填目录中的预设 ID，不填显示名称；非空自定义风格（最多 200 字）优先于 `styleId`。两者均省略时为 Auto。 |
+
+## 请求示例
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "brand": "Weekend coffee market",
+  "content": "Saturday, 10 AM–6 PM",
+  "autoCopy": false,
+  "language": "en",
+  "ratio": "4:5",
+  "quality": "low"
+}
+```
+
+将请求体保存为 `request.json`。此示例无需图片；新任务使用新的 UUID，恢复时保留该 UUID。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/brand-poster/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## MCP 调用示例
+
+下面是 `client.callTool(...)` 的参数对象，与 REST 请求体不同。活动和时间只是示例，真实任务应使用用户提供的事实；一次调用生成一张付费海报。调用方为新尝试生成并保存 UUID，不要盲目重复执行示例。
+
+```json
+{
+  "name": "generate_marketing_poster",
+  "arguments": {
+    "requestId": "8f729f7e-934e-4e2c-bae3-bf23a782f964",
+    "brand": "Coffee tasting",
+    "content": "Coffee tasting\nSaturday, 10:00–12:00",
+    "autoCopy": false,
+    "extraNotes": "Keep the supplied time. Use a clear headline and a small schedule block.",
+    "styleId": "minimalist",
+    "language": "en",
+    "ratio": "4:5",
+    "quality": "low"
+  }
+}
+```
+
+需要当前风格、输出规格或价格时，用 `{"skill":"brand-poster"}` 调用 `list_skills`。耗时受排队、规划和供应商影响；轮询间隔与 HTTP 超时不是预计完成时间，应按实际状态和 `nextAction` 推进。
+
+## 结果与恢复
+
+提交成功返回 `generationId`。使用 `skill=brand-poster` 查询至终态，再读取完成项的图片 URL。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=brand-poster&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

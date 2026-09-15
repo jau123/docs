@@ -177,7 +177,7 @@ POST /api/generate/v2
 <ParamField body="idempotencyKey" type="string">
   可选 UUID。用于防止重复提交——例如弱网超时后的重试。
 
-  同一账号用相同的 key 重复提交，会返回首次创建的生成任务而不是新建一个，也不会再次扣除积分；响应中会带 `deduped: true`。极少数情况下会返回 `409` / `idempotency_conflict`，换一个新 key 重试即可。
+  对于新的 API Token 请求，此 UUID 标识所属账号的一次逻辑尝试；提交前应保存 ID 和精确输入。沿用原 ID 与相同参数可恢复该尝试；已经建单时返回 `deduped: true`，不再扣费。修改参数返回 `409 idempotency_conflict`，不同账务上下文可能返回 `request_id_collision`，不能自动换 ID 绕过。对象字段顺序不影响比对，其它调用参数值在模型默认值应用前比较。旧任务可能缺少完整输入指纹，不能据此追溯保证所有旧回执。详见[按请求 ID 恢复](/zh/api-reference/endpoint/requests)。MCP 普通生成把此句柄称为 `requestId`。
 </ParamField>
 
 ## 响应
@@ -326,6 +326,10 @@ GET /api/generate/v2/status/:generationId
 ```
 
 生成失败时，积分会自动退还。可通过 `creditsStatus` 确认退款是否落地：`pending`（已预扣，结果未定）、`confirmed`（已实际扣费）、`refunded`（已退回余额）。
+
+## 工作流示例
+
+N 个脚本 → 首帧 → 视频、持久化 ID、在途预算预留与有限并发，详见[组合工作流](/zh/mcp/composable-workflows)。HTTP 使用 `idempotencyKey`，MCP 使用 `requestId`。新 ID 表示新尝试，不能用于超时恢复。
 
 ## 示例
 

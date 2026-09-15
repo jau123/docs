@@ -176,9 +176,9 @@ Submits a generation request. The output is generated asynchronously — use the
 </ParamField>
 
 <ParamField body="idempotencyKey" type="string">
-  Optional UUID. Guards against duplicate submissions — e.g. retrying after a timeout on a flaky connection.
+  Optional UUID; strongly recommended for composed workflows. Persist it with the exact inputs before submission. MCP calls expose this ordinary-generation handle as `requestId`.
 
-  Resubmitting the same key for the same account returns the original generation instead of creating a new one, and does not deduct credits again; the response includes `deduped: true`. In rare cases you may get `409` / `idempotency_conflict` — generate a new key and retry.
+  For new API-token requests, the key identifies one logical attempt in the owning account. Reusing it with identical caller inputs recovers that attempt; an existing generation returns `deduped: true` without another charge. Changed inputs return `409 idempotency_conflict`; a different billing context can return `request_id_collision`. Do not automatically allocate a new key to bypass either conflict. Object-key order is ignored, but other caller values are compared before model defaults. Older jobs may lack the full input fingerprint, so this is not a retroactive guarantee for all legacy receipts. See [request-ID recovery](/en/api-reference/endpoint/requests).
 </ParamField>
 
 ## Response
@@ -329,6 +329,10 @@ Poll this endpoint to check if your image is ready.
 ```
 
 When a generation fails, credits are automatically refunded. Poll `creditsStatus` to confirm the outcome: `pending` (deducted, not yet settled), `confirmed` (charged), `refunded` (returned to your balance).
+
+## Workflow examples
+
+For N scripts → frames → videos, persistent IDs, in-flight budget reservations and bounded concurrency, see [composable workflows](/en/mcp/composable-workflows). HTTP uses `idempotencyKey`; MCP uses `requestId`. New IDs represent new attempts, not timeout recovery.
 
 ## Examples
 

@@ -1,0 +1,64 @@
+---
+title: "商品详情图"
+description: "明确选择模块，一次制作一到六张协调的商品详情图。"
+---
+
+`POST https://www.meigen.ai/api/skills/product-detail/run`
+
+MCP: `generate_product_detail_images`
+
+必须有一张真实商品图；商品名、已核实卖点、Logo、模特图和补充角度图可选。提交前明确输出数量，每模块一张付费图，按实时单价乘所选数量计算总价。仅使用自定义模块时传 modules: []。
+
+提交前先阅读[通用认证、上传与恢复指南](/zh/api-reference/skills/overview)。此工作流需要 MeiGen API Key 和购买积分，不提供免费次数或每日积分。
+
+## 参数
+
+| 字段 | 契约 |
+| --- | --- |
+| `requestId` | 必填，新请求使用 UUID；精确参数恢复时保留原值。 |
+| `productImage` | 必填，已准备的商品主图。 |
+| `modules` | 数组：hero、detail、scene、material、usage、brand，不重复。HTTP 默认 hero/detail/scene；MCP 必填。 |
+| `customModules` | 可选 {name, description} 数组；name 1–40 字、description 1–500 字，默认 []；与 modules 合计 1–6 个。 |
+| `productName / sellingPoints` | 可选，最多 200 / 2000 字，使用已核实商品信息。 |
+| `autoCopy` | 默认 true 自动拟文案；false 忠实使用提供的文案，language 可要求翻译。 |
+| `platform` | 默认 amazon，支持的 ID 查询 inputSchema。 |
+| `aspectRatio` | 默认 4:5，支持的比例查询 inputSchema。 |
+| `language / uiLocale` | 画面文案语言，默认 auto；uiLocale 可作后备，最多 35 字。 |
+| `quality` | low（Fast，默认）或 medium（Pro）。 |
+| `modelImage / logo` | 可选，已准备的模特图和 Logo URL。 |
+| `extraProductImages` | 最多两张已准备的商品补充角度图。 |
+| `extraRequirements` | 可选补充要求，最多 500 字。 |
+
+## 请求示例
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "productImage": "https://images.meigen.ai/uploads/product.png",
+  "productName": "Ceramic mug",
+  "modules": [
+    "hero",
+    "detail"
+  ],
+  "quality": "low",
+  "language": "en"
+}
+```
+
+将请求体保存为 `request.json`，把示例图片 URL 换为真实素材，新请求使用新的 UUID。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/product-detail/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## 结果与恢复
+
+响应包含各模块及其 `generationId` 或派发错误的 `items`，以及 `expectedCount`。用 `skill=product-detail` 查询完成后的 `imageUrls`。处理 `partial`、`paywallHitMidBatch` 与逐项退款状态，不丢弃成功模块，也不自动补生成缺失项。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=product-detail&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

@@ -7,6 +7,10 @@ description: "Create product detail images, white-background photos, and marketi
 
 Open **Skills** from the sidebar on web, or from the Create tab in the iOS/Android app, to see the available workflows. Each one has an example project you can preview before running it yourself.
 
+<Note>
+  This page describes the Web/App interface. For automation, use the [five Skills API guides](/en/api-reference/skills/overview) or [MCP](/en/mcp/overview). API fields and billing differ: only purchased credits apply, no free attempts; image enhancement is supported, video enhancement and AI Expand are not exposed by this API.
+</Note>
+
 ## Product Detail Images
 
 Turn one product photo into a full set of detail-page images — the kind used on marketplace listings.
@@ -46,6 +50,12 @@ Turn a one-line idea into a promotional, event, or recruitment poster.
 | Extra requirements | Free-text, optional |
 | Reference image | Optional — use your own brand assets |
 | Poster text language | Chinese, English, Korean, Japanese, Russian, French, or Spanish |
+
+## Image Enhancement (Upscale)
+
+Use an original still JPEG, PNG or WebP. **Crisp** preserves its structure; **Creative** rebuilds detail and can change the appearance. Review the displayed price and any resizing decision before starting. Oversized images may need to shrink first, so the output can be smaller than the original.
+
+App versions with local Upscale upload preparation accept originals up to **64 MiB / 64 million pixels**, preparing uploads within **10 MiB**. It removes metadata without pixel decoding when the sanitized image already fits; otherwise it uses native decoding with a size limit and compresses the result. Reducing oversized dimensions requires acceptance; flattening a PNG requires a separate confirmation. The server checks the actual image again before generation. New local Upscale uploads remove EXIF/GPS/XMP before becoming public, while preserving image orientation and color configuration. If your installed App does not support these confirmations, use the Web interface. App updates are released separately from this API/MCP update. For MCP and HTTP limits, use the separate [Upscale API guide](/en/api-reference/skills/upscale).
 
 ## Where Results Go
 

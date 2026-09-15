@@ -1,0 +1,84 @@
+---
+title: "Marketing Poster"
+description: "Create one poster from a brand, event, campaign or topic."
+---
+
+`POST https://www.meigen.ai/api/skills/brand-poster/run`
+
+MCP: `generate_marketing_poster`
+
+A subject is required; image assets are optional. Supply accurate dates, discounts and product facts. Set autoCopy to false when wording must be preserved. One request creates one paid poster.
+
+Use the [shared authentication, upload and recovery guide](/en/api-reference/skills/overview) before submitting. This workflow requires a MeiGen API key and purchased credits; no free attempts or daily credits apply.
+
+## Parameters
+
+| Field | Contract |
+| --- | --- |
+| `requestId` | Required UUID for a new request; retain it for exact-input recovery. |
+| `brand` | Required subject, 1–60 trimmed characters; may be an event or topic. |
+| `content` | Copy brief or visible text, max 500 characters. With `autoCopy: false`, keep supplied wording subject to selected-language translation. Put style/layout instructions in `extraNotes` or `customStyle`, not here unless they should be printed. |
+| `autoCopy` | Default true; false follows supplied copy, with optional translation through language. |
+| `extraNotes` | Additional verified facts, explicitly requested display information and design/layout requirements, max 500 characters. Design directions such as “make it retro” are instructions, not literal text to print. |
+| `ratio` | Default 4:5; supported values from inputSchema. |
+| `language / uiLocale` | Printed copy language, default auto; optional uiLocale fallback, max 35 characters. |
+| `quality` | low (Fast, default) or medium (Pro). Both currently use the 2K output preset; quality is separate from resolution. Read live catalog specifications and prices. |
+| `logo` | Optional prepared image of the exact logo to reproduce. |
+| `styleImage` | Optional primary visual-style reference; do not copy its products, text or layout. Written style is only a compatible supplement. |
+| `productImages` | Up to three prepared product/subject images to preserve identity and appearance. |
+| `styleId / customStyle` | Use a catalog preset ID, not its label. Nonempty custom style (max 200 characters) overrides `styleId`; omit both for Auto. |
+
+## Request example
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "brand": "Weekend coffee market",
+  "content": "Saturday, 10 AM–6 PM",
+  "autoCopy": false,
+  "language": "en",
+  "ratio": "4:5",
+  "quality": "low"
+}
+```
+
+Save the body as `request.json`. This example needs no image; use a fresh UUID for a new intended request and preserve that UUID for recovery.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/brand-poster/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+## MCP call example
+
+The following is a `client.callTool(...)` parameter object, not the REST request body. The supplied event and time are illustrative; use facts from the user for a real task. One call starts one paid poster. Generate and save a UUID for a new attempt; do not blindly rerun the example.
+
+```json
+{
+  "name": "generate_marketing_poster",
+  "arguments": {
+    "requestId": "8f729f7e-934e-4e2c-bae3-bf23a782f964",
+    "brand": "Coffee tasting",
+    "content": "Coffee tasting\nSaturday, 10:00–12:00",
+    "autoCopy": false,
+    "extraNotes": "Keep the supplied time. Use a clear headline and a small schedule block.",
+    "styleId": "minimalist",
+    "language": "en",
+    "ratio": "4:5",
+    "quality": "low"
+  }
+}
+```
+
+Call `list_skills` with `{"skill":"brand-poster"}` when current styles, output specifications or prices are needed. Queueing, planning and provider execution affect timing; polling intervals and HTTP timeouts are not completion estimates. Follow returned status and `nextAction`.
+
+## Result and recovery
+
+A successful submission returns `generationId`. Query `skill=brand-poster` until a terminal status, then use the completed item image URLs.
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=brand-poster&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```

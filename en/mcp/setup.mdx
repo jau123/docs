@@ -5,9 +5,9 @@ description: "Install the local MCP server and configure your client, provider, 
 
 ## Prerequisites
 
-- **Node.js 18+** installed
-- At least one generation provider (for `generate_image` / `generate_video`):
-  - **MeiGen Cloud** — an API key from [meigen.ai](https://www.meigen.ai) (Settings → API Keys)
+- **Node.js 22+** recommended for the local package
+- For ordinary `generate_image`, configure one of these backends. `generate_video` and all five Skills require MeiGen Cloud:
+  - **MeiGen Cloud** — an API key from the desktop [API Keys page](https://www.meigen.ai/profile/api-keys)
   - **ComfyUI** — a running ComfyUI server ([installation guide](https://github.com/comfyanonymous/ComfyUI))
   - **OpenAI-Compatible API** — your own key from any provider (Together AI, Fireworks AI, OpenAI, etc.)
 
@@ -17,13 +17,32 @@ description: "Install the local MCP server and configure your client, provider, 
 
 ---
 
+## Ask an AI assistant to install it
+
+Copy into a local Codex, Claude Code, Cursor or other assistant that can edit MCP configuration:
+
+```text
+Set up MeiGen MCP for this host, preserving other servers and reusing an existing
+MeiGen entry. Prefer https://www.meigen.ai/api/mcp with Streamable HTTP; use local
+npx -y meigen@2.0.0 when local-file access or local-only tools are needed.
+For Codex remote, use bearer_token_env_var = "MEIGEN_API_TOKEN". If I have not set
+a key yet, omit authentication and verify public tools first. Guide me to enter
+the key privately; never ask me to paste it into chat or put it in a URL.
+After reconnecting, call list_skills and report the actual result. Installation
+verification must not upload images, start generation or spend credits.
+If you cannot change this host's configuration, give precise manual steps and
+state what remains unverified. ChatGPT web follows its separate public-only flow.
+```
+
+See [remote setup](/en/mcp/remote) for Codex HTTP and ChatGPT web instructions.
+
 ## Installation
 
 <Tip>
-  Prefer zero installation? The [remote MCP endpoint](/en/mcp/remote) needs no Node.js, no `npx`, and no local config file — just point any MCP host at `https://www.meigen.ai/api/mcp` over HTTP.
+  Prefer zero installation? The [remote MCP endpoint](/en/mcp/remote) needs no Node.js or local `npx` process — configure an HTTP-capable MCP host at `https://www.meigen.ai/api/mcp` over HTTP.
 </Tip>
 
-### Claude Code Plugin (Recommended)
+### Claude Code Plugin
 
 <Steps>
   <Step title="Install the plugin">
@@ -38,7 +57,7 @@ description: "Install the local MCP server and configure your client, provider, 
     **Restart Claude Code** after installation (close and reopen, or open a new terminal tab).
   </Step>
   <Step title="Configure a provider">
-    Start a new Claude Code session and run `/meigen:setup`. The setup wizard will guide you through provider selection and API key configuration on macOS, Linux, and Windows.
+    Start a new Claude Code session and run `/meigen:setup`. Use the guide to choose a provider; enter credentials yourself in private host settings or local configuration, never in the conversation. The plugin can supply MCP configuration: inspect the existing server and avoid adding a duplicate.
 
     Alternatively, set environment variables directly (see [Provider Configuration](#provider-configuration) below).
   </Step>
@@ -53,7 +72,7 @@ description: "Install the local MCP server and configure your client, provider, 
 </Steps>
 
 <Note>
-  Also listed on the community [wshobson/agents](https://github.com/wshobson/agents) marketplace. That listing doesn't bundle MCP server config — after installing, add the JSON block from [Other MCP-Compatible Hosts](#other-mcp-compatible-hosts) to `.mcp.json` yourself.
+  Also listed on the community [wshobson/agents](https://github.com/wshobson/agents) marketplace. Third-party listings can lag behind the main release. Inspect the installed package and add an MCP entry only if it is missing.
 </Note>
 
 ### Cursor / VS Code / Windsurf / Roo Code
@@ -61,27 +80,31 @@ description: "Install the local MCP server and configure your client, provider, 
 One command writes the right MCP config file for each editor:
 
 ```bash
-npx meigen init cursor      # writes .cursor/mcp.json
-npx meigen init vscode      # writes .vscode/mcp.json
-npx meigen init windsurf    # writes ~/.codeium/windsurf/mcp_config.json
-npx meigen init roo         # writes .roo/mcp.json
-npx meigen init claude      # writes .mcp.json (Claude Code project-level)
+npx -y meigen@2.0.0 init cursor      # writes .cursor/mcp.json
+npx -y meigen@2.0.0 init vscode      # writes .vscode/mcp.json
+npx -y meigen@2.0.0 init windsurf    # writes ~/.codeium/windsurf/mcp_config.json
+npx -y meigen@2.0.0 init roo         # writes .roo/mcp.json
+npx -y meigen@2.0.0 init claude      # writes .mcp.json (Claude Code project-level)
 ```
 
-After the config is written, set `MEIGEN_API_TOKEN` in your shell and restart the host. On hosts that don't support the `/meigen:setup` slash command, add the token to the `env` block of the meigen server entry directly.
+The init helper writes a configuration that follows the latest npm release. To pin this version, edit its generated args to `meigen@2.0.0`; running the helper from a pinned package does not itself pin the generated entry. Set credentials in the MCP process environment or private host settings, then restart.
 
-### OpenAI Codex CLI
+### Codex CLI, IDE extension and local Codex desktop host
 
-Codex uses TOML. Add to `~/.codex/config.toml`:
+[Remote HTTP is recommended for MeiGen Cloud and Skills](/en/mcp/remote). For a local process, merge this into `~/.codex/config.toml` **instead of** a remote entry:
 
 ```toml
 [mcp_servers.meigen]
 command = "npx"
-args = ["-y", "meigen@latest"]
-
-[mcp_servers.meigen.env]
-MEIGEN_API_TOKEN = "meigen_sk_..."
+args = ["-y", "meigen@2.0.0"]
+env_vars = ["MEIGEN_API_TOKEN"]
+startup_timeout_sec = 90
+tool_timeout_sec = 240
 ```
+
+Set `MEIGEN_API_TOKEN` in the environment that launches Codex. For public-only setup without a key, omit `env_vars` until the variable exists. Codex does not automatically load a project's `.env.local`. You can first register the command with `codex mcp add meigen -- npx -y meigen@2.0.0`, then add the environment forwarding and timeouts to its existing table. `meigen init codex` is not supported.
+
+A 240-second tool timeout is suitable for Skills; long generic video generation can require more. Restart/reconnect, inspect `codex mcp list` and `/mcp`, then make an actual `list_skills` call. See the [official Codex configuration guide](https://developers.openai.com/codex/mcp). ChatGPT web does not share this local setup; it supports [public queries only](/en/mcp/remote#chatgpt-web-public-lookups-only) with the current MeiGen authentication.
 
 ### Hermes Agent (NousResearch)
 
@@ -91,7 +114,7 @@ Hermes is a first-class MCP client. Add to `~/.hermes/config.yaml`:
 mcp_servers:
   meigen:
     command: "npx"
-    args: ["-y", "meigen@latest"]
+    args: ["-y", "meigen@2.0.0"]
     env:
       MEIGEN_API_TOKEN: "meigen_sk_..."
     timeout: 2700          # long videos (e.g. reference-video continuation) can exceed 15 min
@@ -101,7 +124,7 @@ mcp_servers:
 <Warning>
   Set `timeout` to **2700**, not the Hermes default (120s). Long video generations — especially reference-video continuation — can run past 15 minutes. A shorter timeout disconnects Hermes while the job is still running server-side, after credits have already been deducted. `connect_timeout: 120` covers the first slow `npx` download.
 
-  If a session does disconnect mid-generation, don't resubmit — call `check_generation` with the `generationId` from your original request to resume tracking it. Resubmitting starts a new generation and deducts credits again.
+  If a session disconnects mid-generation, query `check_generation` with the original generationId or persisted UUID requestId. If recovery calls for resubmission, keep the same ID and exact inputs; a new ID creates a new paid attempt. Use wait=false/download=false for composed MeiGen steps; see [workflow recovery](/en/mcp/composable-workflows).
 </Warning>
 
 ### Standalone CLI (no MCP host required)
@@ -113,40 +136,26 @@ For shell scripts, CI pipelines, or anyone who wants AI image generation without
 export MEIGEN_API_TOKEN=meigen_sk_...
 
 # Generate
-npx meigen gen --prompt "a calico cat in a sunlit kitchen"
+npx -y meigen@2.0.0 gen --prompt "a calico cat in a sunlit kitchen"
 
 # With a specific model + aspect ratio
-npx meigen gen -p "logo design" -m midjourney-v8.1 -r 1:1
+npx -y meigen@2.0.0 gen -p "logo design" -m midjourney-v8.1 -r 1:1
 
 # With a reference image (local path auto-uploaded)
-npx meigen gen -p "product hero shot" --ref ~/Desktop/bottle.jpg
+npx -y meigen@2.0.0 gen -p "product hero shot" --ref ~/Desktop/bottle.jpg
 
 # Submit only — print generationId without polling (good for CI)
-npx meigen gen -p "..." --no-wait
+npx -y meigen@2.0.0 gen -p "..." --no-wait
 
 # Machine-readable output (good for jq pipes)
-npx meigen gen -p "..." --json | jq -r '.imageUrls[0]'
+npx -y meigen@2.0.0 gen -p "..." --json | jq -r '.imageUrls[0]'
 ```
 
 Generated images save to `~/Pictures/meigen/` by default — see [Output Directories](#output-directories) to change where files land.
 
 ### OpenClaw
 
-Install the full plugin from [ClawHub](https://clawhub.ai/plugins/meigen-ai-design) (includes commands, skills, and MCP server):
-
-```bash
-openclaw bundles install clawhub:meigen-ai-design
-```
-
-Or install only the skill (no commands/agents):
-
-```bash
-npx clawhub@latest install creative-toolkit
-```
-
-<Note>
-  OpenClaw uses the [Agent Skills](https://agentskills.io) open standard. No MCP configuration needed — the skill handles everything.
-</Note>
+MeiGen is also distributed as the `meigen-ai-design` bundle and the `creative-toolkit` Skill. These are separate distribution artifacts with independent versions. Follow the [repository installation guide](https://github.com/jau123/MeiGen-AI-Design-MCP#quick-start) for the supported install command and current bundle layout. Inspect the installed manifest and configure exactly one MCP connection; a standalone Skill does not prove that its MCP server is connected.
 
 ### Other MCP-Compatible Hosts
 
@@ -157,7 +166,7 @@ For any host that consumes stdio MCP, add this to its config file:
   "mcpServers": {
     "meigen": {
       "command": "npx",
-      "args": ["-y", "meigen@latest"],
+      "args": ["-y", "meigen@2.0.0"],
       "env": {
         "MEIGEN_API_TOKEN": "meigen_sk_..."
       }
@@ -170,7 +179,7 @@ For any host that consumes stdio MCP, add this to its config file:
 
 ## Provider Configuration
 
-Configure one or more providers. When multiple are available, the plugin selects in order: MeiGen → ComfyUI → OpenAI-compatible. You can override this per-request.
+These provider choices apply to ordinary image generation. Skills always require MeiGen Key and purchased credits. Configure one or more providers. When multiple are available, the plugin selects in order: MeiGen → ComfyUI → OpenAI-compatible. You can override this per-request.
 
 ### MeiGen Cloud
 
@@ -180,7 +189,7 @@ The easiest way to get started. MeiGen's hosted API gives you image and video mo
 | --- | --- |
 | `MEIGEN_API_TOKEN` | Your API key starting with `meigen_sk_` |
 
-Get your API key: sign in at [meigen.ai](https://www.meigen.ai) → click your avatar → **Settings** → **API Keys** → create a new key.
+Create a key using a desktop browser at [API Keys](https://www.meigen.ai/profile/api-keys). Use the same account to choose **Top Up** on [Profile](https://www.meigen.ai/profile), or purchase on [mobile](https://www.meigen.ai/m/premium).
 
 <Warning>
   API keys can only use **purchased credits**, not daily free credits. Ensure your account has purchased credits before generating via the plugin.
@@ -218,7 +227,7 @@ Run image generation on your own GPU with full control over models, samplers, an
 
 ## Output Directories
 
-Generated files are written to disk by both the MCP tools and the standalone CLI.
+General image/video generation and the standalone CLI can save files locally. Dedicated Skills return image URLs/resource links; download them explicitly when you need local files.
 
 | Type | Default location | Override | Linux fallback |
 | --- | --- | --- | --- |
@@ -233,9 +242,9 @@ Set these the same way as your provider variables — in the `env` block of your
 
 After setup, ask your AI assistant:
 
-> "List the available models"
+> "List MeiGen’s available Skills and current prices"
 
-If configured correctly, it will call the `list_models` tool and show models from all your configured providers.
+Confirm a real `list_skills` call succeeds without generation or charges. Use `list_models` separately to inspect general-generation backends. A saved configuration is not proof of connection.
 
 ---
 
@@ -244,6 +253,14 @@ If configured correctly, it will call the `list_models` tool and show models fro
 Once installed, ask your AI assistant in plain language — for example, "Generate a watercolor landscape, 16:9 aspect ratio". See the [overview](/en/mcp/overview) for the full list of tools.
 
 ---
+
+## Upgrade from an earlier version
+
+Your existing MeiGen key, `MEIGEN_API_TOKEN` and private `~/.config/meigen/config.json` can be reused. Change a fixed older npm version to `meigen@2.0.0`, then restart. Entries tracking the latest release also need a restart and a version/tool check. Local npm exposes 17 tools; the existing nine remain and the new dedicated flows change how the agent routes Skill requests.
+
+Claude/OpenClaw instructions and manifests update through their own distribution; upgrading npm alone does not replace them. Remote users do not upgrade npm: wait for backend deployment, then refresh/reconnect. No mandatory switch from local to remote is required. See [source and release notes](https://github.com/jau123/MeiGen-AI-Design-MCP).
+
+For Skill image limits, interrupted requests, resizing confirmation and price changes, follow the [Skills API guide](/en/api-reference/skills/overview). A Skill upload failure must not trigger paid submission or status polling.
 
 ## Troubleshooting
 
@@ -258,7 +275,7 @@ Once installed, ask your AI assistant in plain language — for example, "Genera
   </Accordion>
 
   <Accordion title="'Insufficient credits' (MeiGen)" icon="circle-exclamation">
-    API keys can only use purchased credits, not daily free credits. Purchase credits at [meigen.ai](https://www.meigen.ai).
+    API keys can only use purchased credits, not daily free credits. Use the same key-owner account and choose **Top Up** on [Profile](https://www.meigen.ai/profile); [mobile checkout](https://www.meigen.ai/m/premium).
   </Accordion>
 
   <Accordion title="ComfyUI connection refused" icon="circle-exclamation">
@@ -275,8 +292,8 @@ Once installed, ask your AI assistant in plain language — for example, "Genera
   </Accordion>
 
   <Accordion title="Plugin not showing in tool list" icon="circle-exclamation">
-    1. Make sure Node.js 18+ is installed
-    2. Try running `npx -y meigen` directly to check for errors
+    1. Make sure Node.js 22+ is installed
+    2. Try running `npx -y meigen@2.0.0` directly to check for errors
     3. Restart your editor
     4. Check that the MCP configuration JSON is valid
   </Accordion>
@@ -284,7 +301,7 @@ Once installed, ask your AI assistant in plain language — for example, "Genera
   <Accordion title="Generation timeout" icon="circle-exclamation">
     Generation times vary by model — MeiGen Cloud image models typically finish in well under a minute; video generation takes longer, especially with reference-video continuation. Polling isn't capped by a fixed 5- or 8-minute client timeout — it follows the server's own progress signal, with only a 45-minute safety valve against a fully hung connection.
 
-    If your session disconnects or polling gets interrupted, don't resubmit the same request — call `check_generation` with the `generationId` from your original request to resume tracking it. Resubmitting starts a new generation and deducts credits again.
+    If your session disconnects or polling is interrupted, recover with `check_generation` using the original generationId or persisted UUID requestId. Preserve exact inputs and IDs; do not allocate a new ID on transient failure. See [workflow recovery](/en/mcp/composable-workflows).
 
     ComfyUI generation is still capped at 5 minutes (depends on your local GPU).
   </Accordion>

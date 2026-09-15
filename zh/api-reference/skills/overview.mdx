@@ -1,0 +1,131 @@
+---
+title: "Skills API"
+description: "五项图片工作流的认证、素材上传、实时价格和安全恢复流程。"
+---
+
+专用接口支持[透明抠图](/zh/api-reference/skills/remove-background)、[商品详情图](/zh/api-reference/skills/product-detail)、[营销海报](/zh/api-reference/skills/marketing-poster)、[AI 换背景](/zh/api-reference/skills/ai-backgrounds)和[图片增强](/zh/api-reference/skills/upscale)。这些接口使用 MeiGen Cloud，BYOK 或 ComfyUI 不能替代 MeiGen 凭据。本 Skills API 不开放视频增强和 AI 扩图。
+
+## 1. 准备账号
+
+用桌面浏览器在 [API Keys](https://www.meigen.ai/profile/api-keys) 创建 Key。在**同一个账号**打开[个人主页](https://www.meigen.ai/profile)，点击**充值**；移动端购买使用[会员与积分页](https://www.meigen.ai/m/premium)。移动界面不提供 Key 创建入口。
+
+所有 Skill 生成都只消耗**购买积分（`purchased_credits`）**，第一张抠图也收费。API 不提供免费次数或每日免费积分。[模型对比页](https://www.meigen.ai/model-comparison)用于查价，不是充值入口。
+
+Key 应保存在本地私密配置或密钥管理服务中。示例从本地环境变量 `MEIGEN_API_TOKEN` 读取 Key，不要把真实密钥发到聊天、放进 URL 或提交到仓库。
+
+| 接口 | 认证 | 用途 |
+| --- | --- | --- |
+| `GET /api/skills` | 公开 | 当前参数、价格、材料和工作流指引 |
+| `POST /api/skills/upload` | Bearer API Key | 准备图片，不开始生成 |
+| `POST /api/skills/{skill}/run` | Bearer API Key | 提交付费工作流 |
+| `GET /api/skills/status?skill=...&requestId=...` | 提交时使用的同一个 Key | 恢复回执、查询结果 |
+
+请求体为 JSON。每个 `/run` 请求体最多 **32 KiB**，拒绝未知字段，必须带 UUID `requestId`。上传限制单独列在下文。Skill ID 为 `remove-bg`、`product-detail`、`brand-poster`、`white-bg`、`upscale`。
+
+## 2. 查询当前契约
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills'
+curl -sS 'https://www.meigen.ai/api/skills?skill=product-detail'
+```
+
+每项返回 `endpoint`、`tool`、`materials`、`pricing`、`maxOutputImages` 和 `inputSchema`。枚举与价格以这些实时值为准；价格缺失或为 null 表示不可用，不表示免费。成功目录最多缓存五分钟，错误不缓存。服务端还会执行跨字段校验。
+
+**商品详情图的 HTTP 与 MCP 有区别：**直接 HTTP 省略 `modules` 时默认生成三张付费图片；MCP 强制显式填写 `modules`。两种接入都建议明确发送所需模块。
+
+Upscale 的两种 MCP 首次及后续调用均要求 `confirmedCredits`，来自用户或上层工作流已接受预算内的实时报价；直接 HTTP 仍可省略。
+
+## 3. 准备图片
+
+抠图、详情图、海报和背景的图片字段只接受 `images.meigen.ai`、`images.meigen.art`、`pbs.twimg.com` 上的 HTTPS URL，不带凭据或非标准端口。其他来源先上传，再使用返回的 `imageUrl`。
+
+**Upscale 单独处理：**把原始公开 JPEG/PNG/WebP URL 直接交给 `/api/skills/upscale/run`，不要先用普通参考图上传缩小它。附件字节使用 `purpose: "upscale"` 上传，保留像素尺寸。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/upload' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"sourceUrl":"https://your-public-host.example/product.png","purpose":"reference"}'
+```
+
+将示例 URL 替换为真实可直接下载的图片。响应包含 `success`、`imageUrl`、`width`、`height`、`firstFrameOnly`。保存 `imageUrl`，恢复原请求时复用。
+
+| 字段或入口 | 契约 |
+| --- | --- |
+| `sourceUrl` | 公开 HTTPS 图片文件；不依赖 cookie、凭据、跳转或内网；需能通过公网 IPv4 访问 |
+| `imageBase64` | 真实图片字节的原始 base64，不含 `data:` 前缀；解码后最多 3 MiB |
+| 输入选择 | `sourceUrl` 与 `imageBase64` 必须且只能提供一个 |
+| `purpose` | 默认 `reference`；`upscale` 保留像素尺寸 |
+| 参考图来源 | 最多 8 MiB、6400 万像素；PNG、JPEG、WebP 或 GIF |
+| 处理后的参考图 | 最长边不超过 4096px、最多 8 MiB；保留透明通道；动画只取第一帧 |
+| Upscale 原图 URL | 静态 JPEG/PNG/WebP，最多 64 MiB、6400 万像素；不接受动画 |
+| 本地 npm 参考图文件 | 处理前最多 32 MiB、6400 万像素 |
+| 本地 npm Upscale 文件 | 原文件最多 64 MiB、6400 万像素；不缩尺寸的编码结果必须在 9,500,000 字节以内，否则使用原始公开 URL |
+
+源图片服务器临时返回 429/5xx 时会转为 503。上传阶段等待后重试上传；若发生在 Upscale 提交过程中，则用该提交原 UUID 和参数恢复。
+
+上传会完整解码和重编码，去除元数据，并在支持的格式中保留透明通道。上传不建生成任务、不消耗生成积分，但有独立的**每用户每日 1,000 次上传请求**保护上限。上传失败还没有 Skill 回执，应修正或重试上传，不要查询 `/skills/status`。
+
+宿主必须能读取实际附件字节或访问 URL，不能猜路径、链接或编造 base64。上传 URL 不承诺永久保存，请保留原图并下载结果。
+
+## 4. 提交并保存请求
+
+各工作流页面包含请求体。每个**新的付费请求**生成新的 UUID，并保存 UUID、完整 JSON 请求体和返回的任务 ID。示例 UUID 仅作演示，不要用于不相关的多次请求。
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/product-detail/run' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN" \
+  -H 'Content-Type: application/json' \
+  --data-binary @request.json
+```
+
+抠图通常同步返回 `imageUrl`。其他工作流返回 `generationId`，商品详情图返回 `items`。**提交成功不等于图片已生成完成。**
+
+## 5. 查询和恢复
+
+```bash
+curl -sS 'https://www.meigen.ai/api/skills/status?skill=product-detail&requestId=550e8400-e29b-41d4-a716-446655440000' \
+  -H "Authorization: Bearer $MEIGEN_API_TOKEN"
+```
+
+使用原来的 API Key、Skill ID 和 UUID。回执按账号和 Token 隔离，同账号的另一个 Key 也不能读取该回执。建议每 **10 秒**查一次。
+
+| 字段 | 含义 |
+| --- | --- |
+| `status` | `processing`、`completed`、`partial` 或 `failed` |
+| `submissionStatus` | 回执状态，与图片生成状态不同 |
+| `submission`、`submissionHttpStatus` | 原提交响应及其 HTTP 状态码 |
+| `items[]` | 各任务的 `generationId`、`module`、`status`、`imageUrls`、`error`、`creditsUsed`、`creditsStatus` |
+| `retryable`、`retryParameters` | 允许恢复时可重新提交的原始参数及上传 URL |
+
+到达终态后停止普通轮询，展示成功图片并分别解释失败或缺失模块。退款以 `creditsStatus` 为准；HTTP 失败或图片缺失本身不能证明退款。
+
+断线或 5xx 后**先查状态**。仅在允许恢复时，以同一个 `requestId` 和规范化参数重试；不要重新上传后静默替换 URL。重复已记录的提交会返回原结果，不再派发。中断工作进程的租约约 **330 秒**；重复提交的 `409 in_progress` 会返回剩余 `retryAfterSeconds`，状态查询仍可按正常间隔进行。
+
+部分批次按已有任务恢复，不自动补生成缺失模块。替代批次或失败后的新尝试可能再次收费，需要有重试意愿。已退款的抠图重试也可能开启新的付费尝试。
+
+## 计费与错误处理
+
+商品详情图一次生成 1–6 张，按成功接收的模块预扣积分；其他工作流每次生成一张。用当前单张价格计算用户请求的总数。供应商失败沿用现有积分账本与退款规则。
+
+API 有**每用户、每 Skill、每日 1,000 次请求**保护上限，工作流自身还可能有限制。它不是免费额度，充值不会移除此限制。目录与状态查询不消耗生成积分，回放已完成回执不会再次占用派发次数。
+
+| 响应 | 处理方式 |
+| --- | --- |
+| 400 / 413 / 422 | 修正参数或素材大小；若拒绝已带存储回执（`batchId`），修改参数须使用新 UUID |
+| 401 / 403 | 配置目标账号有效的 MeiGen Key，不要轮询被拒绝的提交 |
+| 402 | 给 Key 所属账号购买积分；愿意继续时再新建请求 |
+| 409 `in_progress` | 查状态；再次提交前遵守剩余租约时间 |
+| 409 `idempotency_conflict` | 恢复原参数并查询该请求，不自动新建付费请求 |
+| 409 `request_id_collision` | 该被拒绝 ID 未创建 Skill 任务，可换新 UUID，不轮询它 |
+| 409 `upscale_resize_required` | 确认缩图取舍后，以新 UUID 和 `allowDownscale: true` 提交 |
+| 409 `price_changed` | 说明 `quotedCredits` 并取得接受后，以新 UUID 和已接受的 `confirmedCredits` 提交 |
+| 429 | 等待对应限制恢复，不是积分不足 |
+| 5xx / `request_interrupted` | 可能已创建任务，重试前查询原回执 |
+| 状态查询 404 | 核对原 Key、Skill、UUID；若第一次提交曾中断，重试原请求体和 UUID |
+
+MCP 会额外提供 `nextAction` 指引；直接 HTTP 客户端根据上述状态码、code 和字段实现同样的流程，不要假设 HTTP 响应包含 MCP 专用的 `nextAction` 或资源链接内容块。
+
+远程图片准备要求购买积分余额大于零，在读取请求体和处理图片之前检查。上传本身不扣生成积分；上传遇到 402 后，为同一账号充值并重试同一上传，不要查询未创建的生成任务。
+
+已知受理任务的记录缺失时，返回 **410 `generation_unavailable`** 和原任务 ID。停止轮询，不自动重提或创建付费替代任务；记录缺失不证明已退款。部分缺失的批次保留仍可用的结果，并单独标注缺失项。
