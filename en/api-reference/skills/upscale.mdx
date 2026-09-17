@@ -16,7 +16,7 @@ Use the [shared authentication, upload and recovery guide](/en/api-reference/ski
 | Field | Contract |
 | --- | --- |
 | `requestId` | Required UUID for a new request; retain it for exact-input recovery. |
-| `imageUrl` | Required original public HTTPS JPEG/PNG/WebP URL; no credentials, fragment or nonstandard port. Max 64 MiB / 64 MP; still images only. |
+| `imageUrl` | Required original HTTPS JPEG/PNG/WebP URL that MeiGen can fetch anonymously; no credentials, fragment or nonstandard port. Any host works here — unlike `referenceVideos` / `referenceAudios`, this one is not restricted to `images.meigen.ai`. Max 64 MiB / 64 MP; still images only. |
 | `mode` | crisp (default) preserves structure; creative regenerates detail in blurry images. |
 | `allowDownscale` | Default false. Set true only after the resizing tradeoff is accepted. |
 | `confirmedCredits` | Required by MCP on every call, including the first; optional for direct HTTP. Nonnegative integer from a live quote within the accepted user or workflow budget, for a pre-dispatch price check. It is not an atomic spending ceiling. Obtain the current price from the catalog. |

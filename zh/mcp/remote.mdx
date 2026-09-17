@@ -82,7 +82,7 @@ claude mcp add --transport http meigen https://www.meigen.ai/api/mcp \
 | `generate_video` | MeiGen Cloud 视频生成 | 是 |
 | `check_generation` | 按 generationId 或 requestId 查询／恢复 | 按请求 ID 查询需要同账号 Key |
 | `list_models` | 当前模型与能力 | 否 |
-| `search_gallery` | 搜索公开提示词和图片预览 | 否 |
+| `search_gallery` | 搜索公开提示词和图片预览，最多返回 3 条 | 否 —— 但带 Key 时该次搜索计入这个账户的额度 |
 | `get_inspiration` | 读取公开画廊条目 | 否 |
 | `list_skills` | 五项工作流、材料、实时价格和输入参数 | 否 |
 | `upload_skill_image` | 准备真实图片 URL 或附件字节 | 是 |
@@ -96,6 +96,8 @@ claude mcp add --transport http meigen https://www.meigen.ai/api/mcp \
 ## 首次验证
 
 重连后询问：**“列出 MeiGen 当前可用的 Skills 和价格。”**确认真实工具调用成功；仅保存配置不能证明连接成功。这不会生成或扣点。然后提供实际材料，选择[五项工作流](/zh/api-reference/skills/overview)之一。Skills 提交后用 `check_skill` 查询；通用生成用 `check_generation` 恢复。
+
+`search_gallery` 每次调用**最多返回 3 条**，请收窄查询词，不要指望一次拿到长列表。连接带 API Key 时，每次搜索都计入该账户的[**每日搜索额度**](/zh/features/gallery#搜索) —— 与网页登录用户相同的免费额度，不消耗购买积分。没有 Key 时按匿名 IP 限流。
 
 远程工具不能读取本地文件路径。请使用公开图片 URL，或通过 `upload_skill_image` 上传实际可读取的字节。Upscale 直接传原图 URL，或使用 `purpose: "upscale"` 上传，不要先按普通参考图缩小。
 
@@ -116,6 +118,30 @@ claude mcp add --transport http meigen https://www.meigen.ai/api/mcp \
 ```
 
 示例使用 2K Standard，提交前请查询当前模型价格。通过 `referenceImages` 添加公开参考图 URL，即可编辑或提供视觉参考。示例 UUID 仅用于说明：每次逻辑尝试应分配并持久化自己的 `requestId`，恢复时沿用该 ID 和相同输入。`wait: false` 提交后即返回；中断后用 requestId 或 generationId 调用 `check_generation`。旧版 `attemptId` 仍兼容，新集成应使用 requestId。完整矩阵见[模型价格](/zh/features/models)。
+
+
+### 参考视频与音频
+
+`generate_video` 的参考素材都是数组：`referenceVideos`（mp4 / mov）和 `referenceAudios`（wav / mp3）。**远程工具读不到本地文件路径**，也不接受任意公网 URL。每一项都必须是 `https://images.meigen.ai/...` 地址：此前 MeiGen 生成结果的 `videoUrl`，或通过 [`POST /api/upload/reference-video`](/zh/api-reference/endpoint/generate#上传参考视频与音频) 上传的文件。其他域名一律在扣点前被拒（`invalid_reference_video` / `invalid_reference_audio`）。只有本地 npm 服务器能替你上传本地文件。
+
+```json
+{
+  "prompt": "Continue the dive from [video1] with the camera locked off, scored to the rhythm of [audio1]",
+  "model": "seedance-2-5",
+  "aspectRatio": "adaptive",
+  "resolution": "480p",
+  "duration": 5,
+  "referenceVideos": [
+    "https://images.meigen.ai/generations/eagle-dive.mp4",
+    "https://images.meigen.ai/ref-videos/2026-09-17/river-pan.mp4"
+  ],
+  "referenceAudios": ["https://images.meigen.ai/ref-videos/2026-09-17/theme.mp3"],
+  "requestId": "3f1c2b60-9d2a-4f1e-9a1f-0d3b7c5a8e42",
+  "wait": false
+}
+```
+
+`[video1]` 和 `[audio1]` 在提交前会被改写成厂商自己的 `Video 1` / `Audio 1` 写法；直接写 `Video 1` 同样可行。编号从 1 开始、按类型各自计数，顺序即数组顺序。各模型的条数与总时长请从 `list_models` 读取。计费按参考视频时长的**总和** + `duration`，音频不增加费用。数组为空时请整个省略该字段 —— 参考素材属于 `requestId` 输入指纹的一部分。
 
 
 ## 远程与本地

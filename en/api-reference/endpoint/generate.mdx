@@ -26,6 +26,13 @@ Submits a generation request. The output is generated asynchronously — use the
   The text description of the image or video to generate. To reference a saved character, include `[character:<uuid>]` inline — e.g. `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`. Up to 3 character references per generation.
 
   Supported on image models that accept reference images (all except Flux 2 Klein) and on **Seedance 2.5 / 2.0** for video. Character images consume the same content-reference image budget as user-uploaded images. An unsupported model, a nonexistent or inaccessible character, or too many references returns `400` (`characters_not_supported`, `character_not_found`, `too_many_characters`); some characters require a higher `tier` (`character_tier_required`).
+
+  **Asset tokens** — write `[image1]`, `[video1]` or `[audio1]` inline to tell the model which reference asset a sentence is about: *"Match the grade of [image1] and continue the motion of [video1], scored to [audio1]"*. Numbering is **1-based and per kind**, following the order of `referenceImages` / `referenceVideos` / `referenceAudios` in this request body — `[video2]` is the second entry of `referenceVideos`, not the second asset overall. The two kinds are resolved differently before the request reaches the model:
+
+  - **`[videoN]` / `[audioN]`** are rewritten to the vendor's own wording — `Video 1`, `Audio 1`. A token whose index exceeds the number of clips you actually sent is **dropped**, so `[video3]` with two clips attached leaves nothing behind. Writing the vendor wording directly — `"Video 1"` — works too, and is what MCP and REST callers usually do.
+  - **`[imageN]` and `[character:<uuid>]`** are expanded into a descriptive phrase naming the position of the reference image the token resolves to — `[image1]` becomes *"the subject in reference image 1"*, a character token becomes *"the character in reference image 2"*. The reference planner may merge or reorder images before they reach the model, so the position in the phrase is the one the model actually sees and need not equal `N`. An `[imageN]` pointing past the images you sent is **left in the prompt as-is** rather than dropped — keep image indexes within the images you send.
+
+  Only the copy sent to the model is rewritten. The prompt stored on the generation keeps your original tokens, so reopening it in the editor still shows the mentions you typed.
 </ParamField>
 
 <ParamField body="modelId" type="string">
@@ -43,7 +50,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   - Default `auto` (recommended): a suitable ratio is picked for you.
   - Or pass an explicit value — must be one of the ratios returned in `supported_ratios` from the [List Models](/en/api-reference/endpoint/models) endpoint. Common image ratios: `1:1`, `3:4`, `4:3`, `16:9`, `9:16`, `21:9`, `5:4`, `4:5`.
-  - Seedance 2.5 and 2.0 also accept `adaptive`, which follows the input media. Use it for first/last-frame and `referenceVideo` requests.
+  - Seedance 2.5 and 2.0 also accept `adaptive`, which follows the input media. Use it for first/last-frame and `referenceVideos` requests.
   - For Seedance 2.5 text-to-video or `referenceMode: content`, pass an explicit supported ratio when you need a specific frame shape.
   - **On Seedance 2.0, an omitted or unrecognised `aspectRatio` resolves to `adaptive`.** Pure text-to-video has nothing to adapt to, so always pass an explicit ratio when generating without a reference image or reference video.
 
@@ -53,7 +60,7 @@ Submits a generation request. The output is generated asynchronously — use the
 <ParamField body="resolution" type="string">
   The output resolution. Availability depends on the model. If omitted, the selected model's default is used.
 
-  Available values depend on the model: image models use `1K` / `2K` / `3K` / `4K`; video models use `480p` / `720p` / `1080p` / `4k` (note the lowercase `k` on video). Seedance 2.5 supports 480p / 720p only. Seedance 2.0 adds 1080p / 4k on `pro`; Veo 3.1 also supports 4k. With Seedance 2.0 `referenceVideo`, the ceiling is 1080p. See [Models](/en/features/models) for the complete matrix.
+  Available values depend on the model: image models use `1K` / `2K` / `3K` / `4K`; video models use `480p` / `720p` / `1080p` / `4k` (note the lowercase `k` on video). Seedance 2.5 supports 480p / 720p / 1080p. Seedance 2.0 adds 1080p / 4k on `pro`; Veo 3.1 also supports 4k. With Seedance 2.0 `referenceVideos`, the ceiling is 1080p. See [Models](/en/features/models) for the complete matrix.
 </ParamField>
 
 <ParamField body="quality" type="string">
@@ -103,7 +110,7 @@ Submits a generation request. The output is generated asynchronously — use the
 </ParamField>
 
 <ParamField body="contentReferenceImages" type="string[]">
-  Optional structured Seedance content references: up to 30 for Seedance 2.5 or 9 for Seedance 2.0. These can coexist with `frameReferenceImages`, `referenceVideo`, and saved-character references. Image and video limits are counted separately; saved-character images count toward this image limit.
+  Optional structured Seedance content references: up to 30 for Seedance 2.5 or 9 for Seedance 2.0. These can coexist with `frameReferenceImages`, `referenceVideos`, `referenceAudios`, and saved-character references. Image, video and audio limits are three independent budgets; saved-character images count toward this image limit.
 </ParamField>
 
 <ParamField body="referenceMode" type="string" default="frame">
@@ -160,19 +167,38 @@ Submits a generation request. The output is generated asynchronously — use the
   Seedance 2.5 has no tier; omit this field. Higher tiers render at higher fidelity for a higher price. If omitted, the model's own default tier is used — Seedance 2.0 defaults to `mini`. See [Models](/en/features/models) for the full pricing matrix.
 </ParamField>
 
-<ParamField body="referenceVideo" type="string">
-  Reference video URL for Seedance 2.5 or Seedance 2.0 continuation. It must be a publicly accessible HTTPS URL (typically a previous generation result's `videoUrl`).
+<ParamField body="referenceVideos" type="string[]">
+  Array of reference videos for Seedance 2.5 or Seedance 2.0 continuation. Every entry must be an `https://images.meigen.ai/...` URL — either a previous MeiGen generation's `videoUrl`, or a file you uploaded through the [reference-media upload endpoint](#upload-reference-videos-and-audio). Arbitrary public URLs are **not** accepted: any other host is rejected with `400` / `invalid_reference_video` before any credits are deducted. Each URL may appear only once — a duplicate entry is rejected with `400` / `invalid_input` rather than probed and billed twice.
 
-  | Model | Reference input | Output | With-video rates |
-  | --- | --- | --- | --- |
-  | Seedance 2.5 | 2–30s, ≤200MB | 4–30s; 480p / 720p | 11 / 24 credits/sec |
-  | Seedance 2.0 | 2–15s, ≤50MB | 4–15s; tier-specific, up to 1080p | Mini 7/13, Fast 8/14, Pro 16/28 credits/sec |
+  | Model | Clips | Per clip | Total across clips | Size per clip | With-video rates |
+  | --- | --- | --- | --- | --- | --- |
+  | Seedance 2.5 | up to 10 | 2–30s | ≤30s | ≤200MB | 480p 11 / 720p 24 / 1080p 54 credits/sec |
+  | Seedance 2.0 | up to 3 | 2–15s | ≤15s | ≤50MB | Mini 480p 7 / 720p 13, Fast 480p 8 / 720p 14, Pro 720p 16 / 1080p 28 credits/sec (with a reference video, Pro is limited to 720p / 1080p) |
 
-  For both models, `billable seconds = max(reference duration + output duration, minimum-billable floor)`. See [Models](/en/features/models) for the complete rate tables and examples. The system detects the reference video's actual duration automatically. A reference video can be submitted together with content-reference images; their limits are independent.
+  The server probes every clip and its detected duration is authoritative — any duration you send is only a diagnostic hint. If probing the reference videos or audio cannot finish in its budget, the request fails with `503` / `reference_probe_timeout` and `retryable: true` **before any charge**: resubmit the same request under the same `idempotencyKey`. Billing uses the **sum** of all reference video durations:
+
+  `billable seconds = max(sum of reference video durations + output duration, minimum-billable floor)`
+
+  See [Models](/en/features/models) for the complete rate tables and examples. Reference videos, reference audio and content-reference images are three independent budgets.
+
+  **Legacy alias.** The singular `referenceVideo` (a plain string) is still accepted and is treated as a one-element `referenceVideos` array; it will keep working indefinitely. If you send both, `referenceVideo` must be the first element of `referenceVideos` — any other combination returns `400` / `invalid_input`.
+</ParamField>
+
+<ParamField body="referenceAudios" type="string[]">
+  Array of reference audio clips for Seedance 2.5 or Seedance 2.0. Every entry must be an `https://images.meigen.ai/...` URL from the [reference-media upload endpoint](#upload-reference-videos-and-audio), in **wav** or **mp3**, at most **15MB** per clip. Arbitrary public URLs are **not** accepted: any other host is rejected with `400` / `invalid_reference_audio` before any credits are deducted. The format is verified from the file's own bytes, not from its extension or `Content-Type`.
+
+  | Model | Clips | Per clip | Total across clips | Audio-only request |
+  | --- | --- | --- | --- | --- |
+  | Seedance 2.5 | up to 10 | 2–30s | ≤30s | Allowed |
+  | Seedance 2.0 | up to 3 | 2–15s | ≤15s | Not allowed — needs at least 1 reference image or 1 reference video |
+
+  **Reference audio is free.** It never enters the billable-seconds sum, and adding audio to a request never changes its price. A request that carries reference audio but no reference video is billed at the model's **direct** (no-video) per-second rate, not the discounted with-video rate.
+
+  Rejections are pre-charge `400`s: `reference_audio_not_supported`, `too_many_reference_audios`, `reference_audio_total_seconds_exceeded`, `reference_audio_requires_visual`, or `invalid_reference_audio` for a clip that can't be read, isn't wav/mp3, or falls outside the per-clip duration range.
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">
-  Deprecated compatibility hint; omit it in new integrations. If supplied, it must be a finite non-negative number and may be compared with the detected value for diagnostics, but it does not control billing or clipping. The server-probed duration is authoritative for Seedance 2.5 / 2.0 continuation.
+  Deprecated compatibility hint; omit it in new integrations. If supplied, it must be a finite non-negative number and may be compared with the detected value for diagnostics, but it does not control billing or clipping. The server-probed duration is authoritative for Seedance 2.5 / 2.0 continuation, and with `referenceVideos` the billed total is the sum of every probed clip. There is no audio equivalent of this field — audio durations are always probed and never billed.
 </ParamField>
 
 <ParamField body="idempotencyKey" type="string">
@@ -330,6 +356,77 @@ Poll this endpoint to check if your image is ready.
 
 When a generation fails, credits are automatically refunded. Poll `creditsStatus` to confirm the outcome: `pending` (deducted, not yet settled), `confirmed` (charged), `refunded` (returned to your balance).
 
+## Upload Reference Videos and Audio
+
+```
+POST /api/upload/reference-video
+```
+
+`referenceVideos` and `referenceAudios` only accept files hosted on `images.meigen.ai`. Use this endpoint to get a presigned URL for a local file, then upload the bytes yourself. It accepts **either** an API token (`Bearer meigen_sk_...`) **or** a logged-in session access token — Bearer header only, cookies are not read. The same endpoint serves both kinds; pick with `kind`.
+
+An API-token call also requires a **positive purchased-credit balance** on the owning account. Presigning itself costs nothing, but a zero balance returns `402` — top up the same account and retry. Session calls are not gated this way.
+
+### Body Parameters
+
+<ParamField body="filename" type="string" required>
+  The original file name. It must be a non-empty string, but that is the only check: the server neither stores it nor echoes it back, so it never reaches the stored object or the response. The stored object's extension is derived **only** from `contentType`: `video/mp4` → `mp4`, `video/quicktime` → `mov`, `audio/wav` / `audio/x-wav` / `audio/wave` / `audio/vnd.wave` → `wav`, `audio/mpeg` / `audio/mp3` → `mp3`. A file named `clip.mov` but declared as `video/mp4` is still stored as `.mp4`, so send the `contentType` that matches the file's real container — vendors read the container from the stored URL's extension.
+</ParamField>
+
+<ParamField body="contentType" type="string" required>
+  The MIME type of the file, and the only thing that decides the stored extension. Video accepts `video/mp4` and `video/quicktime`; audio accepts `audio/wav`, `audio/x-wav`, `audio/wave`, `audio/vnd.wave`, `audio/mpeg` and `audio/mp3`. It must agree with `kind` — an audio type sent as `kind: "video"` (or the reverse) is rejected with `400`. Use the exact same value on the follow-up `PUT`.
+</ParamField>
+
+<ParamField body="size" type="number" required>
+  The file's exact byte length. It is checked against the selected model's cap before a URL is issued: reference video is ≤200MB on Seedance 2.5 and ≤50MB on Seedance 2.0; reference audio is ≤15MB on both.
+</ParamField>
+
+<ParamField body="modelId" type="string">
+  The model you intend to generate with. It selects which size cap applies. If omitted, a legacy fallback of 15MB is used for audio.
+</ParamField>
+
+<ParamField body="kind" type="string" default="video">
+  `video` or `audio`. Defaults to `video` for backward compatibility with existing integrations.
+</ParamField>
+
+### Response
+
+<ResponseField name="presignedUrl" type="string">
+  A short-lived URL to `PUT` the raw file bytes to. Send the same `Content-Type` you declared above, and no `Authorization` header.
+</ResponseField>
+
+<ResponseField name="publicUrl" type="string">
+  The `https://images.meigen.ai/...` URL to pass in `referenceVideos` or `referenceAudios` once the upload completes.
+</ResponseField>
+
+<ResponseField name="key" type="string">
+  The stored object key, `ref-videos/YYYY-MM-DD/{id}.{mp4|mov|wav|mp3}`. Audio and video share this prefix.
+</ResponseField>
+
+```bash
+# 1. Ask for a presigned URL
+curl -X POST https://www.meigen.ai/api/upload/reference-video \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filename": "theme.mp3",
+    "contentType": "audio/mpeg",
+    "size": 1843200,
+    "modelId": "seedance-2-5",
+    "kind": "audio"
+  }'
+
+# 2. Upload the bytes to the returned presignedUrl
+curl -X PUT "<presignedUrl>" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @theme.mp3
+
+# 3. Use the returned publicUrl in referenceAudios
+```
+
+<Note>
+  Uploaded reference objects are deleted automatically **7 days** after upload. Keep the source file if you need to resubmit later — a generation that already started is unaffected, but a stale `publicUrl` will fail validation on a new request.
+</Note>
+
 ## Workflow examples
 
 For N scripts → frames → videos, persistent IDs, in-flight budget reservations and bounded concurrency, see [composable workflows](/en/mcp/composable-workflows). HTTP uses `idempotencyKey`; MCP uses `requestId`. New IDs represent new attempts, not timeout recovery.
@@ -434,11 +531,33 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
     "aspectRatio": "adaptive",
     "resolution": "480p",
     "duration": 5,
-    "referenceVideo": "https://images.meigen.ai/generations/eagle-clip.mp4"
+    "referenceVideos": ["https://images.meigen.ai/generations/eagle-clip.mp4"]
   }'
 ```
 
 Pricing: 480p with-reference-video rate is 11 credits/sec. Assuming the uploaded reference is 2 seconds long (detected automatically), billable seconds = max(2 + 5, 9) = 9 sec, total **99 credits**. Output length remains `duration` = 5 seconds.
+
+### Seedance 2.5 with two reference videos and one reference audio
+
+```bash
+curl -X POST https://www.meigen.ai/api/generate/v2 \
+  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Continue the dive from [video1], then cut to the river camera move of [video2], scored to the rhythm of [audio1]",
+    "modelId": "seedance-2-5",
+    "aspectRatio": "adaptive",
+    "resolution": "480p",
+    "duration": 5,
+    "referenceVideos": [
+      "https://images.meigen.ai/generations/eagle-dive.mp4",
+      "https://images.meigen.ai/ref-videos/2026-09-17/river-pan.mp4"
+    ],
+    "referenceAudios": ["https://images.meigen.ai/ref-videos/2026-09-17/theme.mp3"]
+  }'
+```
+
+Pricing: the two clips are probed at 3s and 4s, so the reference sum is **7 seconds**. Billable seconds = max(7 + 5, 9) = 12 sec at the 480p with-video rate of 11 credits/sec, total **132 credits**. The reference audio adds **0** — it is never billed, and its length does not enter the sum. `[video1]` / `[video2]` / `[audio1]` are rewritten to `Video 1` / `Video 2` / `Audio 1` before the request reaches the model.
 
 ### Auto ratio selection
 

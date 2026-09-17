@@ -128,7 +128,16 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | `unsupported_resolution` | 400 | 该模型/档位不支持这个分辨率 |
 | `first_frame_required` | 400 | 该模型必须提供首帧图 |
 | `reference_video_not_supported` | 400 | 该模型/档位/分辨率不支持参考视频续写 |
-| `invalid_reference_video` | 400 | 参考视频无法读取或不符合所选模型限制。请读取 `capabilities.video.referenceVideo`：Seedance 2.5 为 2–30 秒、≤200MB；Seedance 2.0 为 2–15 秒、≤50MB；链接必须来自平台内 |
+| `invalid_reference_video` | 400 | `referenceVideos` 中某一条无法读取，或不符合该模型的单条限制。请读取 `capabilities.video.referenceVideo`：Seedance 2.5 单条 2–30 秒、≤200MB；Seedance 2.0 单条 2–15 秒、≤50MB；每一项都必须是 `https://images.meigen.ai/...` 地址 —— 任意公网 URL 会在这里被拒 |
+| `too_many_reference_videos` | 400 | `referenceVideos` 条数超过该模型上限 —— 读 `capabilities.video.referenceVideo.maxCount`（Seedance 2.5 为 10，Seedance 2.0 为 3）|
+| `reference_video_total_seconds_exceeded` | 400 | 各条参考视频单独合规，但时长总和超过 `capabilities.video.referenceVideo.maxTotalSeconds`（Seedance 2.5 为 30 秒，Seedance 2.0 为 15 秒）|
+| `reference_audio_not_supported` | 400 | 该模型不接受 `referenceAudios` —— 读 `capabilities.video.referenceAudio.enabled` |
+| `invalid_reference_audio` | 400 | `referenceAudios` 中某一条不是 `https://images.meigen.ai/...` 地址、无法读取、不是 wav / mp3、超过 15MB，或单条时长越界（Seedance 2.5 为 2–30 秒，Seedance 2.0 为 2–15 秒）|
+| `too_many_reference_audios` | 400 | `referenceAudios` 条数超过该模型上限 —— 读 `capabilities.video.referenceAudio.maxCount`（Seedance 2.5 为 10，Seedance 2.0 为 3）|
+| `reference_audio_total_seconds_exceeded` | 400 | 参考音频时长总和超过 `capabilities.video.referenceAudio.maxTotalSeconds`（Seedance 2.5 为 30 秒，Seedance 2.0 为 15 秒）|
+| `reference_audio_requires_visual` | 400 | 该模型不能只靠音频生成 —— `referenceAudios` 必须搭配至少 1 张参考图或 1 条参考视频（Seedance 2.0；见 `capabilities.video.referenceAudio.requiresVisualReference`）|
+| `reference_probe_timeout` | 503 | 参考视频或参考音频在预算内没能完成服务端校验（CDN 抖动、源站变慢等）。**未扣点**，响应体带 `retryable: true` —— 用同一个 `requestId` / `idempotencyKey` 原样重试这条请求，不要另建新尝试 |
+| `invalid_input` | 400 | JSON 请求体格式错误，或同时传了 `referenceVideo` 与 `referenceVideos` 但第一条不一致 |
 | `invalid_reference_url` | 400 | `referenceImages` 中存在不合法的 URL 或 base64 值 |
 | `frame_reference_limit` | 400 | `referenceMode: "frame"` 最多 2 张图，改用 `referenceMode: "content"` 可传更多 |
 | `too_many_references` | 400 | 参考图数量超出该模型上限 |
@@ -137,7 +146,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | `characters_not_supported` | 400 | 该模型不支持角色引用 |
 | `character_tier_required` | 400 | 该角色需要更高档位 |
 | `model_not_available` | 403 | 该模型在当前平台不可用 |
-| `idempotency_conflict` | 409 | 换一个新的 `idempotencyKey` 重试 |
+| `idempotency_conflict` | 409 | 这个 `idempotencyKey` 已经属于一次参数不同的请求。不要自动换 key 绕过：先用 `GET /api/generate/v2/requests/{requestId}` 查回原请求并核对参数；只有调用方明确要再发起一次付费生成时才用新 key |
 
 除上述之外的错误——包括所有 `5xx` 响应——都代表服务端暂时不可用。稍后重试即可，生成失败的积分会自动退还。
 

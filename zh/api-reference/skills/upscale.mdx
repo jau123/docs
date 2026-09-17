@@ -16,7 +16,7 @@ MCP: `upscale_image`
 | 字段 | 契约 |
 | --- | --- |
 | `requestId` | 必填，新请求使用 UUID；精确参数恢复时保留原值。 |
-| `imageUrl` | 必填，原始公开 HTTPS JPEG/PNG/WebP URL，不含凭据、片段或非标准端口；最多 64 MiB / 6400 万像素，仅静态图片。 |
+| `imageUrl` | 必填，MeiGen 能匿名拉取的原始 HTTPS JPEG/PNG/WebP URL，不含凭据、片段或非标准端口。任意域名都可以 —— 与只收 `images.meigen.ai` 的 `referenceVideos` / `referenceAudios` 不同。最多 64 MiB / 6400 万像素，仅静态图片。 |
 | `mode` | crisp（默认）保留结构；creative 为模糊图片重建细节。 |
 | `allowDownscale` | 默认 false，仅在用户接受缩图取舍后设为 true。 |
 | `confirmedCredits` | MCP 每次调用均必填（含首次），直接 HTTP 可选。非负整数，来自用户或上层工作流已接受预算内的实时报价，用于派发前查价，不是原子扣费上限；当前价格从目录获取。 |

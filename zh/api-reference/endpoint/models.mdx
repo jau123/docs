@@ -62,7 +62,9 @@ GET /api/models
 </ResponseField>
 
 <ResponseField name="capabilities" type="object">
-  稳定、向前兼容的能力契约。`capabilities.video` 始终是对象：用 `capabilities.video.valid` 区分视频模型（`true`）与图片模型（`false`）。`valid` 为真时，该对象描述输出时长、参考视频限制、计费模式和是否必须提供首帧。**不要写 `if (capabilities.video)`**，因为图片模型也会返回该对象。新集成应读取这份契约，不要从 `extra_config` 自行拼装视频能力。
+  稳定、向前兼容的能力契约。`capabilities.video` 始终是对象：用 `capabilities.video.valid` 区分视频模型（`true`）与图片模型（`false`）。`valid` 为真时，该对象描述输出时长、参考视频与参考音频限制、计费模式和是否必须提供首帧。**不要写 `if (capabilities.video)`**，因为图片模型也会返回该对象。新集成应读取这份契约，不要从 `extra_config` 自行拼装视频能力。
+
+  `capabilities.video.referenceVideo` 包含 `enabled`、`minSeconds` 和 `maxSeconds`（单条），以及面向整个数组的 `maxCount` 与 `maxTotalSeconds` —— Seedance 2.5 为 10 条、合计 30 秒，Seedance 2.0 为 3 条、合计 15 秒。`capabilities.video.referenceAudio` 结构相同，另加 `formats`（`["wav", "mp3"]`）和 `requiresVisualReference`：为 `true` 时（Seedance 2.0）请求还必须带至少 1 张参考图或 1 条参考视频，纯音频生成会被拒绝。当前响应总是包含这两个对象。早于 2026-09 的缓存响应体仍可能缺少它们，读到没有 `referenceVideo` 或 `referenceAudio` 时按 `{ "enabled": false }` 处理，而不是当作"不限"。参考音频永远不影响计费。
 </ResponseField>
 
 <ResponseField name="extra_config" type="object">
@@ -81,8 +83,8 @@ GET /api/models
   | `durations` | 视频模型 | `duration` 允许的取值（秒）|
   | `pricingPerSec` | Seedance 2.5 / Seedance 2.0 / Grok Video 1.5 / Agnes Video 2.5 Flash | 直接生成每秒积分，按分辨率分级；有档位的模型先按档位再按分辨率 |
   | `pricingPerCall` | Veo 3.1 | 每次生成消耗的积分，按档位再按 `duration` 二维查表。与 `pricingPerSec` 互斥，存在时优先 |
-  | `pricingPerSecWithVideo` | Seedance 2.5 / Seedance 2.0 | 提供 `referenceVideo` 时的每秒积分，按分辨率或档位 + 分辨率分级 |
-  | `minBillableTable` | Seedance 2.5 / Seedance 2.0 | 按输出 `duration` 的最低计费秒数；计费取 `max(参考 + 输出, 最低值)` |
+  | `pricingPerSecWithVideo` | Seedance 2.5 / Seedance 2.0 | **只要带了参考视频**就适用的每秒积分，按分辨率或档位 + 分辨率分级。只带参考音频不会切到这档价，纯音频请求按 `pricingPerSec` 计费 |
+  | `minBillableTable` | Seedance 2.5 / Seedance 2.0 | 按输出 `duration` 的最低计费秒数；计费取 `max(参考视频时长总和 + 输出, 最低值)`。参考音频时长从不计入 |
   | `maxContentReferenceImages` | Seedance 2.5 / Seedance 2.0 | `referenceMode` 为 `content` 时的图片上限；与 `max_reference_images` 的首帧/末帧槽位分开 |
 
   上述定价相关的键属于契约的一部分；响应里可能出现其它键，仅供参考。
@@ -123,7 +125,8 @@ curl https://www.meigen.ai/api/models
       "capabilities": {
         "video": {
           "outputDuration": null,
-          "referenceVideo": { "enabled": false, "minSeconds": 0, "maxSeconds": 0, "maxUploadBytes": 0 },
+          "referenceVideo": { "enabled": false, "minSeconds": 0, "maxSeconds": 0, "maxCount": 0, "maxTotalSeconds": 0, "maxUploadBytes": 0 },
+          "referenceAudio": { "enabled": false, "minSeconds": 0, "maxSeconds": 0, "maxCount": 0, "maxTotalSeconds": 0, "maxUploadBytes": 0, "formats": [], "requiresVisualReference": false },
           "billing": null,
           "requiresFirstFrame": false,
           "valid": false
@@ -139,11 +142,11 @@ curl https://www.meigen.ai/api/models
       "max_reference_images": 2,
       "media_type": "video",
       "extra_config": {
-        "resolutions": ["480p", "720p"],
+        "resolutions": ["480p", "720p", "1080p"],
         "durations": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
         "maxContentReferenceImages": 30,
-        "pricingPerSec": { "480p": 18, "720p": 39 },
-        "pricingPerSecWithVideo": { "480p": 11, "720p": 24 },
+        "pricingPerSec": { "480p": 18, "720p": 39, "1080p": 90 },
+        "pricingPerSecWithVideo": { "480p": 11, "720p": 24, "1080p": 54 },
         "minBillableTable": { "4": 7, "5": 9, "6": 10, "7": 12, "8": 14, "9": 15, "10": 17, "11": 19, "12": 20, "13": 22, "14": 24, "15": 25, "16": 27, "17": 29, "18": 30, "19": 32, "20": 34, "21": 35, "22": 37, "23": 39, "24": 40, "25": 42, "26": 44, "27": 45, "28": 47, "29": 49, "30": 50 }
       },
       "estimatedTiming": { "p50": 118, "p90": 165.2 },
@@ -154,8 +157,20 @@ curl https://www.meigen.ai/api/models
             "enabled": true,
             "minSeconds": 2,
             "maxSeconds": 30,
+            "maxCount": 10,
+            "maxTotalSeconds": 30,
             "maxUploadBytes": 209715200,
-            "resolutions": ["480p", "720p"]
+            "resolutions": ["480p", "720p", "1080p"]
+          },
+          "referenceAudio": {
+            "enabled": true,
+            "minSeconds": 2,
+            "maxSeconds": 30,
+            "maxCount": 10,
+            "maxTotalSeconds": 30,
+            "maxUploadBytes": 15728640,
+            "formats": ["wav", "mp3"],
+            "requiresVisualReference": false
           },
           "billing": { "mode": "per_second", "requestDefaultSeconds": 4, "referenceSeconds": "reference_plus_output_with_minimum_table" },
           "requiresFirstFrame": false,

@@ -82,7 +82,7 @@ The remote server exposes **14 tools**:
 | `generate_video` | MeiGen Cloud video generation | Yes |
 | `check_generation` | Status/recovery by generationId or requestId | Request-ID lookup requires an owning-account key |
 | `list_models` | Available models and capabilities | No |
-| `search_gallery` | Search public prompts and image previews | No |
+| `search_gallery` | Search public prompts and image previews; returns at most 3 entries | No — but with a key the search counts against that account's quota |
 | `get_inspiration` | Read a public gallery entry | No |
 | `list_skills` | Five workflows, materials, live prices and input schemas | No |
 | `upload_skill_image` | Prepare real image URLs or attachment bytes | Yes |
@@ -96,6 +96,8 @@ The remote server exposes **14 tools**:
 ## First successful check
 
 Reconnect, then ask: **“List MeiGen's available Skills and current prices.”** Verify that an actual tool call succeeds; registration alone is not connection proof. It does not generate or spend credits. Then supply the required material and request one of the [five workflows](/en/api-reference/skills/overview). Skills return after submission and use `check_skill`; generic generation recovery uses `check_generation`.
+
+`search_gallery` returns **at most 3 entries** per call, so narrow the query instead of expecting a long list. When the connection carries an API key, each search is counted against that account's [**daily search allowance**](/en/features/gallery#search) — the same free allowance a signed-in web user gets, not purchased credits. Without a key, searches are rate-limited per anonymous IP instead.
 
 Remote tools cannot read a local filesystem path. Use a public image URL or `upload_skill_image` with actual accessible bytes. For Upscale, pass the original URL directly or upload with `purpose: "upscale"`; do not downsize it as an ordinary reference first.
 
@@ -116,6 +118,30 @@ When `list_models` includes `gpt-image-2.5`, `generate_image` accepts all five q
 ```
 
 Check the current model price before submitting this 2K Standard request. Add public reference-image URLs with `referenceImages` for editing or visual guidance. The UUID shown is illustrative: allocate and persist your own `requestId` once per logical attempt, then reuse it only with the exact inputs for recovery. `wait: false` returns after submission. Use `check_generation` with requestId or generationId after an interruption. Legacy `attemptId` remains accepted; new integrations should use requestId. See [model pricing](/en/features/models) for the full matrix.
+
+
+### Reference video and audio
+
+`generate_video` takes reference media as arrays: `referenceVideos` (mp4 / mov) and `referenceAudios` (wav / mp3). **Remote tools cannot read a local filesystem path**, and an arbitrary public URL is not accepted either. Every entry must be an `https://images.meigen.ai/...` URL: a previous MeiGen generation's `videoUrl`, or a file you uploaded through [`POST /api/upload/reference-video`](/en/api-reference/endpoint/generate#upload-reference-videos-and-audio). Any other host is rejected before credits are deducted (`invalid_reference_video` / `invalid_reference_audio`). Only the local npm server can upload local files for you.
+
+```json
+{
+  "prompt": "Continue the dive from [video1] with the camera locked off, scored to the rhythm of [audio1]",
+  "model": "seedance-2-5",
+  "aspectRatio": "adaptive",
+  "resolution": "480p",
+  "duration": 5,
+  "referenceVideos": [
+    "https://images.meigen.ai/generations/eagle-dive.mp4",
+    "https://images.meigen.ai/ref-videos/2026-09-17/river-pan.mp4"
+  ],
+  "referenceAudios": ["https://images.meigen.ai/ref-videos/2026-09-17/theme.mp3"],
+  "requestId": "3f1c2b60-9d2a-4f1e-9a1f-0d3b7c5a8e42",
+  "wait": false
+}
+```
+
+`[video1]` and `[audio1]` are rewritten to the vendor's own `Video 1` / `Audio 1` wording before submission; writing `Video 1` directly works too. Numbering is 1-based per kind, in array order. Read the per-model counts and totals from `list_models`. Billing uses the **sum** of the reference video durations plus `duration`; the audio clip adds nothing. Omit an empty array entirely — reference media are part of the `requestId` input fingerprint.
 
 
 ## Remote and local

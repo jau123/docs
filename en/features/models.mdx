@@ -23,8 +23,8 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Midjourney V8.2** | 15 (1K) / 20 (2K) | Fast (~33s) | 1 | ✓ | Photorealistic, universal aesthetics |
 | **Flux 2 Klein** | 2 | Fast (~23s) | None | Web only | General-purpose base model, text rendering |
 | **Agnes Image 2.5 Flash** | 1 | Fast (~30s) | 1 | ✓ | Cheapest model, high-volume drafts, covered by daily free credits |
-| **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec) | Video, ~2-3min | First/last frame or content reference | ✓ | 4–30s, 480p/720p, generated audio, reference-video continuation |
-| **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio |
+| **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec, 1080p 90/sec) | Video, ~2-3min | First/last frame or content reference, plus reference video & audio | ✓ | 4–30s, 480p/720p/1080p, generated audio, multi-clip reference video & audio continuation |
+| **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference, plus reference video & audio | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio, reference video & audio |
 | **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video, ~35s | First frame (required) | ✓ | First-frame image-to-video only, 4–15s, ratio follows input, audio |
 | **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-8min | Up to 2 (first/last frame) | Web only | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
 | **Agnes Video 2.5 Flash** | 10 per video (720p, 2/sec × 5s) | Video, ~2min | First frame (single image) | ✓ | Fixed 5s / 720p, the only video model covered by daily free credits |
@@ -253,13 +253,14 @@ The cheapest model on MeiGen at 1 credit per image, and the only basic-tier **im
 | **Credits** | Per-second pricing (see below) |
 | **Duration** | 4–30 seconds (default 4) |
 | **Reference images** | Up to 2 first/last frames, or up to 30 content references (`referenceMode: content`) |
-| **Reference video** | 2–30 seconds, up to 200MB; actual duration is detected automatically |
-| **Resolutions** | 480p, 720p (default 480p) |
+| **Reference video** | Up to 10 clips, 2–30s each, 30s in total, ≤200MB per clip; actual durations are detected automatically |
+| **Reference audio** | Up to 10 clips, 2–30s each, 30s in total, ≤15MB per clip (WAV / MP3); free, and allowed with no image or video attached |
+| **Resolutions** | 480p, 720p, 1080p (default 480p) |
 | **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
 | **Audio** | Auto-generated |
 | **Tiers** | None — do not send `tier` |
 
-Seedance 2.5 is the long-duration Seedance model on MeiGen. It supports text-to-video, first/last-frame image-to-video, up to 30 content-reference images, and reference-video continuation. Content images and the optional reference video can be used together and are counted separately. Frame references and reference-video continuation use `adaptive` ratio so the output follows the input media; text-to-video and content-reference requests can use an explicit supported ratio.
+Seedance 2.5 is the long-duration Seedance model on MeiGen. It supports text-to-video, first/last-frame image-to-video, up to 30 content-reference images, and reference-video continuation. Content images, reference videos and reference audio can all be used in the same request and are three independent budgets. Frame references and reference-video continuation use `adaptive` ratio so the output follows the input media; text-to-video and content-reference requests can use an explicit supported ratio.
 
 #### Pricing
 
@@ -267,19 +268,23 @@ Seedance 2.5 is the long-duration Seedance model on MeiGen. It supports text-to-
 | --- | --- | --- |
 | 480p | 18 credits/sec | 11 credits/sec |
 | 720p | 39 credits/sec | 24 credits/sec |
+| 1080p | 90 credits/sec | 54 credits/sec |
 
-Direct generation bills only the selected output duration. With a reference video:
+Direct generation bills only the selected output duration. With one or more reference videos, billing uses the **sum** of their durations:
 
-`billable seconds = max(reference video duration + selected output duration, ceil(selected output duration × 5 / 3))`
+`billable seconds = max(sum of reference video durations + selected output duration, ceil(selected output duration × 5 / 3))`
 
-The minimum-billable floor is 7 seconds for a 4-second output, 9 for 5 seconds, and 50 for 30 seconds. Output length is always the selected 4–30 seconds; the billing floor does not lengthen the generated clip.
+The minimum-billable floor is 7 seconds for a 4-second output, 9 for 5 seconds, and 50 for 30 seconds. Output length is always the selected 4–30 seconds; the billing floor does not lengthen the generated clip. **Reference audio is free** — its duration never enters the sum, and a request with audio but no reference video is billed at the direct rate.
 
 | Scenario | Calculation | Total |
 | --- | --- | --- |
 | 480p × 5s direct | 18 × 5 | **90** |
 | 720p × 5s direct | 39 × 5 | **195** |
-| 480p, 2s reference + 5s output | 11 × max(2+5, 9) | **99** |
-| 720p, 2s reference + 5s output | 24 × max(2+5, 9) | **216** |
+| 480p, one 2s reference video + 5s output | 11 × max(2+5, 9) | **99** |
+| 720p, one 2s reference video + 5s output | 24 × max(2+5, 9) | **216** |
+| 480p, 2s + 3s reference videos + 5s output | 11 × max(2+3+5, 9) = 11 × 10 | **110** |
+| 480p, one 2s reference video + 1 reference audio clip + 5s output | 11 × max(2+5, 9); audio adds 0 | **99** |
+| 480p × 5s direct + 1 reference audio clip | 18 × 5; no reference video, so the direct rate applies | **90** |
 | 480p × 30s direct | 18 × 30 | **540** |
 
 <Note>
@@ -297,21 +302,22 @@ The minimum-billable floor is 7 seconds for a 4-second output, 9 for 5 seconds, 
 | **Credits** | Per-second pricing (see below) |
 | **Duration** | 4-15 seconds (default 4) |
 | **Reference images** | Up to 2 first/last frames, or up to 9 content references (`referenceMode: content`) |
-| **Reference video** | All three tiers. Upload must be 2–15s and ≤50MB — the platform detects the actual duration automatically |
+| **Reference video** | All three tiers. Up to 3 clips, 2–15s each, 15s in total, ≤50MB per clip — the platform detects each actual duration automatically |
+| **Reference audio** | Up to 3 clips, 2–15s each, 15s in total, ≤15MB per clip (WAV / MP3); free, but requires at least 1 reference image or reference video |
 | **Resolutions** | Direct: Mini/Fast 480p/720p, Pro 480p/720p/1080p/4K. With reference video: Mini/Fast 480p/720p, Pro 720p/1080p (no 480p, no 4K) |
 | **Aspect ratios** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 |
 | **Audio** | Auto-generated |
 
 Seedance 2.0 is the three-tier Seedance option. It supports text-to-video, image-to-video (first/last frame or content reference), and video continuation. All outputs include AI-generated audio. The `adaptive` aspect ratio automatically matches the reference image/video dimensions. Both Seedance 2.0 and 2.5 support **character assets**: save a character once, then reference it with `@` in your prompt to keep the same subject across shots.
 
-Two reference-image modes: **first/last frame** (default, up to 2 images) sets the opening and/or closing frame; **content reference** guides style or subject instead of fixing a frame position and accepts up to 9 images. Content images and the optional reference video can be used together and are counted separately.
+Two reference-image modes: **first/last frame** (default, up to 2 images) sets the opening and/or closing frame; **content reference** guides style or subject instead of fixing a frame position and accepts up to 9 images. Content images, reference videos and reference audio can all be used in the same request and are three independent budgets.
 
 **Three tiers**, picked from the tier switch (Mini / Fast / Pro) in the video sidebar. Same Seedance 2.0 model, same params, just different rendering quality and price:
 - **Mini** (default): cheapest and most lightweight; 480p / 720p
 - **Fast**: quick turnaround at 480p / 720p
 - **Pro**: higher fidelity, with **native 1080p and 4K** rendering (4K is direct-generation only)
 
-All three tiers support reference-video continuation — continuation output tops out at 1080p even on Pro.
+All three tiers support multi-clip reference-video continuation and reference audio — continuation output tops out at 1080p even on Pro.
 
 #### Pricing
 
@@ -328,9 +334,9 @@ Mini and Fast only support 480p / 720p. Pro adds native 1080p and 4K for direct 
 
 **With-reference-video billing rule (all tiers):**
 
-`billable seconds = max(reference video duration + your selected duration, min billable)`
+`billable seconds = max(sum of reference video durations + your selected duration, min billable)`
 
-Output length is always your selected duration (4–15), independent of the reference video's length.
+Output length is always your selected duration (4–15), independent of the reference videos' lengths. **Reference audio is free** and never enters the sum; attaching audio without any reference video keeps the direct rate.
 
 | Your selected duration (sec) | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -344,11 +350,13 @@ Output length is always your selected duration (4–15), independent of the refe
 | Mini 720p × 5s direct | 16 × 5 | **80** |
 | Fast 480p × 5s direct | 13 × 5 | **65** |
 | Fast 720p × 5s direct | 20 × 5 | **100** |
-| Fast 720p, 5s reference + 10s selected duration | 14 × max(5+10, 17) = 14 × 17 | **238** |
+| Fast 720p, one 5s reference video + 10s selected duration | 14 × max(5+10, 17) = 14 × 17 | **238** |
+| Fast 720p, 4s + 5s reference videos + 10s selected duration | 14 × max(4+5+10, 17) = 14 × 19 | **266** |
+| Mini 720p × 5s with a first frame + 1 reference audio clip | 16 × 5; audio adds 0 | **80** |
 | Pro 720p × 5s direct | 22 × 5 | **110** |
 | Pro 1080p × 5s direct | 42 × 5 | **210** |
 | Pro 4K × 5s direct | 100 × 5 | **500** |
-| Pro 1080p, 5s reference + 10s selected duration | 28 × max(5+10, 17) = 28 × 17 | **476** |
+| Pro 1080p, one 5s reference video + 10s selected duration | 28 × max(5+10, 17) = 28 × 17 | **476** |
 
 <Note>
   If generation fails, the **full** credit amount is automatically refunded — including all per-second charges.
@@ -366,6 +374,7 @@ Output length is always your selected duration (4–15), independent of the refe
 | **Duration** | 4-15 seconds (default 4) |
 | **Reference images** | 1 — first frame **required** (image-to-video only) |
 | **Reference video** | Not supported |
+| **Reference audio** | Not supported |
 | **Resolutions** | 480p, 720p (default 480p) |
 | **Aspect ratios** | Follows the first-frame image automatically (no manual ratio selection) |
 | **Audio** | Auto-generated |
@@ -404,6 +413,7 @@ xAI's image-to-video model. A starting (first-frame) image is **required** — p
 | **Duration** | 4, 6, or 8 seconds (default 4) |
 | **Reference images** | Up to 2 (as first/last frame) |
 | **Reference video** | Not supported |
+| **Reference audio** | Not supported |
 | **Resolutions** | 720p, 1080p, 4k (default 1080p) |
 | **Aspect ratios** | Auto, 16:9, 9:16 |
 | **Audio** | Auto-generated (always on) |
@@ -450,10 +460,11 @@ Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 
 | **Duration** | 5 seconds (fixed) |
 | **Reference images** | 1 (first frame, image-to-video) |
 | **Reference video** | Not supported |
+| **Reference audio** | Not supported |
 | **Resolutions** | 720p |
 | **Aspect ratios** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
 
-The only basic-tier video model — and the only one your daily free credits cover. Supports text-to-video and single-image first-frame image-to-video at a fixed 5 seconds / 720p. For longer clips, use Seedance 2.5; for higher resolutions, use Seedance 2.0 Pro or Veo 3.1.
+The only basic-tier video model — and the only one your daily free credits cover. Supports text-to-video and single-image first-frame image-to-video at a fixed 5 seconds / 720p. For longer clips or higher resolutions, use Seedance 2.5 (up to 30s and 1080p); for 4K, use Seedance 2.0 Pro or Veo 3.1.
 
 <Note>
   **Image-to-video ignores the requested aspect ratio** — the output follows the first frame.
@@ -501,11 +512,15 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
   </Accordion>
 
   <Accordion title="Seedance 2.0 — Per-second pricing + With-reference-video minimum" icon="circle-info">
-    Seedance bills **per second**, not per image — and uploading a reference video uses a separate rate table with a minimum-billable floor. See the **Seedance 2.0** section above for the full rates and formula.
+    Seedance bills **per second**, not per image — and uploading a reference video switches to a separate rate table with a minimum-billable floor. With several reference videos, the billed seconds use the **sum** of their durations plus your selected output duration, so each extra clip raises the total. Reference audio is free and never enters that sum, and a request with audio but no reference video stays on the direct rate. See the **Seedance 2.0** section above for the full rates and formula.
+  </Accordion>
+
+  <Accordion title="Seedance 2.0 — Reference audio needs an image or video" icon="triangle-exclamation">
+    On Seedance 2.0, reference audio only works alongside at least one reference image (a saved character counts) or one reference video — audio on its own is rejected before any credits are deducted. Seedance 2.5 has no such requirement and accepts audio-only requests.
   </Accordion>
 
   <Accordion title="Seedance 2.5 — No Mini / Fast / Pro tier" icon="circle-info">
-    Seedance 2.5 has one quality level and supports 480p / 720p. Do not send `tier`; use Seedance 2.0 Pro when you specifically need 1080p or 4K.
+    Seedance 2.5 has one quality level and supports 480p / 720p / 1080p. Do not send `tier`; use Seedance 2.0 Pro when you specifically need 4K.
   </Accordion>
 
   <Accordion title="Seedance 2.0 Mini — 480p / 720p only" icon="triangle-exclamation">
@@ -517,7 +532,7 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
   </Accordion>
 
   <Accordion title="Grok Video 1.5 — 480p / 720p only" icon="triangle-exclamation">
-    Grok Video 1.5 outputs at 480p or 720p only. For higher resolutions (1080p / 4k), use Seedance 2.0 or Veo 3.1.
+    Grok Video 1.5 outputs at 480p or 720p only. For 1080p, use Seedance 2.5 or Seedance 2.0 Pro; for 4K, use Seedance 2.0 Pro or Veo 3.1.
   </Accordion>
 
   <Accordion title="Veo 3.1 — Limited aspect ratios" icon="triangle-exclamation">

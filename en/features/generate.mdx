@@ -46,16 +46,18 @@ Some prompts from the gallery contain blue `[placeholder]` tags — for example,
 
 Click any blue tag to select it, then type your replacement text. This makes it easy to create variations of a prompt without rewriting the whole thing.
 
-### @ Image Mentions
+### @ Mentions
 
-When you have multiple reference images uploaded, you can mention specific images inline in your prompt:
+When you have reference images — or, on video models, reference videos and audio — uploaded, you can mention a specific item inline in your prompt:
 
 1. Type `@` in the prompt editor
-2. A popup appears showing thumbnails of your uploaded reference images
-3. Select an image to insert a mention tag (e.g., `@image1`, `@image2`)
-4. Write instructions around the mentions: *"Use @image1 as the background scenery and apply the color palette from @image2"*
+2. A popup lists everything you have uploaded. Images show a thumbnail; **videos and audio show a video or audio icon only**, with no preview frame
+3. Select an item to insert a mention tag (`@image1`, `@image2`, `@video1`, `@audio1`)
+4. Write instructions around the mentions: *"Use @image1 as the background scenery, continue the camera move from @video1, and match the rhythm of @audio1"*
 
-This gives you precise control over how each reference image influences the generation.
+Numbering runs **per kind**, following the order of the items in each module — `@video2` is the second reference video, not the second item overall. Inline chips look the same as the popup rows, icon-only for video and audio. Remove an item and the remaining tags renumber themselves; a tag whose item is gone is marked stale so you can fix it before generating.
+
+This gives you precise control over how each reference influences the generation.
 
 ### Characters
 
@@ -193,6 +195,25 @@ Some prompts work best — or only make sense — with a reference image attache
 
 ---
 
+## Reference Video & Audio
+
+On **Seedance 2.5** and **Seedance 2.0**, the video sidebar's **Reference video & audio** module accepts several clips at once — videos to continue or condition on, audio to score or style the result.
+
+- **Upload methods** — drag files onto the module, or click **+** to browse
+- **Supported formats** — MP4 and MOV for video, WAV and MP3 for audio
+- **Thumbnail grid** — items appear as a grid on the left, exactly like reference images: a video shows a frame thumbnail, an audio clip shows an audio tile. Each has an × button to remove it. The module title disappears as soon as the first item is added, and the **+** button stays visible until you reach the model's cap
+- **Per-model counts and totals** — Seedance 2.5 takes up to 10 videos (2–30s each, 30s in total) and up to 10 audio clips (2–30s each, 30s in total). Seedance 2.0 takes up to 3 videos (2–15s each, 15s in total) and up to 3 audio clips (2–15s each, 15s in total)
+- **Size limits** — video is up to 200MB per clip on Seedance 2.5 and 50MB on Seedance 2.0; audio is up to 15MB per clip on both
+- **Seedance 2.0 needs something visual** — reference audio on 2.0 only works alongside at least one reference image (a saved character counts) or one reference video. Seedance 2.5 accepts audio on its own
+- **@ mentions** — every uploaded video and audio clip can be mentioned in the prompt as `@video1` / `@audio1`, shown with an icon only
+- **Audio is free** — reference audio never changes the credit cost; only the videos do
+
+<Note>
+  Items the currently selected model or settings cannot use stay in the module, greyed out and labelled "Not used by the current model settings" — switch back and they come straight into play again. See the [Models](/en/features/models) page for each model's exact counts and totals.
+</Note>
+
+---
+
 ## Generation Options
 
 ### Count
@@ -306,8 +327,8 @@ You can use the generated prompt as-is, or edit it to create variations of the o
 
 MeiGen offers several video models — the current list and full specs are on the [Models](/en/features/models) page:
 
-- **Seedance 2.5** — one quality level, per-second pricing, 4–30 seconds, reference videos up to 30 seconds / 200MB
-- **Seedance 2.0** — three tiers, per-second pricing, 4–15 seconds, reference videos up to 15 seconds / 50MB
+- **Seedance 2.5** — one quality level, per-second pricing, 4–30 seconds, up to 10 reference videos (30s in total, 200MB each) and up to 10 reference audio clips (30s in total)
+- **Seedance 2.0** — three tiers, per-second pricing, 4–15 seconds, up to 3 reference videos (15s in total, 50MB each) and up to 3 reference audio clips (15s in total)
 - **Veo 3.1** — two tiers, per-generation pricing, 4 / 6 / 8 seconds, audio always on
 - **Grok Video 1.5** — per-second pricing, 4–15 seconds, a first-frame image is required
 - **Agnes Video 2.5 Flash** — per-second pricing, fixed 5 seconds, covered by daily free credits
@@ -340,15 +361,16 @@ You can also drag gallery cards directly as frame images.
 | Option | Values | Description |
 | --- | --- | --- |
 | **Aspect ratio** | adaptive, 16:9, 4:3, 1:1, 3:4, 9:16, 21:9 | Frame-image and reference-video requests use `adaptive`; text-to-video and content-reference requests can use an explicit ratio |
-| **Resolution** | 480p, 720p (default 480p) | No quality tier; 480p uses fewer credits |
+| **Resolution** | 480p, 720p, 1080p (default 480p) | No quality tier; 480p uses fewer credits |
 | **Duration** | 4–30 seconds (default 4) | Slider or input |
 | **Audio** | Auto-generated | Always on |
 | **Reference images** | 2 frames or up to 30 content references | First/last frame and content references are separate modes |
-| **Reference video** | 2–30 seconds, up to 200MB | Actual duration is detected automatically |
+| **Reference video** | Up to 10 clips, 2–30s each, 30s in total, ≤200MB per clip | Actual durations are detected automatically; billing uses their sum |
+| **Reference audio** | Up to 10 clips, 2–30s each, 30s in total, ≤15MB per clip (WAV / MP3) | Free — never enters the credit cost. Audio-only requests are allowed |
 
-**Pricing**: direct generation costs 18 credits/sec at 480p or 39 credits/sec at 720p. With a reference video, the rates are 11 and 24 credits/sec and a minimum-billable floor applies. The sidebar shows the exact total; see [Models → Seedance 2.5](/en/features/models) for the formula and examples.
+**Pricing**: direct generation costs 18 / 39 / 90 credits per second at 480p / 720p / 1080p. With one or more reference videos, the rates are 11 / 24 / 54 credits per second, billed on the **sum** of the reference durations plus your output duration, with a minimum-billable floor. Reference audio adds nothing. The sidebar shows the exact total; see [Models → Seedance 2.5](/en/features/models) for the formula and examples.
 
-Seedance 2.5 has no Mini / Fast / Pro switch. Use Seedance 2.0 Pro when you specifically need 1080p or 4K.
+Seedance 2.5 has no Mini / Fast / Pro switch. Use Seedance 2.0 Pro when you specifically need 4K.
 
 ### Seedance 2.0
 
@@ -358,8 +380,9 @@ Seedance 2.5 has no Mini / Fast / Pro switch. Use Seedance 2.0 Pro when you spec
 | **Resolution** | Mini / Fast: 480p, 720p. Pro: 480p, 720p, 1080p, 4K (default 480p) | Depends on the selected tier; 480p saves credits |
 | **Duration** | 4–15 seconds (default 4) | Slider or input |
 | **Audio** | Auto-generated | Always on |
-| **Reference images** | 2 frames or up to 9 content references | Content references can be combined with a reference video |
-| **Reference video** | Yes | Used as visual conditioning input for "video continuation" — must be 2–15 seconds, up to 50MB; MeiGen detects the actual length automatically (see [Extending a Video](#extending-a-video) below) |
+| **Reference images** | 2 frames or up to 9 content references | Content references can be combined with reference videos and audio |
+| **Reference video** | Up to 3 clips, 2–15s each, 15s in total, ≤50MB per clip | Visual conditioning input for "video continuation"; MeiGen detects each actual length automatically (see [Extending a Video](#extending-a-video) below) |
+| **Reference audio** | Up to 3 clips, 2–15s each, 15s in total, ≤15MB per clip (WAV / MP3) | Free. Needs at least 1 reference image or reference video alongside it — Seedance 2.0 cannot run on audio alone |
 
 **Pricing**: per-second; full formula (including the minimum-billable table for continuation) is in the [Models](/en/features/models) page. The sidebar shows the exact total before you submit.
 
@@ -367,12 +390,13 @@ Seedance 2.5 has no Mini / Fast / Pro switch. Use Seedance 2.0 Pro when you spec
 - Text-to-video: just write a prompt
 - Image-to-video: upload 1–2 frame images to control first/last frame
 - Content reference: attach up to 9 images to guide subject, style, or composition
-- Video extension: upload a reference video (see the [Extending a Video](#extending-a-video) section below)
+- Video extension: upload one or more reference videos (see the [Extending a Video](#extending-a-video) section below)
+- Reference audio: add WAV / MP3 clips to score or style the result — on Seedance 2.0 always alongside at least one image or video
 
-Content-reference images and a reference video may be submitted together; their limits are counted separately. Saved-character images share the content-image budget with user-uploaded images.
+Content-reference images, reference videos and reference audio can all be submitted in the same request: they are **three independent budgets** and never consume each other's slots. Saved-character images share the content-image budget with user-uploaded images.
 
 <Warning>
-  **Adding a reference video makes the total credit cost depend on its length**: billed seconds = "reference video duration + your chosen duration" (never below the minimum-billable floor). Longer reference videos cost more. The sidebar shows the exact total before you submit — confirm before clicking Generate.
+  **Adding reference videos makes the total credit cost depend on their length**: billed seconds = "the **sum** of every reference video's duration + your chosen duration" (never below the minimum-billable floor). More clips, or longer ones, cost more. **Reference audio adds nothing** — it is never billed, and a request carrying audio but no video is priced at the plain direct rate. The sidebar shows the exact total before you submit — confirm before clicking Generate.
 </Warning>
 
 ### Veo 3.1 — Two Tiers, Native Audio
@@ -397,25 +421,25 @@ After generating an image, hover over the completed card and click the **Animate
 
 ### Extending a Video
 
-Seedance 2.5 and Seedance 2.0 support reference-video continuation. Upload an existing video as visual conditioning input to guide the model toward generating a new segment that semantically continues the original.
+Seedance 2.5 and Seedance 2.0 support reference-video continuation. Upload one or more existing videos as visual conditioning input to guide the model toward generating a new segment that semantically continues the original.
 
 <Note>
-  **Seedance 2.5**: 2–30 second reference, up to 200MB; 4–30 second output at 480p or 720p.
+  **Seedance 2.5**: up to 10 reference videos, 2–30 seconds each and 30 seconds in total, up to 200MB per clip; 4–30 second output at 480p, 720p or 1080p.
 
-  **Seedance 2.0**: 2–15 second reference, up to 50MB; 4–15 second output. Mini / Fast offer 480p and 720p; Pro offers 720p and 1080p for continuation. 4K is direct-generation only.
+  **Seedance 2.0**: up to 3 reference videos, 2–15 seconds each and 15 seconds in total, up to 50MB per clip; 4–15 second output. Mini / Fast offer 480p and 720p; Pro offers 720p and 1080p for continuation. 4K is direct-generation only.
 
-  MeiGen detects the uploaded video's actual duration automatically for billing and trimming.
+  MeiGen detects each uploaded video's actual duration automatically for billing and trimming. Reference audio can ride along in the same module and is never billed.
 </Note>
 
 #### Three entry points
 
-1. **From a video card**: hover over any completed video card and click the **Extend** button in the top-left corner — the video loads into the Seedance sidebar as a reference
+1. **From a video card**: hover over any completed video card and click the **Extend** button in the top-left corner — the video is added to the Seedance sidebar as a reference
 2. **Drag a video to the reference-image area**: drag a video (local or from the gallery) onto the reference upload area — a confirmation popup asks "Use this as an extension reference?"
-3. **Direct upload**: in the Seedance sidebar's "Extend or reference video" upload area, pick a local video
+3. **Direct upload**: in the Seedance sidebar's **Reference video & audio** module, click **+** and pick local files — you can add several videos, and audio clips, in the same module
 
 #### Workflow
 
-1. Trigger any of the entries above — the reference video appears in the sidebar preview
+1. Trigger any of the entries above — the reference video appears in the module's thumbnail grid. The two **Extend** entries (video-card button and drop-confirm popup) start a fresh continuation: they replace whatever is already in the module (videos and audio clips) and reset the prompt. **+** and drag-and-drop inside the module append to the current list instead
 2. The prompt box is auto-prefilled with `"Extend this video with the following plot: "` — keep this prefix and add your desired continuation
 3. Pick a supported resolution and output duration for the selected Seedance model
 4. Click Generate
@@ -427,15 +451,15 @@ Seedance 2.5 and Seedance 2.0 support reference-video continuation. Upload an ex
 </Warning>
 
 <Note>
-  **Output length = your selected duration** (4–30 seconds on Seedance 2.5; 4–15 on Seedance 2.0), independent of the reference video's length. The reference video acts as visual conditioning input and is not concatenated into the output. To create a continuous "original + new" video, stitch the clips in a video editor.
+  **Output length = your selected duration** (4–30 seconds on Seedance 2.5; 4–15 on Seedance 2.0), independent of the reference videos' lengths. The reference videos act as visual conditioning input and are not concatenated into the output. To create a continuous "original + new" video, stitch the clips in a video editor.
 </Note>
 
 #### Pricing
 
-Both models use `max(reference duration + output duration, minimum-billable floor)`.
+Both models use `max(sum of reference video durations + output duration, minimum-billable floor)`. Reference audio is free and never enters that sum.
 
-- **Seedance 2.5**: 480p 11 credits/sec; 720p 24 credits/sec. A 2-second reference + 5-second output bills 9 seconds, for **99 / 216 credits**.
-- **Seedance 2.0**: the rate depends on Mini / Fast / Pro and resolution. See [Models → Seedance 2.0](/en/features/models) for the full matrix.
+- **Seedance 2.5**: 480p 11 credits/sec; 720p 24 credits/sec; 1080p 54 credits/sec. A single 2-second reference + 5-second output bills 9 seconds, for **99 / 216 / 486 credits**. Add a second, 3-second reference and the sum becomes 5 seconds, so the same 5-second output bills max(5 + 5, 9) = 10 seconds — **110 / 240 / 540 credits**. Attaching audio on top of either leaves the total unchanged.
+- **Seedance 2.0**: the rate depends on Mini / Fast / Pro and resolution, with the same sum-of-references rule. See [Models → Seedance 2.0](/en/features/models) for the full matrix.
 
 ---
 

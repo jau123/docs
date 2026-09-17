@@ -128,7 +128,16 @@ For `POST /api/generate/v2`, error bodies include extra fields useful for debugg
 | `unsupported_resolution` | 400 | This model/tier doesn't support the requested resolution |
 | `first_frame_required` | 400 | This model requires a first-frame image |
 | `reference_video_not_supported` | 400 | This model/tier/resolution doesn't support reference-video continuation |
-| `invalid_reference_video` | 400 | The reference video couldn't be read or violates the selected model's limits. Read `capabilities.video.referenceVideo`: Seedance 2.5 accepts 2–30s / ≤200MB; Seedance 2.0 accepts 2–15s / ≤50MB. The URL must be hosted on the platform |
+| `invalid_reference_video` | 400 | A `referenceVideos` entry couldn't be read or violates the selected model's per-clip limits. Read `capabilities.video.referenceVideo`: Seedance 2.5 accepts 2–30s / ≤200MB per clip; Seedance 2.0 accepts 2–15s / ≤50MB per clip. Every entry must be an `https://images.meigen.ai/...` URL — an arbitrary public URL fails here |
+| `too_many_reference_videos` | 400 | More `referenceVideos` entries than this model allows — read `capabilities.video.referenceVideo.maxCount` (Seedance 2.5: 10; Seedance 2.0: 3) |
+| `reference_video_total_seconds_exceeded` | 400 | The reference videos are individually valid but their durations add up past `capabilities.video.referenceVideo.maxTotalSeconds` (Seedance 2.5: 30s; Seedance 2.0: 15s) |
+| `reference_audio_not_supported` | 400 | This model doesn't accept `referenceAudios` — read `capabilities.video.referenceAudio.enabled` |
+| `invalid_reference_audio` | 400 | A `referenceAudios` entry isn't an `https://images.meigen.ai/...` URL, couldn't be read, isn't a wav or mp3 file, exceeds 15MB, or falls outside the per-clip duration range (Seedance 2.5: 2–30s; Seedance 2.0: 2–15s) |
+| `too_many_reference_audios` | 400 | More `referenceAudios` entries than this model allows — read `capabilities.video.referenceAudio.maxCount` (Seedance 2.5: 10; Seedance 2.0: 3) |
+| `reference_audio_total_seconds_exceeded` | 400 | The reference audio clips add up past `capabilities.video.referenceAudio.maxTotalSeconds` (Seedance 2.5: 30s; Seedance 2.0: 15s) |
+| `reference_audio_requires_visual` | 400 | This model can't run on audio alone — send at least 1 reference image or 1 reference video alongside `referenceAudios` (Seedance 2.0; `capabilities.video.referenceAudio.requiresVisualReference`) |
+| `reference_probe_timeout` | 503 | Server-side validation of the reference videos or audio did not finish within its budget (a CDN hiccup, a slow origin). **Nothing was charged**, and the body carries `retryable: true` — resubmit the identical request with the same `requestId` / `idempotencyKey` rather than creating a new attempt |
+| `invalid_input` | 400 | The JSON body is malformed, or `referenceVideo` and `referenceVideos` were both sent with a different first element |
 | `invalid_reference_url` | 400 | A `referenceImages` entry is not an accepted URL or base64 value |
 | `frame_reference_limit` | 400 | `referenceMode: "frame"` allows at most 2 images — use `referenceMode: "content"` for more |
 | `too_many_references` | 400 | Reference image count exceeds this model's limit |
@@ -137,7 +146,7 @@ For `POST /api/generate/v2`, error bodies include extra fields useful for debugg
 | `characters_not_supported` | 400 | This model doesn't support character references |
 | `character_tier_required` | 400 | This character requires a higher tier |
 | `model_not_available` | 403 | This model isn't available on the current platform |
-| `idempotency_conflict` | 409 | Retry the request with a new `idempotencyKey` |
+| `idempotency_conflict` | 409 | This `idempotencyKey` already belongs to a request with different inputs. Never rotate the key automatically to get past this: look up the original request with `GET /api/generate/v2/requests/{requestId}` and reconcile your inputs. Use a new key only when the caller explicitly wants another paid generation |
 
 Any other error — including all `5xx` responses — means the service is temporarily unavailable. Retry later; the credits for a failed generation are automatically refunded.
 

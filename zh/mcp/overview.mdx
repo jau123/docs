@@ -75,7 +75,7 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 | `generate_video` | MeiGen Cloud 视频生成 | 是 |
 | `check_generation` | 按 generationId 或 requestId 查询／恢复 | 按请求 ID 查询需要同账号 Key |
 | `list_models` | 当前模型与能力 | 否 |
-| `search_gallery` | 搜索公开提示词和图片预览 | 否 |
+| `search_gallery` | 搜索公开提示词和图片预览，最多返回 3 条 | 否 —— 但带 Key 时该次搜索计入这个账户的额度 |
 | `get_inspiration` | 读取公开画廊条目 | 否 |
 | `list_skills` | 五项工作流、材料、实时价格和输入参数 | 否 |
 | `upload_skill_image` | 准备真实图片 URL 或附件字节 | 是 |
@@ -86,14 +86,18 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 | `upscale_image` | 增强一张原始静态图片 | 是 |
 | `check_skill` | 私有 Skill 回执、模块状态和恢复 | 是，同一个Key |
 
-本地另有 `enhance_prompt`、`manage_preferences`、`comfyui_workflow`，它们不要求 MeiGen Key。本地画廊搜索可回退到内置提示词库，远程访问需要网络。多提供商配置适用于通用生成，所有专用 Skill 都需要 MeiGen Cloud 凭据和购买积分。远程 `check_generation` 按已知 generationId 公开查询；按 requestId 恢复需要所属账号的有效 Key。`check_skill` 必须使用原 API Key。
+本地另有 `enhance_prompt`、`manage_preferences`、`comfyui_workflow`，它们不要求 MeiGen Key。本地画廊搜索可回退到内置提示词库，远程访问需要网络。两种连接下 `search_gallery` 每次都**最多返回 3 条**；配置了 Key 时（本地为 `MEIGEN_API_TOKEN`，远程为 `Authorization` 头），每次搜索计入该账户的[**每日搜索额度**](/zh/features/gallery#搜索) —— 与网页登录用户相同的免费额度，不消耗购买积分。没有 Key 时按匿名 IP 限流。多提供商配置适用于通用生成，所有专用 Skill 都需要 MeiGen Cloud 凭据和购买积分。远程 `check_generation` 按已知 generationId 公开查询；按 requestId 恢复需要所属账号的有效 Key。`check_skill` 必须使用原 API Key。
 
 <Note>
   视频能力因模型而异 — 画质档位、可选时长与分辨率、音频、参考视频续写，以及是否必须提供首帧图。部分模型仅支持图生视频。当前清单用 `list_models` 查，或见[模型对比](/zh/features/models)。
 
-  Seedance 2.5 的模型 ID 是 `seedance-2-5`，支持 4–30 秒、480p/720p 输出和参考视频续写，没有 `tier` 参数。
+  Seedance 2.5 的模型 ID 是 `seedance-2-5`，支持 4–30 秒、480p/720p/1080p 输出和参考视频续写，没有 `tier` 参数。
 
-  `generate_video` 必须显式指定 `model`——平台没有默认模型。`referenceVideoDuration` 是已弃用且会被校验的兼容提示，不会决定计费时长；请省略它并传 `referenceVideo`，服务端会自动探测真实时长。
+  `generate_video` 必须显式指定 `model`——平台没有默认模型。参考素材都是数组：`referenceVideos`（mp4 / mov）和 `referenceAudios`（wav / mp3，单条 ≤15MB）。**本地 npm 服务器支持直接传本地文件路径**并自动上传；远程服务器只接受已经指向 `images.meigen.ai` 的地址 —— 此前生成结果的 `videoUrl`，或通过 [`POST /api/upload/reference-video`](/zh/api-reference/endpoint/generate#上传参考视频与音频) 上传的文件。任意公网 URL 会在扣点前被拒。单数形式 `referenceVideo` 仍作为只含一项的别名受理；`referenceVideoDuration` 是已弃用且会被校验的兼容提示，不会决定计费时长 —— 请省略它，服务端会逐条探测。
+
+  各模型上限从 `list_models` 读取（`capabilities.video.referenceVideo` 与 `capabilities.video.referenceAudio`）：Seedance 2.5 最多 10 条视频和 10 条音频，每类单条 2–30 秒、合计 30 秒；Seedance 2.0 各最多 3 条，单条 2–15 秒、合计 15 秒。**Seedance 2.0 不能只靠音频生成** —— 它的参考音频必须搭配至少 1 张参考图或 1 条参考视频；Seedance 2.5 则允许纯音频请求。
+
+  计费按参考视频时长的**总和** + 你的输出时长，且不低于最低计费秒数。参考音频免费：不计入这个总和，只带音频、不带参考视频的请求按该模型的直接生成价计费。
 </Note>
 
 ---
@@ -111,7 +115,7 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
     从插件市场安装 — 包含斜杠命令、智能 Agent 和自动化 Hook。
   </Card>
   <Card title="Cursor / VS Code / Windsurf / Roo Code" icon="window">
-    一行命令 `npx -y meigen@2.0.0 init <host>` 为每个编辑器写好 MCP 配置文件。
+    一行命令 `npx -y meigen@2.0.1 init <host>` 为每个编辑器写好 MCP 配置文件。
   </Card>
   <Card title="OpenAI Codex CLI" icon="terminal">
     使用 bearer_token_env_var 连接远程 HTTP，或配置本地 stdio 进程；两种方式见安装指南。
@@ -123,7 +127,7 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
     从 [ClawHub](https://clawhub.ai/plugins/meigen-ai-design) 安装插件 — 检查已安装 bundle 的清单，并只配置一次 MCP 连接。
   </Card>
   <Card title="任意 MCP 客户端" icon="plug">
-    标准 stdio MCP — 任意 MCP 兼容客户端指向 `npx -y meigen@2.0.0` 即可。
+    标准 stdio MCP — 任意 MCP 兼容客户端指向 `npx -y meigen@2.0.1` 即可。
   </Card>
 </CardGroup>
 
@@ -135,11 +139,11 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 
 ```bash
 export MEIGEN_API_TOKEN=meigen_sk_...
-npx -y meigen@2.0.0 gen --prompt "阳光厨房里的三花猫"
-npx -y meigen@2.0.0 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
+npx -y meigen@2.0.1 gen --prompt "阳光厨房里的三花猫"
+npx -y meigen@2.0.1 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
 ```
 
-`--json` 输出机器可读、`--no-wait` 仅提交不轮询、`--reference <path|url>` 传参考图。完整参数 `npx -y meigen@2.0.0 gen --help`。
+`--json` 输出机器可读、`--no-wait` 仅提交不轮询、`--reference <path|url>` 传参考图。完整参数 `npx -y meigen@2.0.1 gen --help`。
 
 ---
 

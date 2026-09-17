@@ -75,7 +75,7 @@ Remote Streamable HTTP exposes **14 tools**; local npm exposes **17**. The follo
 | `generate_video` | MeiGen Cloud video generation | Yes |
 | `check_generation` | Status/recovery by generationId or requestId | Request-ID lookup requires an owning-account key |
 | `list_models` | Available models and capabilities | No |
-| `search_gallery` | Search public prompts and image previews | No |
+| `search_gallery` | Search public prompts and image previews; returns at most 3 entries | No — but with a key the search counts against that account's quota |
 | `get_inspiration` | Read a public gallery entry | No |
 | `list_skills` | Five workflows, materials, live prices and input schemas | No |
 | `upload_skill_image` | Prepare real image URLs or attachment bytes | Yes |
@@ -86,14 +86,18 @@ Remote Streamable HTTP exposes **14 tools**; local npm exposes **17**. The follo
 | `upscale_image` | Enhance one original still image | Yes |
 | `check_skill` | Private Skill receipt, module status and recovery | Yes, same key |
 
-Local additionally provides `enhance_prompt`, `manage_preferences` and `comfyui_workflow`; these require no MeiGen key. Local gallery search can fall back to a bundled prompt library; remote access requires the network. Provider setup applies to general generation, while every dedicated Skill requires MeiGen Cloud credentials and purchased credits. `check_generation` by known generationId is public remotely; requestId lookup needs an active key of the owning account. `check_skill` requires the original API key.
+Local additionally provides `enhance_prompt`, `manage_preferences` and `comfyui_workflow`; these require no MeiGen key. Local gallery search can fall back to a bundled prompt library; remote access requires the network. `search_gallery` returns **at most 3 entries** per call on both connections, and when a key is present — `MEIGEN_API_TOKEN` locally, the `Authorization` header remotely — each search counts against that account's [**daily search allowance**](/en/features/gallery#search), the same allowance a signed-in web user gets, rather than against purchased credits. Without a key, searches are rate-limited per anonymous IP. Provider setup applies to general generation, while every dedicated Skill requires MeiGen Cloud credentials and purchased credits. `check_generation` by known generationId is public remotely; requestId lookup needs an active key of the owning account. `check_skill` requires the original API key.
 
 <Note>
   Video capabilities differ by model — quality tiers, available durations and resolutions, audio, reference-video continuation, and whether a first frame is required. Some models are image-to-video only. Call `list_models` for the current lineup, or see the [model comparison](/en/features/models).
 
-  Seedance 2.5 uses model ID `seedance-2-5`, supports 4–30 second 480p/720p output and reference-video continuation, and has no `tier` option.
+  Seedance 2.5 uses model ID `seedance-2-5`, supports 4–30 second 480p/720p/1080p output and reference-video continuation, and has no `tier` option.
 
-  `generate_video` requires an explicit `model` — there's no platform default. `referenceVideoDuration` is a deprecated, validated compatibility hint and never sets the billed duration; omit it and pass `referenceVideo`, whose duration the server detects automatically.
+  `generate_video` requires an explicit `model` — there's no platform default. Reference media are arrays: `referenceVideos` (mp4 / mov) and `referenceAudios` (wav / mp3, ≤15MB per clip). The **local npm server accepts local file paths** here and uploads them for you; the remote server needs URLs that already point at `images.meigen.ai` — a previous generation's `videoUrl`, or a file from [`POST /api/upload/reference-video`](/en/api-reference/endpoint/generate#upload-reference-videos-and-audio). An arbitrary public URL is rejected before charging. The singular `referenceVideo` is still accepted as a one-element alias, and `referenceVideoDuration` is a deprecated, validated compatibility hint that never sets the billed duration — omit it, the server probes every clip itself.
+
+  Per-model caps come from `list_models` (`capabilities.video.referenceVideo` and `capabilities.video.referenceAudio`): Seedance 2.5 takes up to 10 videos and 10 audio clips, 2–30s each and 30s in total per kind; Seedance 2.0 takes up to 3 and 3, 2–15s each and 15s in total. **Seedance 2.0 cannot run on audio alone** — its reference audio needs at least one reference image or reference video alongside it, while Seedance 2.5 accepts audio-only requests.
+
+  Billing uses the **sum** of the reference video durations plus your output duration, never below the minimum-billable floor. Reference audio is free: it never enters that sum, and a request carrying audio but no reference video is priced at the model's direct rate.
 </Note>
 
 ---
@@ -111,7 +115,7 @@ Call `list_models` first to check availability. For the local npm server, use `m
     Install as a plugin from the marketplace — includes slash commands, smart agents, and automation hooks.
   </Card>
   <Card title="Cursor / VS Code / Windsurf / Roo Code" icon="window">
-    One-command setup via `npx -y meigen@2.0.0 init <host>` — writes the right MCP config file for each editor.
+    One-command setup via `npx -y meigen@2.0.1 init <host>` — writes the right MCP config file for each editor.
   </Card>
   <Card title="OpenAI Codex CLI" icon="terminal">
     Use remote HTTP with bearer_token_env_var, or configure a local stdio process. See the setup guide for both.
@@ -123,7 +127,7 @@ Call `list_models` first to check availability. For the local npm server, use `m
     Install as a [plugin](https://clawhub.ai/plugins/meigen-ai-design) from ClawHub — check the installed bundle manifest and connect its MCP server once.
   </Card>
   <Card title="Any MCP host" icon="plug">
-    Standard stdio MCP — point any MCP-compatible host at `npx -y meigen@2.0.0`.
+    Standard stdio MCP — point any MCP-compatible host at `npx -y meigen@2.0.1`.
   </Card>
 </CardGroup>
 
@@ -135,11 +139,11 @@ No MCP host? MeiGen also ships as a CLI for shell scripts and CI pipelines:
 
 ```bash
 export MEIGEN_API_TOKEN=meigen_sk_...
-npx -y meigen@2.0.0 gen --prompt "a calico cat in a sunlit kitchen"
-npx -y meigen@2.0.0 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
+npx -y meigen@2.0.1 gen --prompt "a calico cat in a sunlit kitchen"
+npx -y meigen@2.0.1 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
 ```
 
-Use `--json` for machine-readable output, `--no-wait` to submit without polling, and `--reference <path|url>` to pass a reference image. Run `npx -y meigen@2.0.0 gen --help` for the full flag list.
+Use `--json` for machine-readable output, `--no-wait` to submit without polling, and `--reference <path|url>` to pass a reference image. Run `npx -y meigen@2.0.1 gen --help` for the full flag list.
 
 ---
 

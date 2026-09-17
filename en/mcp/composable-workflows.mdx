@@ -7,7 +7,7 @@ description: "Persist task IDs, generate frames and videos, and resume within an
 
 Use MeiGen as a callable step inside an existing agent, Skill, script or application. The caller owns the creative plan, prompts, model/provider choices, output count, approved budget, scheduling and presentation. Optional MeiGen creative assistants can help develop a brief; they are not required before calling tools. Discovery can support any workflow. A resolved upstream plan does not need another approval for every frame, clip or batch.
 
-Requires local **`meigen@2.0.0` or later** (`npx -y meigen@2.0.0`), or the updated remote endpoint **`https://www.meigen.ai/api/mcp`**. npm 1.4.0 does not implement this contract. Release order is backend deployment, npm publication, then public installation guides; until 2.0.0 is published, validate a locally built package. Reconnect and inspect the installed schemas for `requestId`, `wait` and request lookup. Backend rollbacks must preserve recovery endpoints and the durable POST contract; users do not need to withdraw already installed npm packages.
+Requires local **`meigen@2.0.1` or later** (`npx -y meigen@2.0.1`), or the updated remote endpoint **`https://www.meigen.ai/api/mcp`**. npm 1.4.0 does not implement this contract. Release order is backend deployment, npm publication, then public installation guides; until 2.0.1 is published, validate a locally built package. Reconnect and inspect the installed schemas for `requestId`, `wait` and request lookup. Backend rollbacks must preserve recovery endpoints and the durable POST contract; users do not need to withdraw already installed npm packages.
 
 ## Ordinary task contract
 
@@ -59,7 +59,7 @@ if (result.nextAction?.type === 'check_generation') {
 The upstream workflow first resolves the scripts, image/video settings, requested output count, maximum approved budget and any replacement policy. It can use `list_models` for current choices. No fixed model, price, duration or quality is assumed here.
 
 1. Create and durably save one frame UUID and one video UUID per script, alongside the exact inputs. Do this once when creating the workflow, not on every run or retry.
-2. Before a new submission, reserve its expected charge against the remaining approved budget, including all other in-flight reservations. Use the selected live model/tier/duration/reference pricing; reconcile actual `creditsUsed` and confirmed refunds as results arrive. An unknown charge stays reserved until resolved.
+2. Before a new submission, reserve its expected charge against the remaining approved budget, including all other in-flight reservations. Use the selected live model/tier/duration and reference pricing — a video estimate must be built from the **sum** of every reference video's duration plus the output duration, because that sum is what the billed seconds come from; reference audio is free and adds nothing to the reservation. Reconcile actual `creditsUsed` and confirmed refunds as results arrive. An unknown charge stays reserved until resolved.
 3. Submit independent frame steps with bounded concurrency. Persist each response immediately. After a frame completes, preserve its selected URL in that script's video input before submitting the video step. This maintains a stable dependency even if the frame model returns multiple candidates.
 4. Poll/recover accepted steps by their existing handles. A host restart reloads the saved plan and checks pending steps; it does not recreate UUIDs or re-upload unchanged references.
 5. Return completed clips and any failed/unresolved steps to the caller. The caller decides intermediate previews, visual inspection, downloads, final presentation and whether an authorized replacement is appropriate.
@@ -97,6 +97,12 @@ const video = await client.callTool({
     ...plan.videoSettings, // Includes the caller-selected live model.
     prompt: script.videoPrompt,
     firstFrame: script.selectedFrameUrl,
+    // Reference media are arrays. Local npm also accepts local file paths here;
+    // remote MCP takes images.meigen.ai URLs ONLY — any other host is a pre-charge
+    // 400. Omit a key entirely when the plan has no items for it: these fields are
+    // part of the requestId fingerprint.
+    referenceVideos: script.referenceVideoUrls, // billed on the SUM of their durations
+    referenceAudios: script.referenceAudioUrls, // free — never billed
     requestId: script.videoRequestId,
     wait: false,
     download: false, // Local npm only; omit for remote MCP.
