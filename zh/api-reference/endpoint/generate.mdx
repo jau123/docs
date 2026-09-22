@@ -79,7 +79,8 @@ POST /api/generate/v2
   参考图数组。每一项必须是可公开访问的 HTTP(S) URL，或形如 `data:image/png;base64,...` 的内联 base64 数据。本地文件路径（如 `C:/Users/...`）与 `file://` URI 会被拒绝，返回 `400` / `invalid_reference_url`。
 
   <Note>
-    **Agnes Video 2.5 Flash —— 图生视频会忽略 `aspectRatio`。** 该模型的输出比例由首帧图本身
+    **Agnes Video 2.5 Flash —— 图生视频会忽略 `aspectRatio`。**（该模型自 2026-09-22 起暂时下线，
+    以下规则在其启用时适用。）该模型的输出比例由首帧图本身
     决定。对托管在 `images.meigen.ai` 上的图片（你在 MeiGen 生成或上传过的），我们会先在
     CDN 边缘把首帧裁到你请求的 `aspectRatio`，因此输出与你选的比例一致；对其他来源
     （外部 URL 或 `data:` base64），图片原样透传，**输出比例跟随你的图片，而不是
@@ -152,7 +153,7 @@ POST /api/generate/v2
   | Seedance 2.0 | 4-15 | 4 |
   | Veo 3.1 | 仅 4、6、8 | 4 |
   | Grok Video 1.5 | 4-15 | 4 |
-  | Agnes Video 2.5 Flash | 仅 5(固定) | 5 |
+  | Agnes Video 2.5 Flash（暂时下线） | 仅 5(固定) | 5 |
 
   实际扣除的积分始终以响应中的 `creditsUsed` 为准,不要自行推算。
 </ParamField>

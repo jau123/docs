@@ -79,7 +79,9 @@ Submits a generation request. The output is generated asynchronously — use the
   Array of reference images. Each entry must be either a publicly accessible HTTP(S) URL, or inline base64 data in the form `data:image/png;base64,...`. Local file paths (e.g. `C:/Users/...`) and `file://` URIs are rejected with `400` / `invalid_reference_url`.
 
   <Note>
-    **Agnes Video 2.5 Flash — image-to-video ignores `aspectRatio`.** This model derives the
+    **Agnes Video 2.5 Flash — image-to-video ignores `aspectRatio`.** (This model has been
+    temporarily unavailable since 2026-09-22; the rule below applies whenever it is enabled.)
+    This model derives the
     output ratio from the first frame itself. For images hosted on `images.meigen.ai`
     (anything you generated or uploaded on MeiGen) we crop the frame to your requested
     `aspectRatio` at the CDN edge first, so the output matches what you asked for. For any
@@ -153,7 +155,7 @@ Submits a generation request. The output is generated asynchronously — use the
   | Seedance 2.0 | 4–15 | 4 |
   | Veo 3.1 | 4, 6, 8 only | 4 |
   | Grok Video 1.5 | 4–15 | 4 |
-  | Agnes Video 2.5 Flash | 5 only (fixed) | 5 |
+  | Agnes Video 2.5 Flash (temporarily unavailable) | 5 only (fixed) | 5 |
 
   The amount actually deducted is always returned as `creditsUsed` — treat that field as authoritative rather than computing the cost yourself.
 </ParamField>
