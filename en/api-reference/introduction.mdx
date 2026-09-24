@@ -122,7 +122,7 @@ For `POST /api/generate/v2`, error bodies include extra fields useful for debugg
 | `premium_model_paywall` | 402 | The selected model requires purchased credits (daily free credits don't apply) |
 | `unsupported_quality` | 400 | The selected GPT Image model does not support this quality |
 | `unsupported_model_variant` | 400 | Invalid variant, or `modelVariant` supplied for a model other than GPT Image 2.5 |
-| `invalid_model` | 400 | Model is invalid, inactive, or reserved for a Skill workflow |
+| `invalid_model` | 400 | Explicit rejection of a Skill-only model ID or unsupported GPT Image 2.5 model configuration; ordinary missing/inactive model validation can return `invalid_input` |
 | `unsupported_duration` | 400 | This model doesn't support the requested duration |
 | `unsupported_tier` | 400 | This model doesn't support the requested tier |
 | `unsupported_resolution` | 400 | This model/tier doesn't support the requested resolution |
@@ -137,7 +137,7 @@ For `POST /api/generate/v2`, error bodies include extra fields useful for debugg
 | `reference_audio_total_seconds_exceeded` | 400 | The reference audio clips add up past `capabilities.video.referenceAudio.maxTotalSeconds` (Seedance 2.5: 30s; Seedance 2.0: 15s) |
 | `reference_audio_requires_visual` | 400 | This model can't run on audio alone — send at least 1 reference image or 1 reference video alongside `referenceAudios` (Seedance 2.0; `capabilities.video.referenceAudio.requiresVisualReference`) |
 | `reference_probe_timeout` | 503 | Server-side validation of the reference videos or audio did not finish within its budget (a CDN hiccup, a slow origin). **Nothing was charged**, and the body carries `retryable: true` — resubmit the identical request with the same `requestId` / `idempotencyKey` rather than creating a new attempt |
-| `invalid_input` | 400 | The JSON body is malformed, or `referenceVideo` and `referenceVideos` were both sent with a different first element |
+| `invalid_input` | 400 | Malformed JSON or invalid generation parameters, including inconsistent `referenceVideo`/`referenceVideos`. Also the fallback for terminal 400/422 validation errors without a more specific code; inspect the validation message. |
 | `invalid_reference_url` | 400 | A `referenceImages` entry is not an accepted URL or base64 value |
 | `frame_reference_limit` | 400 | `referenceMode: "frame"` allows at most 2 images — use `referenceMode: "content"` for more |
 | `too_many_references` | 400 | Reference image count exceeds this model's limit |

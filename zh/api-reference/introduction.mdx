@@ -122,7 +122,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | `premium_model_paywall` | 402 | 所选模型需要购买积分（每日免费积分不适用） |
 | `unsupported_quality` | 400 | 所选 GPT Image 模型不支持此质量档位 |
 | `unsupported_model_variant` | 400 | 型号选项不合法，或为 GPT Image 2.5 以外的模型传了 `modelVariant` |
-| `invalid_model` | 400 | 模型不存在、未启用，或仅供技能工作流使用 |
+| `invalid_model` | 400 | 显式拒绝技能专用模型 ID 或不支持的 GPT Image 2.5 模型配置；普通模型不存在/未启用的校验可能返回 `invalid_input` |
 | `unsupported_duration` | 400 | 该模型不支持这个时长 |
 | `unsupported_tier` | 400 | 该模型不支持这个档位 |
 | `unsupported_resolution` | 400 | 该模型/档位不支持这个分辨率 |
@@ -137,7 +137,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | `reference_audio_total_seconds_exceeded` | 400 | 参考音频时长总和超过 `capabilities.video.referenceAudio.maxTotalSeconds`（Seedance 2.5 为 30 秒，Seedance 2.0 为 15 秒）|
 | `reference_audio_requires_visual` | 400 | 该模型不能只靠音频生成 —— `referenceAudios` 必须搭配至少 1 张参考图或 1 条参考视频（Seedance 2.0；见 `capabilities.video.referenceAudio.requiresVisualReference`）|
 | `reference_probe_timeout` | 503 | 参考视频或参考音频在预算内没能完成服务端校验（CDN 抖动、源站变慢等）。**未扣点**，响应体带 `retryable: true` —— 用同一个 `requestId` / `idempotencyKey` 原样重试这条请求，不要另建新尝试 |
-| `invalid_input` | 400 | JSON 请求体格式错误，或同时传了 `referenceVideo` 与 `referenceVideos` 但第一条不一致 |
+| `invalid_input` | 400 | JSON 或生成参数不合法，包括 `referenceVideo` 与 `referenceVideos` 第一条不一致；也作为未提供专用错误码的终态 400/422 参数校验错误的兜底，请结合校验说明判断。 |
 | `invalid_reference_url` | 400 | `referenceImages` 中存在不合法的 URL 或 base64 值 |
 | `frame_reference_limit` | 400 | `referenceMode: "frame"` 最多 2 张图，改用 `referenceMode: "content"` 可传更多 |
 | `too_many_references` | 400 | 参考图数量超出该模型上限 |
