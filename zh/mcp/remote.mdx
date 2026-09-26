@@ -15,74 +15,73 @@ https://www.meigen.ai/api/mcp
 
 保留上层脚本、提示词、模型／供应商、数量和已批准预算，创意助手可选。使用持久化 UUID `requestId`、`wait: false`、结构化结果及 `check_generation` 提交首帧／视频并恢复，无需逐步重复审批。有限并发调度、预览和下载由上层负责。详见[完整工作流合同与示例](/zh/mcp/composable-workflows)。
 
-## 账号与认证
+## 账号登录（推荐）
 
-用桌面浏览器在 [API Keys](https://www.meigen.ai/profile/api-keys) 创建 MeiGen Key。在同账号的[个人主页](https://www.meigen.ai/profile)点击**充值**，或使用[移动端会员与积分页](https://www.meigen.ai/m/premium)。在宿主私密凭据/请求头设置中配置：
+客户端支持 Streamable HTTP 和 OAuth 时，添加上方服务地址，选择**连接／认证**，在浏览器登录 MeiGen 并确认权限即可，无需复制 API Key 或申请共享客户端密钥。客户端通过公开身份资料（CIMD）或动态注册（DCR）接入，不需要按品牌加入 MeiGen 白名单。通用流程支持公开客户端认证（`none`）和 S256 PKCE。
+
+授权时核对应用名、客户端标识和返回地址；自行注册的名称未经 MeiGen 认证。授权最长 30 天，可以随时在[已连接应用](https://www.meigen.ai/oauth/connections)中撤销。付费调用仅使用已购积分，不使用每日免费积分或 Web 免费次数。
+
+通用 OAuth 需服务端完成开放，且客户端版本支持。如果服务没有声明自动注册能力，或客户端无法登录，可使用下方 API Key 兼容方式。“支持 MCP”本身不代表支持远程 HTTP 和 OAuth。
+
+### Codex
+
+```bash
+codex mcp add meigen --url https://www.meigen.ai/api/mcp
+codex mcp login meigen
+```
+
+Codex 桌面端／IDE 在 MCP 设置中填写同一地址，再完成登录。复用已有条目，切换为 OAuth 时移除固定 Authorization 请求头或 `bearer_token_env_var`，保留其他服务。详见 [Codex 官方说明](https://developers.openai.com/codex/mcp)。
+
+### Claude Code
+
+```bash
+claude mcp add --transport http meigen https://www.meigen.ai/api/mcp
+claude mcp login meigen
+```
+
+也可通过 `/mcp` 发起认证。详见 [Claude Code 官方说明](https://code.claude.com/docs/en/mcp)。自动注册不需要预先配置 MeiGen 客户端 ID。
+
+### Cursor 与其他 HTTP 客户端
+
+在客户端的 Streamable HTTP 表单中添加服务地址，再选择连接／认证。使用 `mcpServers` JSON 的客户端可参考：
+
+```json
+{
+  "mcpServers": {
+    "meigen": { "url": "https://www.meigen.ai/api/mcp" }
+  }
+}
+```
+
+具体字段以客户端为准，例如 Claude Code JSON 还需 `"type": "http"`。只支持本地 MCP 的客户端使用 [npm 安装方式](/zh/mcp/setup)。
+
+### ChatGPT 自定义连接
+
+如果账号／工作区提供 Developer mode 和自定义 MCP 入口，添加上方地址，选择 **OAuth**，在提供该选项时使用自动注册，然后完成 MeiGen 账号授权。参考 [OpenAI 当前指引](https://developers.openai.com/api/docs/guides/developer-mode#how-to-use)。不要把 MeiGen API Key 填入 OAuth 客户端密钥字段。
+
+这是标准 MCP 连接，与 MeiGen 市场适配器及专属结果卡片不同。可用性受套餐、工作区和服务端开放状态影响。选择 **No Authentication** 时仅支持公开工具，上传、生成、requestId 恢复和私有 Skill 结果都需要授权。ChatGPT 与 Codex 的配置流程不同，不能在 ChatGPT 网页聊天中安装 npm。
+
+### API Key 兼容方式
+
+已有 API Key 继续有效。用桌面浏览器在 [API Keys](https://www.meigen.ai/profile/api-keys) 创建 Key，在客户端私密请求头中填写：
 
 ```text
 Authorization: Bearer <MeiGen API key>
 ```
 
-付费调用只消耗购买积分，不提供每日免费积分或 Skill 免费次数。不要把 Key 发到聊天或放入 URL。
-
-## Codex CLI、IDE 扩展和本地 Codex 桌面宿主
-
-```bash
-codex mcp add meigen --url https://www.meigen.ai/api/mcp \
-  --bearer-token-env-var MEIGEN_API_TOKEN
-```
-
-等价的 `~/.codex/config.toml` 配置，包含适合 Skills 的超时：
-
-```toml
-[mcp_servers.meigen]
-url = "https://www.meigen.ai/api/mcp"
-bearer_token_env_var = "MEIGEN_API_TOKEN"
-startup_timeout_sec = 30
-tool_timeout_sec = 240
-```
-
-合并到已有条目，避免重复添加。环境变量必须由**启动 Codex 的进程**继承，项目 `.env.local` 不会自动加载。未设置 Key 时要验证公开查询，请省略 token 命令参数/TOML 字段。若桌面启动无法继承环境变量，可在支持的私密连接设置中填写 Authorization 请求头，或自己在私有配置中填写 `http_headers.Authorization` 并移除 `bearer_token_env_var`。保留其他服务，不在共享配置中保存密钥。详见 [Codex 官方 MCP 指南](https://developers.openai.com/codex/mcp)。
-
-## Claude Code 与其他 HTTP 宿主
-
-Claude Code 可在自己的私密终端/连接设置中配置：
-
-```bash
-claude mcp add --transport http meigen https://www.meigen.ai/api/mcp \
-  --header "Authorization: Bearer $MEIGEN_API_TOKEN"
-```
-
-其他宿主常用以下 JSON 结构，具体字段以客户端为准；占位凭据由用户在宿主私密设置中填写。
-
-```json
-{
-  "mcpServers": {
-    "meigen": {
-      "url": "https://www.meigen.ai/api/mcp",
-      "headers": { "Authorization": "Bearer <MeiGen API key>" }
-    }
-  }
-}
-```
-
-## ChatGPT 网页：仅公开查询
-
-账号/工作区具备自定义 MCP 接入时，启用 Developer mode，以以上 URL 创建自定义远程 app/plugin，选择 **No Authentication**。具体入口参考 [OpenAI 当前指引](https://developers.openai.com/api/docs/guides/developer-mode#how-to-use)。ChatGPT 托管客户端[不能发送自定义 API Key](https://developers.openai.com/plugins/build/auth#client-identification)，MeiGen 尚未提供该场景所需的 OAuth 接入。
-
-可用公开工具包括 `list_skills`、`list_models`、画廊查询，以及按已知 generationId 查询的 `check_generation`。生成、上传、requestId 恢复与 **`check_skill` 需要 Key，此 ChatGPT 网页连接暂不支持**。Codex 使用上方另一套配置，聊天指令不能在 ChatGPT 网页内部安装 npm。
+Codex 可改用 `--bearer-token-env-var MEIGEN_API_TOKEN`，并在启动客户端的环境中设置该变量；本地 npm 也使用 `MEIGEN_API_TOKEN`。仅填写项目 `.env.local` 不代表客户端已配置。不要同时使用固定 Authorization 请求头和 OAuth，也不要把 Key 放进聊天、URL 或共享仓库。API Key 和 OAuth 都使用所连接账号的已购积分。
 
 ## 工具
 
 远程服务提供 **14 个工具**：
 
-| 工具 | 用途 | MeiGen Key |
+| 工具 | 用途 | 账号授权 |
 | --- | --- | --- |
 | `generate_image` | 通用图片生成，本地可使用已配置的后端 | 是 |
 | `generate_video` | MeiGen Cloud 视频生成 | 是 |
-| `check_generation` | 按 generationId 或 requestId 查询／恢复 | 按请求 ID 查询需要同账号 Key |
+| `check_generation` | 按 generationId 或 requestId 查询／恢复 | 按请求 ID 查询需要授权所属账号 |
 | `list_models` | 当前模型与能力 | 否 |
-| `search_gallery` | 搜索公开提示词和图片预览，最多返回 3 条 | 否 —— 但带 Key 时该次搜索计入这个账户的额度 |
+| `search_gallery` | 搜索公开提示词和图片预览，最多返回 3 条 | 否 —— 但授权后该次搜索计入这个账户的额度 |
 | `get_inspiration` | 读取公开画廊条目 | 否 |
 | `list_skills` | 五项工作流、材料、实时价格和输入参数 | 否 |
 | `upload_skill_image` | 准备真实图片 URL 或附件字节 | 是 |
@@ -91,13 +90,13 @@ claude mcp add --transport http meigen https://www.meigen.ai/api/mcp \
 | `generate_marketing_poster` | 一张营销海报 | 是 |
 | `generate_ai_background` | 一张纯白、智能或自定义背景图 | 是 |
 | `upscale_image` | 增强一张原始静态图片 | 是 |
-| `check_skill` | 私有 Skill 回执、模块状态和恢复 | 是，同一个Key |
+| `check_skill` | 私有 Skill 回执、模块状态和恢复 | 是，所属账号（API Key 方式需原 Key） |
 
 ## 首次验证
 
 重连后询问：**“列出 MeiGen 当前可用的 Skills 和价格。”**确认真实工具调用成功；仅保存配置不能证明连接成功。这不会生成或扣点。然后提供实际材料，选择[五项工作流](/zh/api-reference/skills/overview)之一。Skills 提交后用 `check_skill` 查询；通用生成用 `check_generation` 恢复。
 
-`search_gallery` 每次调用**最多返回 3 条**，请收窄查询词，不要指望一次拿到长列表。连接带 API Key 时，每次搜索都计入该账户的[**每日搜索额度**](/zh/features/gallery#搜索) —— 与网页登录用户相同的免费额度，不消耗购买积分。没有 Key 时按匿名 IP 限流。
+`search_gallery` 每次调用**最多返回 3 条**，请收窄查询词，不要指望一次拿到长列表。连接使用 OAuth 或 API Key 时，每次搜索都计入该账户的[**每日搜索额度**](/zh/features/gallery#搜索) —— 与网页登录用户相同的免费额度，不消耗购买积分。未授权时按匿名 IP 限流。
 
 远程工具不能读取本地文件路径。请使用公开图片 URL，或通过 `upload_skill_image` 上传实际可读取的字节。Upscale 直接传原图 URL，或使用 `purpose: "upscale"` 上传，不要先按普通参考图缩小。
 

@@ -15,74 +15,73 @@ No Node.js or npm process is needed for remote access. The server is stateless a
 
 Keep the upstream script, prompt, model/provider, count and approved budget. Creative helpers are optional. Use persistent UUID `requestId`, `wait: false`, structured results and `check_generation` to submit frames/videos and resume them without re-approving every step. The caller owns bounded scheduling, previews and downloads. See [the complete workflow contract and examples](/en/mcp/composable-workflows).
 
-## Account and authentication
+## Account login (recommended)
 
-Create a MeiGen key using a desktop browser at [API Keys](https://www.meigen.ai/profile/api-keys). In the same account, choose **Top Up** on [Profile](https://www.meigen.ai/profile), or use the [mobile premium page](https://www.meigen.ai/m/premium). Configure the secret in the host's private credentials/headers settings:
+For clients supporting Streamable HTTP and OAuth, add the server URL above, choose **Connect / Authenticate**, then sign in to MeiGen in your browser and approve the requested permissions. No API key or shared client secret is needed. Clients identify themselves through public client metadata (CIMD) or dynamic registration (DCR); they do not need a brand-specific MeiGen allowlist. This flow supports public-client authentication (`none`) with S256 PKCE.
+
+Check the app name, client identifier and return address on the consent page. Self-registered names are not verified by MeiGen. Authorization lasts up to 30 days and can be revoked in [Connected apps](https://www.meigen.ai/oauth/connections). Paid calls use purchased credits only, never daily free credits or Web free attempts.
+
+General OAuth requires server rollout and support in your client version. If the server does not advertise automatic registration or the host cannot log in, use the API key fallback below. Supporting MCP alone does not guarantee support for remote HTTP or OAuth.
+
+### Codex
+
+```bash
+codex mcp add meigen --url https://www.meigen.ai/api/mcp
+codex mcp login meigen
+```
+
+Use the same URL in Codex desktop/IDE MCP settings and complete the login flow. Reuse an existing entry; remove a fixed Authorization header or `bearer_token_env_var` when switching that entry to OAuth. Keep other servers. See the [official Codex guide](https://developers.openai.com/codex/mcp).
+
+### Claude Code
+
+```bash
+claude mcp add --transport http meigen https://www.meigen.ai/api/mcp
+claude mcp login meigen
+```
+
+You can also authenticate through `/mcp`. See the [official Claude Code guide](https://code.claude.com/docs/en/mcp). No preconfigured MeiGen client ID is required for automatic registration.
+
+### Cursor and other HTTP clients
+
+Add the URL using your client's Streamable HTTP connection form, then choose Connect / Authenticate. For clients using `mcpServers` JSON, the minimal entry is:
+
+```json
+{
+  "mcpServers": {
+    "meigen": { "url": "https://www.meigen.ai/api/mcp" }
+  }
+}
+```
+
+Field names vary; for example, Claude Code JSON also requires `"type": "http"`. Local-only clients should use the [npm installation](/en/mcp/setup).
+
+### ChatGPT custom connections
+
+If your account/workspace offers Developer mode and custom MCP connections, add the URL above with **OAuth** and use automatic registration when offered. Complete the MeiGen account consent flow. Follow [OpenAI's current setup](https://developers.openai.com/api/docs/guides/developer-mode#how-to-use). Do not put a MeiGen API key in the OAuth client-secret field.
+
+This standard MCP connection is separate from the MeiGen marketplace adapter and its custom result cards. Availability depends on your plan/workspace and server rollout. With **No Authentication**, only public tools work; uploads, generation, requestId recovery and private Skill results require authorization. ChatGPT and Codex have different configuration flows; a chat instruction cannot install npm inside ChatGPT web.
+
+### API key fallback
+
+Existing API keys continue to work. In a desktop browser, create a key at [API Keys](https://www.meigen.ai/profile/api-keys), then configure your client's private headers:
 
 ```text
 Authorization: Bearer <MeiGen API key>
 ```
 
-Paid calls spend purchased credits only; no daily free credits or free Skill attempts. Do not place the key in chat or in the URL.
-
-## Codex CLI, IDE extension and local Codex desktop host
-
-```bash
-codex mcp add meigen --url https://www.meigen.ai/api/mcp \
-  --bearer-token-env-var MEIGEN_API_TOKEN
-```
-
-Equivalent `~/.codex/config.toml` entry, with Skill timeouts:
-
-```toml
-[mcp_servers.meigen]
-url = "https://www.meigen.ai/api/mcp"
-bearer_token_env_var = "MEIGEN_API_TOKEN"
-startup_timeout_sec = 30
-tool_timeout_sec = 240
-```
-
-Merge into the existing entry rather than adding a duplicate. Set the variable in the environment that **launches Codex**; a project `.env.local` is not automatically loaded. To verify public lookups before setting a key, omit the token flag/TOML field. If a desktop launch cannot inherit the variable, use its private Authorization-header setting when supported, or privately configure `http_headers.Authorization` and remove `bearer_token_env_var`. Preserve other servers and keep secrets out of shared configuration. See the [official Codex MCP guide](https://developers.openai.com/codex/mcp).
-
-## Claude Code and other HTTP hosts
-
-For Claude Code, use its private local terminal/connection settings:
-
-```bash
-claude mcp add --transport http meigen https://www.meigen.ai/api/mcp \
-  --header "Authorization: Bearer $MEIGEN_API_TOKEN"
-```
-
-Other hosts often use the JSON shape below; field names vary by client. Replace the placeholder privately in your host's credentials settings.
-
-```json
-{
-  "mcpServers": {
-    "meigen": {
-      "url": "https://www.meigen.ai/api/mcp",
-      "headers": { "Authorization": "Bearer <MeiGen API key>" }
-    }
-  }
-}
-```
-
-## ChatGPT web: public lookups only
-
-For an account/workspace with custom MCP access, enable Developer mode, create a custom remote app/plugin for the URL above, and choose **No Authentication**. Follow [OpenAI's current setup](https://developers.openai.com/api/docs/guides/developer-mode#how-to-use). ChatGPT's hosted client [cannot send custom API keys](https://developers.openai.com/plugins/build/auth#client-identification); MeiGen has not provided the OAuth integration needed for authenticated use there.
-
-You can use public tools, including `list_skills`, `list_models`, gallery lookups and `check_generation` for a known generation ID. Generation, upload, requestId recovery and **`check_skill` require a key and are unavailable through this ChatGPT web connection**. Codex has a different configuration flow above. A chat instruction cannot install npm inside ChatGPT web.
+For Codex, use `--bearer-token-env-var MEIGEN_API_TOKEN` instead of OAuth login and set the variable in the environment that launches it. Local npm uses `MEIGEN_API_TOKEN`. A project `.env.local` alone does not configure the AI client. Do not combine a fixed Authorization header with OAuth or put keys in chat, URLs or shared repositories. API keys and OAuth use purchased credits from the connected account.
 
 ## Tools
 
 The remote server exposes **14 tools**:
 
-| Tool | Purpose | MeiGen key |
+| Tool | Purpose | Account authorization |
 | --- | --- | --- |
 | `generate_image` | General image generation; local can use configured backends | Yes |
 | `generate_video` | MeiGen Cloud video generation | Yes |
-| `check_generation` | Status/recovery by generationId or requestId | Request-ID lookup requires an owning-account key |
+| `check_generation` | Status/recovery by generationId or requestId | Request-ID lookup requires the owning account |
 | `list_models` | Available models and capabilities | No |
-| `search_gallery` | Search public prompts and image previews; returns at most 3 entries | No — but with a key the search counts against that account's quota |
+| `search_gallery` | Search public prompts and image previews; returns at most 3 entries | No — but with authorization the search counts against that account's quota |
 | `get_inspiration` | Read a public gallery entry | No |
 | `list_skills` | Five workflows, materials, live prices and input schemas | No |
 | `upload_skill_image` | Prepare real image URLs or attachment bytes | Yes |
@@ -91,13 +90,13 @@ The remote server exposes **14 tools**:
 | `generate_marketing_poster` | One promotional poster | Yes |
 | `generate_ai_background` | One white, smart or custom background | Yes |
 | `upscale_image` | Enhance one original still image | Yes |
-| `check_skill` | Private Skill receipt, module status and recovery | Yes, same key |
+| `check_skill` | Private Skill receipt, module status and recovery | Yes, owning account (same key for API key access) |
 
 ## First successful check
 
 Reconnect, then ask: **“List MeiGen's available Skills and current prices.”** Verify that an actual tool call succeeds; registration alone is not connection proof. It does not generate or spend credits. Then supply the required material and request one of the [five workflows](/en/api-reference/skills/overview). Skills return after submission and use `check_skill`; generic generation recovery uses `check_generation`.
 
-`search_gallery` returns **at most 3 entries** per call, so narrow the query instead of expecting a long list. When the connection carries an API key, each search is counted against that account's [**daily search allowance**](/en/features/gallery#search) — the same free allowance a signed-in web user gets, not purchased credits. Without a key, searches are rate-limited per anonymous IP instead.
+`search_gallery` returns **at most 3 entries** per call, so narrow the query instead of expecting a long list. When the connection uses OAuth or an API key, each search is counted against that account's [**daily search allowance**](/en/features/gallery#search) — the same free allowance a signed-in web user gets, not purchased credits. Without authorization, searches are rate-limited per anonymous IP instead.
 
 Remote tools cannot read a local filesystem path. Use a public image URL or `upload_skill_image` with actual accessible bytes. For Upscale, pass the original URL directly or upload with `purpose: "upscale"`; do not downsize it as an ordinary reference first.
 
