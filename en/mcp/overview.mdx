@@ -115,7 +115,7 @@ Call `list_models` first to check availability. For the local npm server, use `m
     Install as a plugin from the marketplace — includes slash commands, smart agents, and automation hooks.
   </Card>
   <Card title="Cursor / VS Code / Windsurf / Roo Code" icon="window">
-    One-command setup via `npx -y meigen@2.0.1 init <host>` — writes the right MCP config file for each editor.
+    One-command setup via `npx -y meigen@2.0.2 init <host>` — writes the right MCP config file for each editor.
   </Card>
   <Card title="OpenAI Codex CLI" icon="terminal">
     Use remote HTTP with bearer_token_env_var, or configure a local stdio process. See the setup guide for both.
@@ -127,7 +127,7 @@ Call `list_models` first to check availability. For the local npm server, use `m
     Install as a [plugin](https://clawhub.ai/plugins/meigen-ai-design) from ClawHub — check the installed bundle manifest and connect its MCP server once.
   </Card>
   <Card title="Any MCP host" icon="plug">
-    Standard stdio MCP — point any MCP-compatible host at `npx -y meigen@2.0.1`.
+    Standard stdio MCP — point any MCP-compatible host at `npx -y meigen@2.0.2`.
   </Card>
 </CardGroup>
 
@@ -139,11 +139,11 @@ No MCP host? MeiGen also ships as a CLI for shell scripts and CI pipelines:
 
 ```bash
 export MEIGEN_API_TOKEN=meigen_sk_...
-npx -y meigen@2.0.1 gen --prompt "a calico cat in a sunlit kitchen"
-npx -y meigen@2.0.1 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
+npx -y meigen@2.0.2 gen --prompt "a calico cat in a sunlit kitchen"
+npx -y meigen@2.0.2 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
 ```
 
-Use `--json` for machine-readable output, `--no-wait` to submit without polling, and `--reference <path|url>` to pass a reference image. Run `npx -y meigen@2.0.1 gen --help` for the full flag list.
+Use `--json` for machine-readable output, `--no-wait` to submit without polling, and `--reference <path|url>` to pass a reference image. Run `npx -y meigen@2.0.2 gen --help` for the full flag list.
 
 ---
 

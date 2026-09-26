@@ -115,7 +115,7 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
     从插件市场安装 — 包含斜杠命令、智能 Agent 和自动化 Hook。
   </Card>
   <Card title="Cursor / VS Code / Windsurf / Roo Code" icon="window">
-    一行命令 `npx -y meigen@2.0.1 init <host>` 为每个编辑器写好 MCP 配置文件。
+    一行命令 `npx -y meigen@2.0.2 init <host>` 为每个编辑器写好 MCP 配置文件。
   </Card>
   <Card title="OpenAI Codex CLI" icon="terminal">
     使用 bearer_token_env_var 连接远程 HTTP，或配置本地 stdio 进程；两种方式见安装指南。
@@ -127,7 +127,7 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
     从 [ClawHub](https://clawhub.ai/plugins/meigen-ai-design) 安装插件 — 检查已安装 bundle 的清单，并只配置一次 MCP 连接。
   </Card>
   <Card title="任意 MCP 客户端" icon="plug">
-    标准 stdio MCP — 任意 MCP 兼容客户端指向 `npx -y meigen@2.0.1` 即可。
+    标准 stdio MCP — 任意 MCP 兼容客户端指向 `npx -y meigen@2.0.2` 即可。
   </Card>
 </CardGroup>
 
@@ -139,11 +139,11 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 
 ```bash
 export MEIGEN_API_TOKEN=meigen_sk_...
-npx -y meigen@2.0.1 gen --prompt "阳光厨房里的三花猫"
-npx -y meigen@2.0.1 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
+npx -y meigen@2.0.2 gen --prompt "阳光厨房里的三花猫"
+npx -y meigen@2.0.2 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
 ```
 
-`--json` 输出机器可读、`--no-wait` 仅提交不轮询、`--reference <path|url>` 传参考图。完整参数 `npx -y meigen@2.0.1 gen --help`。
+`--json` 输出机器可读、`--no-wait` 仅提交不轮询、`--reference <path|url>` 传参考图。完整参数 `npx -y meigen@2.0.2 gen --help`。
 
 ---
 

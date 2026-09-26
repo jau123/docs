@@ -24,7 +24,7 @@ Copy into a local Codex, Claude Code, Cursor or other assistant that can edit MC
 ```text
 Set up MeiGen MCP for this host, preserving other servers and reusing an existing
 MeiGen entry. Prefer https://www.meigen.ai/api/mcp with Streamable HTTP; use local
-npx -y meigen@2.0.1 when local-file access or local-only tools are needed.
+npx -y meigen@2.0.2 when local-file access or local-only tools are needed.
 For Codex remote, use bearer_token_env_var = "MEIGEN_API_TOKEN". If I have not set
 a key yet, omit authentication and verify public tools first. Guide me to enter
 the key privately; never ask me to paste it into chat or put it in a URL.
@@ -80,14 +80,14 @@ See [remote setup](/en/mcp/remote) for Codex HTTP and ChatGPT web instructions.
 One command writes the right MCP config file for each editor:
 
 ```bash
-npx -y meigen@2.0.1 init cursor      # writes .cursor/mcp.json
-npx -y meigen@2.0.1 init vscode      # writes .vscode/mcp.json
-npx -y meigen@2.0.1 init windsurf    # writes ~/.codeium/windsurf/mcp_config.json
-npx -y meigen@2.0.1 init roo         # writes .roo/mcp.json
-npx -y meigen@2.0.1 init claude      # writes .mcp.json (Claude Code project-level)
+npx -y meigen@2.0.2 init cursor      # writes .cursor/mcp.json
+npx -y meigen@2.0.2 init vscode      # writes .vscode/mcp.json
+npx -y meigen@2.0.2 init windsurf    # writes ~/.codeium/windsurf/mcp_config.json
+npx -y meigen@2.0.2 init roo         # writes .roo/mcp.json
+npx -y meigen@2.0.2 init claude      # writes .mcp.json (Claude Code project-level)
 ```
 
-The init helper writes a configuration that follows the latest npm release. To pin this version, edit its generated args to `meigen@2.0.1`; running the helper from a pinned package does not itself pin the generated entry. Set credentials in the MCP process environment or private host settings, then restart.
+The init helper writes a configuration that follows the latest npm release. To pin this version, edit its generated args to `meigen@2.0.2`; running the helper from a pinned package does not itself pin the generated entry. Set credentials in the MCP process environment or private host settings, then restart.
 
 ### Codex CLI, IDE extension and local Codex desktop host
 
@@ -96,13 +96,13 @@ The init helper writes a configuration that follows the latest npm release. To p
 ```toml
 [mcp_servers.meigen]
 command = "npx"
-args = ["-y", "meigen@2.0.1"]
+args = ["-y", "meigen@2.0.2"]
 env_vars = ["MEIGEN_API_TOKEN"]
 startup_timeout_sec = 90
 tool_timeout_sec = 240
 ```
 
-Set `MEIGEN_API_TOKEN` in the environment that launches Codex. For public-only setup without a key, omit `env_vars` until the variable exists. Codex does not automatically load a project's `.env.local`. You can first register the command with `codex mcp add meigen -- npx -y meigen@2.0.1`, then add the environment forwarding and timeouts to its existing table. `meigen init codex` is not supported.
+Set `MEIGEN_API_TOKEN` in the environment that launches Codex. For public-only setup without a key, omit `env_vars` until the variable exists. Codex does not automatically load a project's `.env.local`. You can first register the command with `codex mcp add meigen -- npx -y meigen@2.0.2`, then add the environment forwarding and timeouts to its existing table. `meigen init codex` is not supported.
 
 A 240-second tool timeout is suitable for Skills; long generic video generation can require more. Restart/reconnect, inspect `codex mcp list` and `/mcp`, then make an actual `list_skills` call. See the [official Codex configuration guide](https://developers.openai.com/codex/mcp). ChatGPT web does not share this local setup; it supports [public queries only](/en/mcp/remote#chatgpt-web-public-lookups-only) with the current MeiGen authentication.
 
@@ -114,7 +114,7 @@ Hermes is a first-class MCP client. Add to `~/.hermes/config.yaml`:
 mcp_servers:
   meigen:
     command: "npx"
-    args: ["-y", "meigen@2.0.1"]
+    args: ["-y", "meigen@2.0.2"]
     env:
       MEIGEN_API_TOKEN: "meigen_sk_..."
     timeout: 2700          # long videos, e.g. with reference videos, can exceed 15 min
@@ -136,19 +136,19 @@ For shell scripts, CI pipelines, or anyone who wants AI image generation without
 export MEIGEN_API_TOKEN=meigen_sk_...
 
 # Generate
-npx -y meigen@2.0.1 gen --prompt "a calico cat in a sunlit kitchen"
+npx -y meigen@2.0.2 gen --prompt "a calico cat in a sunlit kitchen"
 
 # With a specific model + aspect ratio
-npx -y meigen@2.0.1 gen -p "logo design" -m midjourney-v8.1 -r 1:1
+npx -y meigen@2.0.2 gen -p "logo design" -m midjourney-v8.1 -r 1:1
 
 # With a reference image (local path auto-uploaded)
-npx -y meigen@2.0.1 gen -p "product hero shot" --ref ~/Desktop/bottle.jpg
+npx -y meigen@2.0.2 gen -p "product hero shot" --ref ~/Desktop/bottle.jpg
 
 # Submit only — print generationId without polling (good for CI)
-npx -y meigen@2.0.1 gen -p "..." --no-wait
+npx -y meigen@2.0.2 gen -p "..." --no-wait
 
 # Machine-readable output (good for jq pipes)
-npx -y meigen@2.0.1 gen -p "..." --json | jq -r '.imageUrls[0]'
+npx -y meigen@2.0.2 gen -p "..." --json | jq -r '.imageUrls[0]'
 ```
 
 Generated images save to `~/Pictures/meigen/` by default — see [Output Directories](#output-directories) to change where files land.
@@ -166,7 +166,7 @@ For any host that consumes stdio MCP, add this to its config file:
   "mcpServers": {
     "meigen": {
       "command": "npx",
-      "args": ["-y", "meigen@2.0.1"],
+      "args": ["-y", "meigen@2.0.2"],
       "env": {
         "MEIGEN_API_TOKEN": "meigen_sk_..."
       }
@@ -256,7 +256,7 @@ Once installed, ask your AI assistant in plain language — for example, "Genera
 
 ## Upgrade from an earlier version
 
-Your existing MeiGen key, `MEIGEN_API_TOKEN` and private `~/.config/meigen/config.json` can be reused. Change a fixed older npm version to `meigen@2.0.1`, then restart. Entries tracking the latest release also need a restart and a version/tool check. Local npm exposes 17 tools; the existing nine remain and the new dedicated flows change how the agent routes Skill requests.
+Your existing MeiGen key, `MEIGEN_API_TOKEN` and private `~/.config/meigen/config.json` can be reused. Change a fixed older npm version to `meigen@2.0.2`, then restart. Entries tracking the latest release also need a restart and a version/tool check. Local npm exposes 17 tools; the existing nine remain and the new dedicated flows change how the agent routes Skill requests.
 
 Claude/OpenClaw instructions and manifests update through their own distribution; upgrading npm alone does not replace them. Remote users do not upgrade npm: wait for backend deployment, then refresh/reconnect. No mandatory switch from local to remote is required. See [source and release notes](https://github.com/jau123/MeiGen-AI-Design-MCP).
 
@@ -293,7 +293,7 @@ For Skill image limits, interrupted requests, resizing confirmation and price ch
 
   <Accordion title="Plugin not showing in tool list" icon="circle-exclamation">
     1. Make sure Node.js 22+ is installed
-    2. Try running `npx -y meigen@2.0.1` directly to check for errors
+    2. Try running `npx -y meigen@2.0.2` directly to check for errors
     3. Restart your editor
     4. Check that the MCP configuration JSON is valid
   </Accordion>
