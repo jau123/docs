@@ -45,7 +45,7 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 
 <CardGroup cols={3}>
   <Card title="MeiGen Cloud" icon="cloud">
-    **托管式多模型 API**。汇集 OpenAI、Google、ByteDance、Midjourney、xAI、Black Forest Labs、Alibaba、Agnes 的图像与视频模型。无需 GPU — 只需一个 API Key。当前清单随时用 `list_models` 查。
+    **托管式多模型 API**。汇集 OpenAI、Google、ByteDance、Midjourney、xAI、Black Forest Labs、Alibaba、Agnes 的图像与视频模型。无需 GPU，使用已连接的 MeiGen 账号或 API Key。当前清单随时用 `list_models` 查。
   </Card>
   <Card title="ComfyUI" icon="server">
     **本地 GPU 生成**。在你自己的硬件上运行任何 Stable Diffusion、SDXL 或 Flux 模型。完全控制工作流和参数。
@@ -69,13 +69,13 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 
 远程 Streamable HTTP 提供 **14 个工具**，本地 npm 提供 **17 个工具**。以下 14 个工具两种连接都有：
 
-| 工具 | 用途 | MeiGen Key |
+| 工具 | 用途 | MeiGen 账号授权 |
 | --- | --- | --- |
 | `generate_image` | 通用图片生成，本地可使用已配置的后端 | MeiGen Cloud 需要 |
 | `generate_video` | MeiGen Cloud 视频生成 | 是 |
-| `check_generation` | 按 generationId 或 requestId 查询／恢复 | 按请求 ID 查询需要同账号 Key |
+| `check_generation` | 按 generationId 或 requestId 查询／恢复 | 按请求 ID 查询需要授权所属账号 |
 | `list_models` | 当前模型与能力 | 否 |
-| `search_gallery` | 搜索公开提示词和图片预览，最多返回 3 条 | 否 —— 但带 Key 时该次搜索计入这个账户的额度 |
+| `search_gallery` | 搜索公开提示词和图片预览，最多返回 3 条 | 否 —— 但授权后该次搜索计入这个账户的额度 |
 | `get_inspiration` | 读取公开画廊条目 | 否 |
 | `list_skills` | 五项工作流、材料、实时价格和输入参数 | 否 |
 | `upload_skill_image` | 准备真实图片 URL 或附件字节 | 是 |
@@ -84,9 +84,9 @@ MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
 | `generate_marketing_poster` | 一张营销海报 | 是 |
 | `generate_ai_background` | 一张纯白、智能或自定义背景图 | 是 |
 | `upscale_image` | 增强一张原始静态图片 | 是 |
-| `check_skill` | 私有 Skill 回执、模块状态和恢复 | 是，同一个Key |
+| `check_skill` | 私有 Skill 回执、模块状态和恢复 | 是，所属账号（API Key 方式需原 Key） |
 
-本地另有 `enhance_prompt`、`manage_preferences`、`comfyui_workflow`，它们不要求 MeiGen Key。本地画廊搜索可回退到内置提示词库，远程访问需要网络。两种连接下 `search_gallery` 每次都**最多返回 3 条**；配置了 Key 时（本地为 `MEIGEN_API_TOKEN`，远程为 `Authorization` 头），每次搜索计入该账户的[**每日搜索额度**](/zh/features/gallery#搜索) —— 与网页登录用户相同的免费额度，不消耗购买积分。没有 Key 时按匿名 IP 限流。多提供商配置适用于通用生成，所有专用 Skill 都需要 MeiGen Cloud 凭据和购买积分。远程 `check_generation` 按已知 generationId 公开查询；按 requestId 恢复需要所属账号的有效 Key。`check_skill` 必须使用原 API Key。
+本地另有 `enhance_prompt`、`manage_preferences`、`comfyui_workflow`，它们不要求 MeiGen Key。本地画廊搜索可回退到内置提示词库，远程访问需要网络。两种连接下 `search_gallery` 每次都**最多返回 3 条**；已授权时（本地为 API Key，远程可用 OAuth 或 API Key），每次搜索计入该账户的[**每日搜索额度**](/zh/features/gallery#搜索) —— 与网页登录用户相同的免费额度，不消耗购买积分。未授权时按匿名 IP 限流。多提供商配置适用于通用生成，所有专用 Skill 都需要 MeiGen Cloud 凭据和购买积分。远程 `check_generation` 按已知 generationId 公开查询；按 requestId 恢复需要授权所属账号。OAuth Skill 恢复按账号隔离，API Key 方式仍需原 Key。详见[远程账号登录](/zh/mcp/remote)。
 
 <Note>
   视频能力因模型而异 — 画质档位、可选时长与分辨率、音频、参考视频续写，以及是否必须提供首帧图。部分模型仅支持图生视频。当前清单用 `list_models` 查，或见[模型对比](/zh/features/models)。

@@ -45,7 +45,7 @@ MeiGen supports three image generation backends — configure one or more.
 
 <CardGroup cols={3}>
   <Card title="MeiGen Cloud" icon="cloud">
-    **Hosted multi-model API**. Image and video models from OpenAI, Google, ByteDance, Midjourney, xAI, Black Forest Labs, Alibaba, and Agnes. No GPU required — just an API key. Run `list_models` for the current lineup.
+    **Hosted multi-model API**. Image and video models from OpenAI, Google, ByteDance, Midjourney, xAI, Black Forest Labs, Alibaba, and Agnes. No GPU required — use a connected MeiGen account or API key. Run `list_models` for the current lineup.
   </Card>
   <Card title="ComfyUI" icon="server">
     **Local GPU generation**. Run any Stable Diffusion, SDXL, or Flux model on your own hardware. Full control over workflows and parameters.
@@ -69,13 +69,13 @@ MeiGen supports three image generation backends — configure one or more.
 
 Remote Streamable HTTP exposes **14 tools**; local npm exposes **17**. The following 14 are shared:
 
-| Tool | Purpose | MeiGen key |
+| Tool | Purpose | MeiGen account authorization |
 | --- | --- | --- |
 | `generate_image` | General image generation; local can use configured backends | For MeiGen Cloud |
 | `generate_video` | MeiGen Cloud video generation | Yes |
-| `check_generation` | Status/recovery by generationId or requestId | Request-ID lookup requires an owning-account key |
+| `check_generation` | Status/recovery by generationId or requestId | Request-ID lookup requires the owning account |
 | `list_models` | Available models and capabilities | No |
-| `search_gallery` | Search public prompts and image previews; returns at most 3 entries | No — but with a key the search counts against that account's quota |
+| `search_gallery` | Search public prompts and image previews; returns at most 3 entries | No — but with authorization the search counts against that account's quota |
 | `get_inspiration` | Read a public gallery entry | No |
 | `list_skills` | Five workflows, materials, live prices and input schemas | No |
 | `upload_skill_image` | Prepare real image URLs or attachment bytes | Yes |
@@ -84,9 +84,9 @@ Remote Streamable HTTP exposes **14 tools**; local npm exposes **17**. The follo
 | `generate_marketing_poster` | One promotional poster | Yes |
 | `generate_ai_background` | One white, smart or custom background | Yes |
 | `upscale_image` | Enhance one original still image | Yes |
-| `check_skill` | Private Skill receipt, module status and recovery | Yes, same key |
+| `check_skill` | Private Skill receipt, module status and recovery | Yes, owning account (same key for API key access) |
 
-Local additionally provides `enhance_prompt`, `manage_preferences` and `comfyui_workflow`; these require no MeiGen key. Local gallery search can fall back to a bundled prompt library; remote access requires the network. `search_gallery` returns **at most 3 entries** per call on both connections, and when a key is present — `MEIGEN_API_TOKEN` locally, the `Authorization` header remotely — each search counts against that account's [**daily search allowance**](/en/features/gallery#search), the same allowance a signed-in web user gets, rather than against purchased credits. Without a key, searches are rate-limited per anonymous IP. Provider setup applies to general generation, while every dedicated Skill requires MeiGen Cloud credentials and purchased credits. `check_generation` by known generationId is public remotely; requestId lookup needs an active key of the owning account. `check_skill` requires the original API key.
+Local additionally provides `enhance_prompt`, `manage_preferences` and `comfyui_workflow`; these require no MeiGen key. Local gallery search can fall back to a bundled prompt library; remote access requires the network. `search_gallery` returns **at most 3 entries** per call on both connections, and when authenticated — a key locally, OAuth or a key remotely — each search counts against that account's [**daily search allowance**](/en/features/gallery#search), the same allowance a signed-in web user gets, rather than against purchased credits. Without authentication, searches are rate-limited per anonymous IP. Provider setup applies to general generation, while every dedicated Skill requires MeiGen Cloud credentials and purchased credits. `check_generation` by known generationId is public remotely; requestId lookup requires the owning account. OAuth Skill recovery is account-bound; API-key Skill recovery requires the original key. See [remote account login](/en/mcp/remote).
 
 <Note>
   Video capabilities differ by model — quality tiers, available durations and resolutions, audio, reference-video continuation, and whether a first frame is required. Some models are image-to-video only. Call `list_models` for the current lineup, or see the [model comparison](/en/features/models).
