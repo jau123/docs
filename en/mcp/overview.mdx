@@ -15,7 +15,7 @@ Try: *“Use MeiGen to find minimalist product photography inspiration. Show me 
 
 Search does not spend generation credits. Generation uses your purchased MeiGen credits; daily free credits do not apply. Review the model, image count and total price before generating.
 
-The ChatGPT plugin uses MeiGen Cloud. ComfyUI, bring-your-own API and the bundled offline prompt library are features of the local package.
+The ChatGPT plugin and remote OAuth connection use MeiGen Cloud. Local npm remains available for existing MeiGen API-key integrations and explicitly selected external-provider BYOK. Version 3.0.0 removes ComfyUI and the bundled offline prompt library; see the [migration notes](/en/mcp/comfyui).
 
 <Card title="GitHub Repository" icon="github" href="https://github.com/jau123/MeiGen-AI-Design-MCP">
   View source code, report issues, and contribute.
@@ -27,7 +27,7 @@ Keep the upstream script, prompt, model/provider, count and approved budget. Cre
 
 ## What is MCP?
 
-Model Context Protocol (MCP) is an open standard that allows AI assistants to use external tools. When you install MeiGen as an MCP server, your AI assistant gains the ability to generate images and videos, run semantic search across the MeiGen community prompt gallery, and enhance prompts — all through natural language. Search, inspiration, and prompt enhancement need no API key, and the local npm package includes a prompt library for offline search fallback. Remote connections require network access.
+Model Context Protocol (MCP) is an open standard that allows AI assistants to use external tools. When you install MeiGen as an MCP server, your AI assistant gains the ability to generate images and videos, run semantic search across the MeiGen community prompt gallery, and enhance prompts — all through natural language. Standard remote MCP and local npm support anonymous public search; the official ChatGPT plugin requires account authorization for search. Prompt enhancement is local. In 3.0.0, inspiration search uses the online gallery only, without an offline fallback; unavailable services return an error.
 
 ---
 
@@ -43,43 +43,21 @@ Ask for a cutout, product detail images, a marketing poster, a new background or
 | AI Backgrounds | One product photo | Mode; custom mode requires a background description | One paid image |
 | Upscale | One original still JPEG/PNG/WebP | Crisp/creative mode | One paid enhanced image |
 
-Skills use purchased credits only, with no free attempts or daily credits. BYOK/ComfyUI do not supply these workflows. See the [complete Skills API and material guide](/en/api-reference/skills/overview).
+Skills use purchased credits only, with no free attempts or daily credits. BYOK do not supply these workflows. See the [complete Skills API and material guide](/en/api-reference/skills/overview).
 
 For posters, put visible copy in `content`; use `extraNotes` or `customStyle` for design directions. `autoCopy: false` preserves supplied wording, with selected-language translation still possible. See [poster field roles and a complete MCP call](/en/api-reference/skills/marketing-poster#mcp-call-example).
 
 ## Choose a connection
 
-For ChatGPT, use the [official plugin](#chatgpt). In other compatible clients, prefer [remote MCP](/en/mcp/remote) for MeiGen Cloud: no local npm process, stateless Streamable HTTP, with server changes available after backend deployment and client tool refresh. Choose [local npm](/en/mcp/setup) for automatic local-file preparation, local preferences, prompt enhancement or ComfyUI. Claude plugin commands/agents/hooks are separate package features; adding a remote URL does not install them.
+ChatGPT users should install the [official plugin](#chatgpt). Other new users should [connect with remote OAuth](/en/mcp/remote) at `https://www.meigen.ai/api/mcp`, then sign in to MeiGen and approve access in the host. No API key or Node.js is needed. Use a compatible host if OAuth is unavailable.
 
-## Providers
+[Local npm](/en/mcp/setup) retains existing API-key compatibility for generation, public search and Skills, BYOK, local file preparation, prompt enhancement and local preferences. It has no OAuth login or private-library tools. API keys are not offered as another new-user authentication method. Existing Claude/OpenClaw plugin stdio connections and creative instructions update separately; avoid duplicate tools when switching connections.
 
-The local MCP package supports three image generation backends — configure one or more. The ChatGPT plugin and remote MCP use MeiGen Cloud.
-
-<CardGroup cols={3}>
-  <Card title="MeiGen Cloud" icon="cloud">
-    **Hosted multi-model API**. Image and video models from OpenAI, Google, ByteDance, Midjourney, xAI, Black Forest Labs, Alibaba, and Agnes. No GPU required — use a connected MeiGen account or API key. Run `list_models` for the current lineup.
-  </Card>
-  <Card title="ComfyUI" icon="server">
-    **Local GPU generation**. Run any Stable Diffusion, SDXL, or Flux model on your own hardware. Full control over workflows and parameters.
-  </Card>
-  <Card title="Bring Your Own API" icon="plug">
-    **Any OpenAI-compatible API**. Connect Together AI, Fireworks AI, DeepInfra, SiliconFlow, OpenAI, or your own endpoint.
-  </Card>
-</CardGroup>
-
-| Provider | Type | Cost | Best For |
-| --- | --- | --- | --- |
-| MeiGen Cloud | Hosted API | Credits ([pricing](/en/features/models)) | Multi-model access, zero setup |
-| ComfyUI | Local GPU | Free (your hardware) | Full control, custom workflows, privacy |
-| Bring Your Own API | OpenAI-compatible | Varies by service | Existing API keys, any provider |
-
-**Provider priority**: When multiple providers are configured, MeiGen selects in this order: MeiGen Cloud → ComfyUI → OpenAI-compatible. You can override this per-request.
-
----
+The 3.0.0 local image providers are MeiGen (existing legacy key) and OpenAI-compatible APIs, in that priority order. ComfyUI is removed. Skills and video remain MeiGen Cloud features; use `list_models` and `list_skills` for current models and prices.
 
 ## Tools
 
-Remote Streamable HTTP exposes **14 tools**; local npm exposes **17**. The following 14 are shared:
+These **14 shared tools** form the common set. Local npm 3.0.0 has 16 tools, including two local helpers. Standard remote MCP has 19, including the five private-library tools below. The currently published official ChatGPT plugin has 14 tools; its update to 19 tools and six search results per batch still requires store approval. A backend or npm release does not make those new ChatGPT features available.
 
 | Tool | Purpose | MeiGen account authorization |
 | --- | --- | --- |
@@ -87,7 +65,7 @@ Remote Streamable HTTP exposes **14 tools**; local npm exposes **17**. The follo
 | `generate_video` | MeiGen Cloud video generation | Yes |
 | `check_generation` | Status/recovery by generationId or requestId | Request-ID lookup requires the owning account |
 | `list_models` | Available models and capabilities | No |
-| `search_gallery` | Search public prompts and image previews; returns at most 3 entries | No — but with authorization the search counts against that account's quota |
+| `search_gallery` | Search public prompts and image previews; batch limits vary below | Standard MCP/local: optional; official ChatGPT plugin: required |
 | `get_inspiration` | Read a public gallery entry | No |
 | `list_skills` | Five workflows, materials, live prices and input schemas | No |
 | `upload_skill_image` | Prepare real image URLs or attachment bytes | Yes |
@@ -96,9 +74,24 @@ Remote Streamable HTTP exposes **14 tools**; local npm exposes **17**. The follo
 | `generate_marketing_poster` | One promotional poster | Yes |
 | `generate_ai_background` | One white, smart or custom background | Yes |
 | `upscale_image` | Enhance one original still image | Yes |
-| `check_skill` | Private Skill receipt, module status and recovery | Yes, owning account (same key for API key access) |
+| `check_skill` | Private Skill receipt, module status and recovery | Yes, owning account; legacy local calls require the original key |
 
-Local additionally provides `enhance_prompt`, `manage_preferences` and `comfyui_workflow`; these require no MeiGen key. Local gallery search can fall back to a bundled prompt library; remote access requires the network. `search_gallery` returns **at most 3 entries** per call on both connections, and when authenticated — a key locally, OAuth or a key remotely — each search counts against that account's [**daily search allowance**](/en/features/gallery#search), the same allowance a signed-in web user gets, rather than against purchased credits. Without authentication, searches are rate-limited per anonymous IP. Provider setup applies to general generation, while every dedicated Skill requires MeiGen Cloud credentials and purchased credits. `check_generation` by known generationId is public remotely; requestId lookup requires the owning account. OAuth Skill recovery is account-bound; API-key Skill recovery requires the original key. See [remote account login](/en/mcp/remote).
+Local additionally provides `enhance_prompt` and `manage_preferences` without a MeiGen account. Version 3.0.0 removes `comfyui_workflow` and offline prompt fallback.
+
+| Public gallery search | Default / maximum results per batch | Account access |
+| --- | --- | --- |
+| Standard remote MCP | 3 / 3 | Optional OAuth; anonymous searches are IP-limited |
+| Local npm 3.0.0 | 3 / 3 | Anonymous, or an existing legacy key |
+| Official ChatGPT plugin | Published version: 3 / 3; update awaiting store approval: 6 / 6 | OAuth with search permission (`meigen:search`) |
+
+Authorized searches use the account's [daily search allowance](/en/features/gallery#search), not generation credits. Starting a search uses that allowance; continuation pages do not count again. Standard remote MCP and local 3.0.0 support pagination; the official ChatGPT plugin's next-batch cards are part of its update awaiting store approval. To see another batch, preserve the returned query and snapshot ID and pass `nextOffset` as `offset`; stop when `hasMore` is false. A different direction starts a new query. Keep original generation request IDs during recovery; a timeout is not permission for a new paid task.
+
+## Private library through remote OAuth
+
+Standard remote MCP provides `search_favorites`, `list_boards`, `search_history`, `get_library_item` and `save_favorite`. Connect with OAuth and approve the separate library read/write permissions when requested; existing connections do not gain them automatically. Local npm and API keys cannot access these tools. Their addition to the official ChatGPT plugin is still awaiting store approval.
+
+Lists contain prompt excerpts of at most 500 Unicode code points. Use `get_library_item` for a selected user prompt in pages of 8000 code points by default, up to 16000; internal Skill prompts are never returned. Saving requires an explicit request or prior opt-in, preserves existing notes on repeat calls and only supports owned private board destinations. Favorites are context for preferences, not a replacement for current instructions.
+
 
 <Note>
   Video capabilities differ by model — quality tiers, available durations and resolutions, audio, reference-video continuation, and whether a first frame is required. Some models are image-to-video only. Call `list_models` for the current lineup, or see the [model comparison](/en/features/models).
@@ -116,64 +109,12 @@ Local additionally provides `enhance_prompt`, `manage_preferences` and `comfyui_
 
 ### GPT Image 2.5
 
-Call `list_models` first to check availability. For the local npm server, use `model: "gpt-image-2.5"`; supported versions pass `quality` through to MeiGen (`low`, `medium`, `high`, `xhigh`, `max`). The local package currently has no `modelVariant` parameter, so it uses the backend default, Sunburst. To select Flare explicitly, use the [remote MCP server](/en/mcp/remote) or [REST API](/en/api-reference/endpoint/generate). GPT Image 2 remains a separate model with its original pricing.
+Call `list_models` first to check availability. **Local npm 3.0.0 supports** `model: "gpt-image-2.5"` or its `modelId` alias, `quality` (`low`, `medium`, `high`, `xhigh`, `max`) and `modelVariant: "sunburst"` (default) or `"flare"`. If both `model` and `modelId` are supplied, they must match. The [remote MCP server](/en/mcp/remote) and [REST API](/en/api-reference/endpoint/generate) use `modelId` with `modelVariant`. GPT Image 2 remains a separate model with its original pricing.
 
 ---
 
-## Supported Platforms
+## Next steps
 
-<CardGroup cols={3}>
-  <Card title="Claude Code" icon="terminal">
-    Install as a plugin from the marketplace — includes slash commands, smart agents, and automation hooks.
-  </Card>
-  <Card title="Cursor / VS Code / Windsurf / Roo Code" icon="window">
-    One-command setup via `npx -y meigen@2.0.2 init <host>` — writes the right MCP config file for each editor.
-  </Card>
-  <Card title="OpenAI Codex CLI" icon="terminal">
-    Use remote HTTP with bearer_token_env_var, or configure a local stdio process. See the setup guide for both.
-  </Card>
-  <Card title="Hermes Agent" icon="robot">
-    First-class MCP support — add to `~/.hermes/config.yaml` with `timeout: 2700` for video generation.
-  </Card>
-  <Card title="OpenClaw" icon="puzzle-piece">
-    Install as a [plugin](https://clawhub.ai/plugins/meigen-ai-design) from ClawHub — check the installed bundle manifest and connect its MCP server once.
-  </Card>
-  <Card title="Any MCP host" icon="plug">
-    Standard stdio MCP — point any MCP-compatible host at `npx -y meigen@2.0.2`.
-  </Card>
-</CardGroup>
-
----
-
-## Standalone CLI Mode
-
-No MCP host? MeiGen also ships as a CLI for shell scripts and CI pipelines:
-
-```bash
-export MEIGEN_API_TOKEN=meigen_sk_...
-npx -y meigen@2.0.2 gen --prompt "a calico cat in a sunlit kitchen"
-npx -y meigen@2.0.2 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
-```
-
-Use `--json` for machine-readable output, `--no-wait` to submit without polling, and `--reference <path|url>` to pass a reference image. Run `npx -y meigen@2.0.2 gen --help` for the full flag list.
-
----
-
-## Next Steps
-
-<CardGroup cols={3}>
-  <Card title="Setup Guide" icon="wrench" href="/en/mcp/setup">
-    Install the plugin and configure your preferred provider.
-  </Card>
-  <Card title="Remote MCP" icon="cloud" href="/en/mcp/remote">
-    Zero-install alternative — connect over HTTP, no Node.js required.
-  </Card>
-  <Card title="ComfyUI Guide" icon="server" href="/en/mcp/comfyui">
-    Set up local ComfyUI generation with custom workflows.
-  </Card>
-  <Card title="REST API" icon="code" href="/en/api-reference/introduction">
-    Prefer HTTP? Integrate via REST without MCP setup.
-  </Card>
-</CardGroup>
-
-`upload_skill_image` requires a positive purchased-credit balance and does not charge for generation. For Upscale attachments set `purpose: "upscale"`. Every `upscale_image` MCP call, including the first, requires `confirmedCredits` from the current `list_skills` quote within the accepted user or upstream workflow budget; reuse explicit acceptance.
+- [Remote OAuth setup](/en/mcp/remote) for Claude, Cursor and compatible clients.
+- [Legacy local setup and BYOK](/en/mcp/setup) for existing integrations.
+- [3.0.0 migration notes](/en/mcp/comfyui) for the ComfyUI/offline-library removal.

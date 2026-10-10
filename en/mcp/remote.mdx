@@ -1,6 +1,6 @@
 ---
 title: "Remote MCP Server"
-description: "Connect to 14 hosted MCP tools through stateless Streamable HTTP."
+description: "Connect MeiGen through remote OAuth and stateless Streamable HTTP."
 ---
 
 <Tip>
@@ -19,13 +19,13 @@ No Node.js or npm process is needed for remote access. The server is stateless a
 
 Keep the upstream script, prompt, model/provider, count and approved budget. Creative helpers are optional. Use persistent UUID `requestId`, `wait: false`, structured results and `check_generation` to submit frames/videos and resume them without re-approving every step. The caller owns bounded scheduling, previews and downloads. See [the complete workflow contract and examples](/en/mcp/composable-workflows).
 
-## Account login (recommended)
+## Account login
 
 For clients supporting Streamable HTTP and OAuth, add the server URL above, choose **Connect / Authenticate**, then sign in to MeiGen in your browser and approve the requested permissions. No API key or shared client secret is needed. Clients identify themselves through public client metadata (CIMD) or dynamic registration (DCR); they do not need a brand-specific MeiGen allowlist. This flow supports public-client authentication (`none`) with S256 PKCE.
 
 Check the app name, client identifier and return address on the consent page. Self-registered names are not verified by MeiGen. Authorization lasts up to 30 days and can be revoked in [Connected apps](https://www.meigen.ai/oauth/connections). Paid calls use purchased credits only, never daily free credits or Web free attempts.
 
-General OAuth requires server rollout and support in your client version. If the server does not advertise automatic registration or the host cannot log in, use the API key fallback below. Supporting MCP alone does not guarantee support for remote HTTP or OAuth.
+General OAuth requires server rollout and support in your client version. If the server does not advertise automatic registration or the host cannot log in, use a compatible host or the official ChatGPT plugin; do not create an API key as a fallback. Supporting MCP alone does not guarantee support for remote HTTP or OAuth.
 
 ### Codex
 
@@ -36,14 +36,14 @@ codex mcp login meigen
 
 Use the same URL in Codex desktop/IDE MCP settings and complete the login flow. Reuse an existing entry; remove a fixed Authorization header or `bearer_token_env_var` when switching that entry to OAuth. Keep other servers. See the [official Codex guide](https://developers.openai.com/codex/mcp).
 
-### Claude Code
+### Claude
 
 ```bash
 claude mcp add --transport http meigen https://www.meigen.ai/api/mcp
 claude mcp login meigen
 ```
 
-You can also authenticate through `/mcp`. See the [official Claude Code guide](https://code.claude.com/docs/en/mcp). No preconfigured MeiGen client ID is required for automatic registration.
+You can also authenticate through `/mcp`. See the [official Claude guide](https://code.claude.com/docs/en/mcp). No preconfigured MeiGen client ID is required for automatic registration.
 
 ### Cursor and other HTTP clients
 
@@ -57,31 +57,29 @@ Add the URL using your client's Streamable HTTP connection form, then choose Con
 }
 ```
 
-Field names vary; for example, Claude Code JSON also requires `"type": "http"`. Local-only clients should use the [npm installation](/en/mcp/setup).
+Field names vary; for example, Claude JSON also requires `"type": "http"`. New users need an OAuth-capable host; [local npm](/en/mcp/setup) is retained for existing legacy/BYOK integrations.
 
 ### ChatGPT custom connections
 
 If your account/workspace offers Developer mode and custom MCP connections, add the URL above with **OAuth** and use automatic registration when offered. Complete the MeiGen account consent flow. Follow [OpenAI's current setup](https://developers.openai.com/api/docs/guides/developer-mode#how-to-use). Do not put a MeiGen API key in the OAuth client-secret field.
 
-This manual connection is separate from the [official ChatGPT plugin](/en/mcp/overview#chatgpt), which provides result cards in your conversation. Availability depends on your plan/workspace and server rollout. With **No Authentication**, only public tools work; uploads, generation, requestId recovery and private Skill results require authorization. ChatGPT and Codex have different configuration flows; a chat instruction cannot install npm inside ChatGPT web.
+This manual connection is separate from the [official ChatGPT plugin](/en/mcp/overview#chatgpt), which provides result cards in your conversation. Availability depends on your plan/workspace and server rollout. With **No Authentication**, only public tools work; uploads, generation, requestId recovery and private Skill results require authorization. The manual CLI and plugin use different configuration flows; a chat instruction cannot install npm inside ChatGPT web.
 
-### API key fallback
+### Moving an existing local connection to OAuth
 
-Existing API keys continue to work. In a desktop browser, create a key at [API Keys](https://www.meigen.ai/profile/api-keys), then configure your client's private headers:
+Use OAuth for new MeiGen connections. Existing local stdio integrations can retain their [legacy key configuration](/en/mcp/setup) until migration; external-provider BYOK is a separate local option. When switching to remote OAuth, remove any fixed Authorization header and complete account sign-in in the host. Do not create another MeiGen key or send credentials in chat.
 
-```text
-Authorization: Bearer <MeiGen API key>
-```
-
-For Codex, use `--bearer-token-env-var MEIGEN_API_TOKEN` instead of OAuth login and set the variable in the environment that launches it. Local npm uses `MEIGEN_API_TOKEN`. A project `.env.local` alone does not configure the AI client. Do not combine a fixed Authorization header with OAuth or put keys in chat, URLs or shared repositories. API keys and OAuth use purchased credits from the connected account.
+<Note>
+  Existing remote connections with a fixed Authorization header retain legacy compatibility for generation, public search and Skills. API keys cannot access favorites, boards, history or private item details. Remove the fixed header before switching to OAuth. This compatibility is not a new-connection option.
+</Note>
 
 ## Tools
 
-The remote server exposes **14 tools**:
+Standard remote MCP provides **19 tools**: the 14 shared tools in this table and five private-library tools below. This section describes the standard remote endpoint, not the official ChatGPT plugin schema. The official plugin's 19-tool update is still awaiting store approval.
 
 | Tool | Purpose | Account authorization |
 | --- | --- | --- |
-| `generate_image` | General image generation; local can use configured backends | Yes |
+| `generate_image` | MeiGen Cloud image generation | Yes |
 | `generate_video` | MeiGen Cloud video generation | Yes |
 | `check_generation` | Status/recovery by generationId or requestId | Request-ID lookup requires the owning account |
 | `list_models` | Available models and capabilities | No |
@@ -94,13 +92,21 @@ The remote server exposes **14 tools**:
 | `generate_marketing_poster` | One promotional poster | Yes |
 | `generate_ai_background` | One white, smart or custom background | Yes |
 | `upscale_image` | Enhance one original still image | Yes |
-| `check_skill` | Private Skill receipt, module status and recovery | Yes, owning account (same key for API key access) |
+| `check_skill` | Private Skill receipt, module status and recovery | Yes, owning account |
+
+## Private library
+
+`search_favorites`, `list_boards`, `search_history`, `get_library_item` and `save_favorite` require OAuth. Approve `meigen:library:read` to read your library and `meigen:library:write` to save favorites; existing connections need consent for these additional permissions. Local npm and all API keys are excluded. These standard remote tools do not imply availability in the official ChatGPT plugin, whose update is still awaiting store approval.
+
+Lists return `promptExcerpt` (at most 500 Unicode code points), `promptLength` and `promptTruncated`. `get_library_item` takes the original `contentType` / `sourceId`, `promptOffset` (default 0) and `promptLimit` (default 8000, maximum 16000). All offsets and lengths count Unicode code points. `prompt.length` is the total safe prompt length; `nextOffset=null` marks the final page. Detailed data is returned once in `structuredContent`. Saving requires explicit intent, preserves existing notes and never publishes content; `favorites_limit_reached` means the account's favorite entitlement is full, not a generation-credit shortage.
 
 ## First successful check
 
 Reconnect, then ask: **“List MeiGen's available Skills and current prices.”** Verify that an actual tool call succeeds; registration alone is not connection proof. It does not generate or spend credits. Then supply the required material and request one of the [five workflows](/en/api-reference/skills/overview). Skills return after submission and use `check_skill`; generic generation recovery uses `check_generation`.
 
-`search_gallery` returns **at most 3 entries** per call, so narrow the query instead of expecting a long list. When the connection uses OAuth or an API key, each search is counted against that account's [**daily search allowance**](/en/features/gallery#search) — the same free allowance a signed-in web user gets, not purchased credits. Without authorization, searches are rate-limited per anonymous IP instead.
+Standard remote `search_gallery` defaults to and returns **at most 3 entries per batch**. Its schema accepts integer `limit` values from 1 to 30 for compatibility and clamps them to 3. Search can run anonymously with per-IP limits. With OAuth, starting a search uses the account's [daily search allowance](/en/features/gallery#search), not purchased credits; continuation pages do not count again.
+
+For another batch, preserve `query`, `limit` and `snapshotId`, and use `nextOffset` as `offset`; stop when `hasMore` is false. Snapshot expiry requires an explicit new search. Change the query only for a new direction. The published [official ChatGPT plugin](/en/mcp/overview#chatgpt) returns at most 3 entries. Its update awaiting store approval defaults to and allows at most 6, with OAuth search permission required. Its limit and authorization rules must not be applied to this endpoint.
 
 Remote tools cannot read a local filesystem path. Use a public image URL or `upload_skill_image` with actual accessible bytes. For Upscale, pass the original URL directly or upload with `purpose: "upscale"`; do not downsize it as an ordinary reference first.
 
@@ -151,15 +157,15 @@ Check the current model price before submitting this 2K Standard request. Add pu
 
 | | Remote | Local npm |
 | --- | --- | --- |
-| Tools | 14 | 17 |
+| Tools | 19, including 5 OAuth-only library tools | 3.0.0: 16 |
 | Installation | HTTP connection; no Node.js | npm process, Node.js 22+ recommended |
 | Updates | Backend deployment, then refresh cached tools | Upgrade the installed/pinned package and restart |
-| Providers | MeiGen Cloud | General images: MeiGen, ComfyUI, OpenAI-compatible; Skills: MeiGen only |
+| Providers | MeiGen Cloud | 3.0.0: existing MeiGen key or OpenAI-compatible; Skills: MeiGen only |
 | Local files | No direct access | Host-readable files can upload automatically |
-| Additional tools | — | Prompt enhancement, preferences, ComfyUI workflows |
+| Additional tools | — | Prompt enhancement and local preferences |
 | Results | Image URLs/resource links | General generation may save files; Skills return URLs/resource links |
 | Claude plugin commands/agents/hooks | Not installed by the URL | Separate Claude plugin distribution |
 
-Existing keys and the endpoint remain usable across server updates. Switching from local to remote is optional; local-only capabilities do not migrate. See [local setup and upgrade notes](/en/mcp/setup).
+Existing local integrations do not need to switch immediately; their local-only capabilities do not migrate. New MeiGen connections use remote OAuth. See [legacy local setup and upgrade notes](/en/mcp/setup).
 
 `upload_skill_image` requires a positive purchased-credit balance and does not charge for generation. For Upscale attachments set `purpose: "upscale"`. Every `upscale_image` MCP call, including the first, requires `confirmedCredits` from the current `list_skills` quote within the accepted user or upstream workflow budget; reuse explicit acceptance.

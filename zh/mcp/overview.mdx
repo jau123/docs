@@ -15,7 +15,7 @@ description: "连接 AI 助手，生成图片与视频、搜索画廊，并使�
 
 搜索不消耗生成积分。生成使用 MeiGen 账号的充值积分，不使用每日免费积分；生成前确认模型、图片数量和总价。
 
-ChatGPT 插件使用 MeiGen Cloud。ComfyUI、自带 API 和内置离线提示词库属于本地包功能。
+ChatGPT 插件和远程 OAuth 连接使用 MeiGen Cloud。本地 npm 保留已有 MeiGen API Key 集成兼容，以及明确选用的外部供应商 BYOK；3.0.0 已移除 ComfyUI 与内置离线提示词库，详见[迁移说明](/zh/mcp/comfyui)。
 
 <Card title="GitHub 仓库" icon="github" href="https://github.com/jau123/MeiGen-AI-Design-MCP">
   查看源代码、报告问题和贡献代码。
@@ -27,7 +27,7 @@ ChatGPT 插件使用 MeiGen Cloud。ComfyUI、自带 API 和内置离线提示�
 
 ## 什么是 MCP？
 
-Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外部工具。当你将 MeiGen 安装为 MCP 服务器后，你的 AI 助手就能通过自然语言生成图片和视频、对 MeiGen 社区提示词画廊做语义搜索、增强提示词。搜索、灵感和提示词增强无需 API Key；本地 npm 包内置提示词库，可作离线搜索回退；远程连接需要网络。
+Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外部工具。当你将 MeiGen 安装为 MCP 服务器后，你的 AI 助手就能通过自然语言生成图片和视频、对 MeiGen 社区提示词画廊做语义搜索、增强提示词。通用远程 MCP 和本地 npm 支持匿名搜索公开灵感；官方 ChatGPT 插件的搜索需要账号授权。提示词增强属于本地工具。3.0.0 的灵感搜索仅访问在线画廊，不再提供离线回退；在线服务不可用会返回错误。
 
 ---
 
@@ -43,43 +43,21 @@ Model Context Protocol (MCP) 是一个开放标准，允许 AI 助手使用外�
 | AI 换背景 | 一张商品图 | 模式；自定义模式必须提供背景描述 | 一张付费图 |
 | 图片增强 | 一张原始静态 JPEG/PNG/WebP | 清晰或创意模式 | 一张付费增强图 |
 
-Skills 只用购买积分，不提供免费次数或每日积分。BYOK/ComfyUI 不提供这些工作流。详见[完整 Skills API 与素材指南](/zh/api-reference/skills/overview)。
+Skills 只用购买积分，不提供免费次数或每日积分。BYOK 不提供这些工作流。详见[完整 Skills API 与素材指南](/zh/api-reference/skills/overview)。
 
 海报的画面文案放在 `content`，设计要求放在 `extraNotes` 或 `customStyle`。`autoCopy: false` 忠实使用原文，选定语言仍可要求翻译。参见[海报字段用途与完整 MCP 调用示例](/zh/api-reference/skills/marketing-poster#mcp-调用示例)。
 
 ## 选择连接
 
-ChatGPT 用户使用[官方插件](#chatgpt)。其他兼容客户端使用 MeiGen Cloud 时优先选择[远程 MCP](/zh/mcp/remote)：无需本地 npm 进程，通过无状态 Streamable HTTP 接入；服务端更新需要后端部署，客户端刷新工具后可用。需要自动读取本地文件、本地偏好、提示词增强或 ComfyUI 时选[本地 npm](/zh/mcp/setup)。Claude 插件的命令、Agent 和 Hook 是独立分发的附加功能，添加远程 URL 不会安装它们。
+ChatGPT 用户使用[官方插件](#chatgpt)。其他新用户通过[远程 OAuth](/zh/mcp/remote)连接 `https://www.meigen.ai/api/mcp`，在客户端登录 MeiGen 并授权；无需创建 API Key 或安装 Node.js。不支持 OAuth 时请使用兼容客户端。
 
-## 提供商
+[本地 npm](/zh/mcp/setup)保留既有 API Key 的生成、公开搜索和 Skills 兼容，以及 BYOK、本地文件处理、提示词增强和本地偏好。它没有 OAuth 登录，也不提供私人资料库。API Key 不是新用户的另一种认证选项。Claude／OpenClaw 插件附带的旧版 stdio 连接与创意指引独立更新，切换连接时避免重复工具。
 
-本地 MCP 包支持三种图片生成后端，可配置一个或多个。ChatGPT 插件和远程 MCP 使用 MeiGen Cloud。
-
-<CardGroup cols={3}>
-  <Card title="MeiGen Cloud" icon="cloud">
-    **托管式多模型 API**。汇集 OpenAI、Google、ByteDance、Midjourney、xAI、Black Forest Labs、Alibaba、Agnes 的图像与视频模型。无需 GPU，使用已连接的 MeiGen 账号或 API Key。当前清单随时用 `list_models` 查。
-  </Card>
-  <Card title="ComfyUI" icon="server">
-    **本地 GPU 生成**。在你自己的硬件上运行任何 Stable Diffusion、SDXL 或 Flux 模型。完全控制工作流和参数。
-  </Card>
-  <Card title="自带 API" icon="plug">
-    **任意 OpenAI 兼容 API**。接入 Together AI、Fireworks AI、DeepInfra、硅基流动、OpenAI，或你自己的端点。
-  </Card>
-</CardGroup>
-
-| 提供商 | 类型 | 费用 | 适用场景 |
-| --- | --- | --- | --- |
-| MeiGen Cloud | 托管 API | 积分（[定价](/zh/features/models)） | 多模型访问，零配置 |
-| ComfyUI | 本地 GPU | 免费（使用你自己的硬件） | 完全控制，自定义工作流，隐私保护 |
-| 自带 API | OpenAI 兼容 | 因服务而异 | 已有 API Key，任意供应商 |
-
-**提供商优先级**：当配置了多个提供商时，MeiGen 按以下顺序选择：MeiGen Cloud → ComfyUI → OpenAI 兼容。你可以在每次请求时覆盖此设置。
-
----
+3.0.0 本地普通生图仍支持 MeiGen（已有旧 Key）和 OpenAI 兼容供应商；优先级为 MeiGen → OpenAI 兼容。ComfyUI 不再支持，五项 Skills 与视频仍由 MeiGen 云端提供。模型与价格以 `list_models`、`list_skills` 为准。
 
 ## 工具
 
-远程 Streamable HTTP 提供 **14 个工具**，本地 npm 提供 **17 个工具**。以下 14 个工具两种连接都有：
+以下 **14 个共享工具**构成公共集合。本地 npm 3.0.0 有 16 个工具，包含两个本地辅助工具。通用远程 MCP 有 19 个，包含下方五个私人资料库工具。当前已发布的 ChatGPT 官方插件有 14 个工具；升级为 19 个工具、每批六条搜索结果的版本仍待商店审核。后端或 npm 发布不代表 ChatGPT 新功能已可用。
 
 | 工具 | 用途 | MeiGen 账号授权 |
 | --- | --- | --- |
@@ -87,7 +65,7 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他兼容客户端使用 MeiGe
 | `generate_video` | MeiGen Cloud 视频生成 | 是 |
 | `check_generation` | 按 generationId 或 requestId 查询／恢复 | 按请求 ID 查询需要授权所属账号 |
 | `list_models` | 当前模型与能力 | 否 |
-| `search_gallery` | 搜索公开提示词和图片预览，最多返回 3 条 | 否 —— 但授权后该次搜索计入这个账户的额度 |
+| `search_gallery` | 搜索公开提示词和图片预览，各连接的每批上限见下表 | 通用 MCP／本地可选；官方 ChatGPT 插件必须授权 |
 | `get_inspiration` | 读取公开画廊条目 | 否 |
 | `list_skills` | 五项工作流、材料、实时价格和输入参数 | 否 |
 | `upload_skill_image` | 准备真实图片 URL 或附件字节 | 是 |
@@ -96,9 +74,24 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他兼容客户端使用 MeiGe
 | `generate_marketing_poster` | 一张营销海报 | 是 |
 | `generate_ai_background` | 一张纯白、智能或自定义背景图 | 是 |
 | `upscale_image` | 增强一张原始静态图片 | 是 |
-| `check_skill` | 私有 Skill 回执、模块状态和恢复 | 是，所属账号（API Key 方式需原 Key） |
+| `check_skill` | 私有 Skill 回执、模块状态和恢复 | 是，所属账号；旧版本地调用须使用原 Key |
 
-本地另有 `enhance_prompt`、`manage_preferences`、`comfyui_workflow`，它们不要求 MeiGen Key。本地画廊搜索可回退到内置提示词库，远程访问需要网络。两种连接下 `search_gallery` 每次都**最多返回 3 条**；已授权时（本地为 API Key，远程可用 OAuth 或 API Key），每次搜索计入该账户的[**每日搜索额度**](/zh/features/gallery#搜索) —— 与网页登录用户相同的免费额度，不消耗购买积分。未授权时按匿名 IP 限流。多提供商配置适用于通用生成，所有专用 Skill 都需要 MeiGen Cloud 凭据和购买积分。远程 `check_generation` 按已知 generationId 公开查询；按 requestId 恢复需要授权所属账号。OAuth Skill 恢复按账号隔离，API Key 方式仍需原 Key。详见[远程账号登录](/zh/mcp/remote)。
+本地另有 `enhance_prompt` 和 `manage_preferences`，均不需要 MeiGen 账号。3.0.0 不再提供 `comfyui_workflow` 或离线提示词回退。
+
+| 公开画廊搜索 | 每批默认／最多条数 | 账号访问 |
+| --- | --- | --- |
+| 通用远程 MCP | 3／3 | 可选 OAuth；匿名搜索按 IP 限流 |
+| 本地 npm 3.0.0 | 3／3 | 匿名，或兼容已有旧版 Key |
+| 官方 ChatGPT 插件 | 已发布版本：3／3；待商店审核的更新：6／6 | 必须 OAuth 授权搜索权限（`meigen:search`） |
+
+授权搜索使用账号[每日搜索额度](/zh/features/gallery#搜索)，不消耗生成积分。开始一次搜索计入额度，后续翻页不重复计数。通用远程 MCP 与本地 3.0.0 支持分页；ChatGPT 官方插件的换批卡片属于待商店审核的更新。查看同方向下一批时，保留返回的查询词和快照 ID，将 `nextOffset` 传为 `offset`；`hasMore=false` 时停止。换方向则开始新查询。生成请求恢复仍保留原 ID，不能因超时重新创建付费任务。
+
+## 通过远程 OAuth 访问私人资料库
+
+通用远程 MCP 提供 `search_favorites`、`list_boards`、`search_history`、`get_library_item` 和 `save_favorite`。通过 OAuth 连接，并在请求时分别同意资料库读取／写入权限；已有连接不会自动获得新权限。本地 npm 和 API Key 不支持这些工具。ChatGPT 官方插件新增这些工具的版本仍待商店审核。
+
+列表只返回最多 500 个 Unicode 码点的 prompt 摘要。选定作品后用 `get_library_item` 分页读取用户提示词，默认 8000、最多 16000 码点；不返回内部 Skill 提示词。收藏须用户明确要求或事先允许，重复保存不会取消收藏或覆盖备注，只能存入自己的私密画板。收藏是偏好参考，不能代替用户当前要求。
+
 
 <Note>
   视频能力因模型而异 — 画质档位、可选时长与分辨率、音频、参考视频续写，以及是否必须提供首帧图。部分模型仅支持图生视频。当前清单用 `list_models` 查，或见[模型对比](/zh/features/models)。
@@ -116,64 +109,12 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他兼容客户端使用 MeiGe
 
 ### GPT Image 2.5
 
-先调用 `list_models` 确认可用性。本地 npm 服务使用 `model: "gpt-image-2.5"`；支持的版本会把 `quality` 透传给 MeiGen（`low`、`medium`、`high`、`xhigh`、`max`）。本地包目前没有 `modelVariant` 参数，因此使用后端默认 Sunburst。需要显式选择 Flare 时，请用[远程 MCP 服务](/zh/mcp/remote)或 [REST API](/zh/api-reference/endpoint/generate)。GPT Image 2 作为独立模型保留原有价格。
-
----
-
-## 支持的平台
-
-<CardGroup cols={3}>
-  <Card title="Claude Code" icon="terminal">
-    从插件市场安装 — 包含斜杠命令、智能 Agent 和自动化 Hook。
-  </Card>
-  <Card title="Cursor / VS Code / Windsurf / Roo Code" icon="window">
-    一行命令 `npx -y meigen@2.0.2 init <host>` 为每个编辑器写好 MCP 配置文件。
-  </Card>
-  <Card title="OpenAI Codex CLI" icon="terminal">
-    使用 bearer_token_env_var 连接远程 HTTP，或配置本地 stdio 进程；两种方式见安装指南。
-  </Card>
-  <Card title="Hermes Agent" icon="robot">
-    原生支持 MCP — 加到 `~/.hermes/config.yaml`,视频生成需 `timeout: 2700`。
-  </Card>
-  <Card title="OpenClaw" icon="puzzle-piece">
-    从 [ClawHub](https://clawhub.ai/plugins/meigen-ai-design) 安装插件 — 检查已安装 bundle 的清单，并只配置一次 MCP 连接。
-  </Card>
-  <Card title="任意 MCP 客户端" icon="plug">
-    标准 stdio MCP — 任意 MCP 兼容客户端指向 `npx -y meigen@2.0.2` 即可。
-  </Card>
-</CardGroup>
-
----
-
-## 独立 CLI 模式
-
-没有 MCP 宿主?MeiGen 同包附带 CLI,适合 shell 脚本和 CI 流水线:
-
-```bash
-export MEIGEN_API_TOKEN=meigen_sk_...
-npx -y meigen@2.0.2 gen --prompt "阳光厨房里的三花猫"
-npx -y meigen@2.0.2 gen -p "logo design" -m midjourney-v8.1 -r 1:1 --json
-```
-
-`--json` 输出机器可读、`--no-wait` 仅提交不轮询、`--reference <path|url>` 传参考图。完整参数 `npx -y meigen@2.0.2 gen --help`。
+先调用 `list_models` 确认可用性。**本地 npm 3.0.0 支持** `model: "gpt-image-2.5"` 或别名 `modelId`、`quality`（`low`、`medium`、`high`、`xhigh`、`max`），以及 `modelVariant: "sunburst"`（默认）或 `"flare"`。同时传入 `model` 和 `modelId` 时两者必须相同。[远程 MCP 服务](/zh/mcp/remote)与 [REST API](/zh/api-reference/endpoint/generate) 使用 `modelId` 搭配 `modelVariant`。GPT Image 2 作为独立模型保留原有价格。
 
 ---
 
 ## 下一步
 
-<CardGroup cols={3}>
-  <Card title="安装指南" icon="wrench" href="/zh/mcp/setup">
-    安装插件并配置你偏好的提供商。
-  </Card>
-  <Card title="远程 MCP" icon="cloud" href="/zh/mcp/remote">
-    零安装方案 — 通过 HTTP 连接,不需要 Node.js。
-  </Card>
-  <Card title="ComfyUI 指南" icon="server" href="/zh/mcp/comfyui">
-    设置本地 ComfyUI 生成及自定义工作流。
-  </Card>
-  <Card title="REST API" icon="code" href="/zh/api-reference/introduction">
-    不用 MCP？通过 REST API 直接集成。
-  </Card>
-</CardGroup>
-
-`upload_skill_image` 要求购买积分余额大于零，上传本身不扣生成积分。Upscale 附件设置 `purpose: "upscale"`。`upscale_image` 的每次 MCP 调用（含首次）都需要 `confirmedCredits`，取自 `list_skills` 的实时报价，且符合用户或上层工作流已接受的预算；已有明确授权可复用。
+- [远程 OAuth 连接](/zh/mcp/remote)：适用于 Claude、Cursor 等兼容客户端。
+- [旧版本地配置与 BYOK](/zh/mcp/setup)：维护现有集成。
+- [3.0.0 迁移说明](/zh/mcp/comfyui)：ComfyUI 与离线库移除。

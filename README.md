@@ -30,7 +30,7 @@ mint dev
     ├── mcp/
     │   ├── overview.mdx         # MCP plugin intro
     │   ├── setup.mdx            # Installation guide
-    │   └── comfyui.mdx          # ComfyUI integration
+    │   └── comfyui.mdx          # 3.0 migration (legacy URL)
     └── api-reference/
         ├── introduction.mdx     # API overview
         └── endpoint/

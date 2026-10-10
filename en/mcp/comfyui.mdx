@@ -1,141 +1,30 @@
 ---
-title: "ComfyUI Integration"
-description: "Connect local ComfyUI workflows to an MCP client and generate images on your own hardware."
+title: "3.0 Migration: ComfyUI and Offline Library"
+description: "Upgrade existing integrations after the removal of ComfyUI and bundled prompt data."
 ---
 
-ComfyUI is a node-based UI for Stable Diffusion and other image generation models. The MeiGen MCP plugin can connect to your local ComfyUI server, letting your AI assistant generate images directly on your own GPU.
+<Warning>
+  [meigen 3.0.0](https://www.npmjs.com/package/meigen/v/3.0.0) is a major release with breaking changes. Review the removals below before upgrading an existing integration.
+</Warning>
 
-## Prerequisites
+## Removed in 3.0.0
 
-- **ComfyUI** installed and running ([installation guide](https://github.com/comfyanonymous/ComfyUI))
-- At least one **checkpoint model** downloaded (e.g., SDXL, Flux, or Stable Diffusion 1.5)
-- The MeiGen MCP plugin installed ([Setup Guide](/en/mcp/setup))
-- `COMFYUI_URL` configured (default: `http://127.0.0.1:8188`)
+- The `comfyui` generation provider and `comfyui_workflow` tool.
+- `COMFYUI_URL`, `comfyuiUrl` and `comfyuiDefaultWorkflow` configuration support.
+- The bundled collection of about 1,400 prompts and offline search fallback. Online search returns an explicit error if its service is unavailable; it does not substitute local results.
 
----
+Remove these settings from your MCP environment and private `~/.config/meigen/config.json`, and update scripts that call the removed provider/tool. User-owned files in `~/.config/meigen/workflows/` are not deleted or automatically migrated. An explicit ComfyUI request is rejected rather than redirected to a paid cloud provider.
 
-## Exporting a Workflow from ComfyUI
+## Connection choices
 
-The plugin uses ComfyUI's **API format** — a JSON file that describes the workflow as a graph of nodes. This is different from the standard ComfyUI save format.
+New users connect [remote MCP with OAuth](/en/mcp/remote) or install the [official ChatGPT plugin](/en/mcp/overview#chatgpt). Existing API-key calls for generation, public search and Skills and explicitly selected BYOK workflows retain [legacy local compatibility](/en/mcp/setup). Do not create a new MeiGen key as a new-user alternative.
 
-<Steps>
-  <Step title="Enable Dev Mode">
-    In ComfyUI, go to **Settings** → enable **Dev Mode Options**. This adds the API format save button to the menu.
-  </Step>
-  <Step title="Build or load your workflow">
-    Set up the workflow you want to use — choose your checkpoint, sampler, prompt nodes, and any other processing steps.
-  </Step>
-  <Step title="Save as API format">
-    Click **Save (API Format)** in the menu. This exports a `.json` file in the node-graph format the plugin expects.
+Local 3.0.0 has 16 tools and no private-library tools. Favorites, boards, history, item details and saving are available through standard remote MCP with OAuth. The official ChatGPT plugin update adding these tools is still awaiting store approval.
 
-    <Warning>
-      The regular **Save** button exports a different format that the plugin cannot use. You must use **Save (API Format)**.
-    </Warning>
-  </Step>
-</Steps>
+## Upgrade sequence
 
----
+1. Review workflows and remove unsupported ComfyUI/offline-library assumptions.
+2. Update only the existing package argument to `meigen@3.0.0`, preserving credentials and host settings as described in [local setup](/en/mcp/setup). Configurations following the default npm tag can receive a new major automatically; keep an explicit pin. Claude/OpenClaw plugin bundles update separately.
+3. Restart/reconnect and inspect actual tool schemas. Keep original request IDs for any interrupted generation; upgrading does not authorize a new paid attempt.
 
-## Importing Workflows
-
-After exporting from ComfyUI, import the workflow into the plugin:
-
-```
-comfyui_workflow import ~/path/to/my-workflow.json
-```
-
-The plugin will:
-1. Parse the workflow JSON
-2. Auto-detect key nodes:
-   - **KSampler** — sampler, steps, CFG, scheduler
-   - **CLIPTextEncode** — positive and negative prompt
-   - **EmptyLatentImage** — image width and height
-   - **CheckpointLoader** — model checkpoint
-   - **LoadImage** — reference image input
-   - **SaveImage** — output node
-3. Save the template to `~/.config/meigen/workflows/`
-4. Report which nodes were detected and which parameters can be controlled
-
-You can import multiple workflows and switch between them when generating.
-
----
-
-## Managing Workflows
-
-Use the `comfyui_workflow` tool to manage your imported templates:
-
-| Action | Description |
-| --- | --- |
-| **list** | Show all imported workflows with a summary (model, sampler, steps) |
-| **view** | Inspect a workflow's full node graph, parameters, and editable fields |
-| **modify** | Change workflow parameters — steps, CFG, sampler, scheduler, checkpoint, etc. |
-| **delete** | Remove a workflow template |
-
-### Viewing a Workflow
-
-```
-comfyui_workflow view my-workflow
-```
-
-Shows all nodes with their parameters. Editable nodes (prompt, sampler, size, model) are highlighted so the AI assistant knows what it can change.
-
-### Modifying Parameters
-
-```
-comfyui_workflow modify my-workflow --node "3" --input "steps" --value "30"
-```
-
-Changes are saved to the template file. The original ComfyUI workflow is not affected.
-
----
-
-## How Generation Works
-
-When you ask the AI to generate an image using ComfyUI:
-
-1. **Prompt injection** — your prompt text is inserted into the positive `CLIPTextEncode` node
-2. **Size calculation** — the requested aspect ratio is converted to pixel dimensions (rounded to multiples of 8 for Stable Diffusion compatibility)
-3. **Reference images** — if you provided reference image URLs, the plugin downloads them and uploads to ComfyUI's `input/` directory, then injects them into `LoadImage` nodes
-4. **Workflow submission** — the modified workflow is submitted to ComfyUI's API
-5. **Status polling** — the plugin polls every 2 seconds until generation completes (5-minute timeout)
-6. **Result retrieval** — the generated image is downloaded from ComfyUI and returned
-
----
-
-## Reference Images
-
-To use reference images with ComfyUI, your workflow must include at least one **LoadImage** node.
-
-- The plugin automatically detects `LoadImage` nodes in your workflow
-- When you provide reference image URLs, the plugin downloads and uploads them to ComfyUI
-- If your workflow has no `LoadImage` nodes, reference images are ignored (with a warning)
-
-<Tip>
-  For image-to-image (img2img) workflows, make sure your workflow includes a LoadImage node connected to the appropriate processing chain. Standard text-to-image workflows typically don't include this node.
-</Tip>
-
----
-
-## Troubleshooting
-
-<AccordionGroup>
-  <Accordion title="'Connection refused' error" icon="circle-exclamation">
-    ComfyUI is not running or the URL is wrong. Start ComfyUI and check that `COMFYUI_URL` matches the address shown in the ComfyUI terminal output (default: `http://127.0.0.1:8188`).
-  </Accordion>
-
-  <Accordion title="No workflows found" icon="circle-exclamation">
-    You need to import at least one workflow before generating. Export a workflow from ComfyUI using **Save (API Format)**, then import it with `comfyui_workflow import`.
-  </Accordion>
-
-  <Accordion title="Node detection missed a node" icon="circle-exclamation">
-    The plugin uses class-type matching to detect nodes. If detection fails for a custom node, use `comfyui_workflow view` to see all nodes, then `comfyui_workflow modify` to manually set parameters.
-  </Accordion>
-
-  <Accordion title="Checkpoint not found" icon="circle-exclamation">
-    The workflow references a checkpoint model that isn't downloaded. Check ComfyUI's `models/checkpoints/` directory and ensure the filename matches what the workflow expects.
-  </Accordion>
-
-  <Accordion title="Reference images not working" icon="circle-exclamation">
-    Your workflow must include a `LoadImage` node. Standard text-to-image workflows don't have this. Create or use an img2img workflow instead.
-  </Accordion>
-</AccordionGroup>
+See the [source release notes](https://github.com/jau123/MeiGen-AI-Design-MCP) for release status. This URL is retained so old ComfyUI documentation links continue to explain the migration.
