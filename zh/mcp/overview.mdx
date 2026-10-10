@@ -51,7 +51,7 @@ Skills 只用购买积分，不提供免费次数或每日积分。BYOK 不提�
 
 ChatGPT 用户使用[官方插件](#chatgpt)。其他新用户通过[远程 OAuth](/zh/mcp/remote)连接 `https://www.meigen.ai/api/mcp`，在客户端登录 MeiGen 并授权；无需创建 API Key 或安装 Node.js。不支持 OAuth 时请使用兼容客户端。
 
-[本地 npm](/zh/mcp/setup)保留既有 API Key 的生成、公开搜索和 Skills 兼容，以及 BYOK、本地文件处理、提示词增强和本地偏好。它没有 OAuth 登录，也不提供私人资料库。API Key 不是新用户的另一种认证选项。Claude／OpenClaw 插件附带的旧版 stdio 连接与创意指引独立更新，切换连接时避免重复工具。
+[本地 npm](/zh/mcp/setup)保留既有 API Key 的生成、公开搜索和 Skills 兼容，以及 BYOK、本地文件处理、提示词增强和本地偏好。它没有 OAuth 登录，也不提供私人资料库。API Key 不是新用户的另一种认证选项。OpenClaw 用户可[安装 ClawHub 插件并通过 OAuth 连接](/zh/mcp/remote#openclaw)。已有 Claude／OpenClaw 本地连接作为独立兼容路径保留，切换时避免重复工具。
 
 3.0.0 本地普通生图仍支持 MeiGen（已有旧 Key）和 OpenAI 兼容供应商；优先级为 MeiGen → OpenAI 兼容。ComfyUI 不再支持，五项 Skills 与视频仍由 MeiGen 云端提供。模型与价格以 `list_models`、`list_skills` 为准。
 

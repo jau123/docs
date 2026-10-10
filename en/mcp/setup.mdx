@@ -69,7 +69,7 @@ The host must inherit the existing variable; a project `.env.local` is not autom
 
 ### Existing Claude and OpenClaw plugins
 
-The Claude marketplace and OpenClaw bundle may include a local stdio server. Their versions and instruction files update separately from npm. Inspect the installed connection and keep one active MeiGen server when switching to OAuth. A standalone ClawHub Skill supplies instructions; it does not prove a live MCP connection. See the [repository guide](https://github.com/jau123/MeiGen-AI-Design-MCP#quick-start) for the selected distribution.
+The Claude marketplace plugin and OpenClaw bundle 3.x use local stdio. The [OpenClaw 4.0 ClawHub plugin](/en/mcp/remote#openclaw) defaults to remote OAuth; saved local/BYOK overrides are not automatically migrated. Back up and inspect the existing connection before choosing to switch. Keep one active MeiGen server and preserve legacy credentials privately. Distribution versions and instructions update separately from npm. The standalone ClawHub Skill is guidance only, and is already included in the plugin.
 
 ### Hermes Agent (NousResearch)
 

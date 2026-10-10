@@ -51,7 +51,7 @@ For posters, put visible copy in `content`; use `extraNotes` or `customStyle` fo
 
 ChatGPT users should install the [official plugin](#chatgpt). Other new users should [connect with remote OAuth](/en/mcp/remote) at `https://www.meigen.ai/api/mcp`, then sign in to MeiGen and approve access in the host. No API key or Node.js is needed. Use a compatible host if OAuth is unavailable.
 
-[Local npm](/en/mcp/setup) retains existing API-key compatibility for generation, public search and Skills, BYOK, local file preparation, prompt enhancement and local preferences. It has no OAuth login or private-library tools. API keys are not offered as another new-user authentication method. Existing Claude/OpenClaw plugin stdio connections and creative instructions update separately; avoid duplicate tools when switching connections.
+[Local npm](/en/mcp/setup) retains existing API-key compatibility for generation, public search and Skills, BYOK, local file preparation, prompt enhancement and local preferences. It has no OAuth login or private-library tools. API keys are not offered as another new-user authentication method. OpenClaw users can install the [ClawHub plugin and connect with OAuth](/en/mcp/remote#openclaw). Existing local Claude/OpenClaw connections remain a separate compatibility path; avoid duplicate tools when switching.
 
 The 3.0.0 local image providers are MeiGen (existing legacy key) and OpenAI-compatible APIs, in that priority order. ComfyUI is removed. Skills and video remain MeiGen Cloud features; use `list_models` and `list_skills` for current models and prices.
 

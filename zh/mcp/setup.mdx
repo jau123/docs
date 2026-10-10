@@ -68,7 +68,7 @@ tool_timeout_sec = 240
 
 ### 已有 Claude／OpenClaw 插件
 
-Claude marketplace 与 OpenClaw bundle 可能附带本地 stdio 连接，其版本和指引文件独立于 npm 更新。切换 OAuth 时检查已安装连接，仅保留一套有效 MeiGen 服务。独立 ClawHub Skill 只提供指引，不代表 MCP 已连接；分发方式见[源码仓指南](https://github.com/jau123/MeiGen-AI-Design-MCP#quick-start)。
+Claude marketplace 插件和 OpenClaw bundle 3.x 使用本地 stdio。[OpenClaw 4.0 ClawHub 插件](/zh/mcp/remote#openclaw)默认使用远程 OAuth，但已保存的本地／BYOK 配置不会自动迁移。先备份并检查已有连接，再决定是否切换；仅保留一套有效 MeiGen 服务，旧凭据私密保留。分发版本与指引独立于 npm 更新。独立 ClawHub Skill 只提供指引，插件已内置，无需重复安装。
 
 ### Hermes Agent (NousResearch)
 

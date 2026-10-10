@@ -45,6 +45,31 @@ claude mcp login meigen
 
 You can also authenticate through `/mcp`. See the [official Claude guide](https://code.claude.com/docs/en/mcp). No preconfigured MeiGen client ID is required for automatic registration.
 
+### OpenClaw
+
+Install [MeiGen from ClawHub](https://clawhub.ai/plugins/meigen-ai-design) using a current OpenClaw release with native HTTP MCP and OAuth (validated with 2026.9.9):
+
+```bash
+openclaw plugins install clawhub:meigen-ai-design
+```
+
+Then save a **new** connection and sign in:
+
+```bash
+openclaw mcp add meigen --url https://www.meigen.ai/api/mcp --transport streamable-http --auth oauth --timeout 240
+openclaw mcp login meigen
+```
+
+Complete the browser consent yourself. OpenClaw login needs a saved `mcp.servers.meigen` entry even when the plugin supplies the server; the saved entry overrides the bundle default without duplicating tools. If `meigen` exists, `add` refuses to overwrite it. Reuse a matching OAuth connection; do not blindly run `mcp set`.
+
+Run `openclaw mcp doctor meigen --probe`, start a new conversation, and ask MeiGen to list Skills and current prices. Installation alone is not proof of access. The plugin includes guidance for search pagination, using favorites as preference context, and saving only on explicit request or prior opt-in. Private library tools require the additional library OAuth permissions.
+
+<Note>
+  ClawHub plugin 4.0 changes the default from local npm/stdio to remote OAuth. Back up your existing configuration before updating. Saved local, wrapper or BYOK entries are not migrated and still override the default. Choose whether to retain local capabilities or deliberately replace the active entry with OAuth; preserve old credentials privately and keep one active MeiGen connection. Remote MCP cannot directly read local files and does not offer local preferences, prompt enhancement or BYOK. [Legacy compatibility](/en/mcp/setup).
+</Note>
+
+For a direct connection without creative guides, skip the plugin install and use the same add/login commands. The standalone [creative-toolkit Skill](https://clawhub.ai/jau123/skills/creative-toolkit) contains guidance only and is not needed alongside the plugin. No mcporter prerequisite is needed for remote OpenClaw. See [OpenClaw's transport documentation](https://docs.openclaw.ai/cli/mcp/transports).
+
 ### Cursor and other HTTP clients
 
 Add the URL using your client's Streamable HTTP connection form, then choose Connect / Authenticate. For clients using `mcpServers` JSON, the minimal entry is:
