@@ -3,6 +3,10 @@ title: "Install MCP Plugin"
 description: "Install the local MCP server and configure your client, provider, and output directory."
 ---
 
+<Tip>
+  ChatGPT users: follow the [three-step plugin guide](/en/mcp/overview#chatgpt) to install from the official ChatGPT store. No API key, Node.js or manual MCP configuration is needed. The instructions below are for other clients and the local package.
+</Tip>
+
 ## Prerequisites
 
 - **Node.js 22+** recommended for the local package
@@ -31,10 +35,10 @@ the key privately; never ask me to paste it into chat or put it in a URL.
 After reconnecting, call list_skills and report the actual result. Installation
 verification must not upload images, start generation or spend credits.
 If you cannot change this host's configuration, give precise manual steps and
-state what remains unverified. ChatGPT web follows its separate public-only flow.
+state what remains unverified. For ChatGPT, use the official MeiGen plugin instead.
 ```
 
-See [remote setup](/en/mcp/remote) for Codex HTTP and ChatGPT web instructions.
+See [remote setup](/en/mcp/remote) for HTTP clients, or the [ChatGPT plugin guide](/en/mcp/overview#chatgpt).
 
 ## Installation
 
@@ -104,7 +108,7 @@ tool_timeout_sec = 240
 
 Set `MEIGEN_API_TOKEN` in the environment that launches Codex. For public-only setup without a key, omit `env_vars` until the variable exists. Codex does not automatically load a project's `.env.local`. You can first register the command with `codex mcp add meigen -- npx -y meigen@2.0.2`, then add the environment forwarding and timeouts to its existing table. `meigen init codex` is not supported.
 
-A 240-second tool timeout is suitable for Skills; long generic video generation can require more. Restart/reconnect, inspect `codex mcp list` and `/mcp`, then make an actual `list_skills` call. See the [official Codex configuration guide](https://developers.openai.com/codex/mcp). ChatGPT web does not share this local setup; it supports [public queries only](/en/mcp/remote#chatgpt-web-public-lookups-only) with the current MeiGen authentication.
+A 240-second tool timeout is suitable for Skills; long generic video generation can require more. Restart/reconnect, inspect `codex mcp list` and `/mcp`, then make an actual `list_skills` call. See the [official Codex configuration guide](https://developers.openai.com/codex/mcp). For ChatGPT, install the [official plugin](/en/mcp/overview#chatgpt) to search for inspiration and generate images and videos with your MeiGen account.
 
 ### Hermes Agent (NousResearch)
 

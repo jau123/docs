@@ -40,7 +40,9 @@ Submits a generation request. The output is generated asynchronously — use the
 
   **[List Models](/en/api-reference/endpoint/models) is the authoritative source for valid IDs.** Models are added and retired over time, so resolve IDs at runtime rather than hard-coding a copy of the catalogue. Every model that endpoint returns can be used here, including with an API token.
 
-  Frequently used values: `gpt-image-2.5`, `gpt-image-2`, `nanobanana-2`, `midjourney-v8.1` (images); `seedance-2-5`, `seedance-2-0`, `veo-3.1` (video).
+  Frequently used values: `gpt-image-2.5`, `gpt-image-2`, `nanobanana-2.1`, `nanobanana-2`, `midjourney-v8.1` (images); `seedance-2-5`, `seedance-2-0`, `veo-3.1` (video).
+
+  Nanobanana 2.1 uses `modelId: "nanobanana-2.1"` and `resolution: "2K"` (5 credits) or `"4K"` (8 credits). It is separate from `nanobanana-2`, which remains available at 5 credits for either resolution.
 
   > `rhart-1.5` (GPT image 1.5) was retired on 2026-04-22 — use `gpt-image-2` instead. `midjourney-v7` was replaced by `midjourney-v8.1` on 2026-05-09 (upgraded in place to V8.2 on 2026-09-02, same ID) (legacy `midjourney-v7` requests still accepted for backward compatibility).
 </ParamField>
@@ -97,7 +99,7 @@ Submits a generation request. The output is generated asynchronously — use the
   | Limit | Models |
   | --- | --- |
   | 16 | GPT Image 2.5, GPT Image 2.0 |
-  | 14 | Nanobanana 2, Nanobanana Pro |
+  | 14 | Nanobanana 2 / 2.1, Nanobanana Pro |
   | 10 | Seedream 5.0 Pro, Seedream 4.5 |
   | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5, Seedance 2.0, Veo 3.1 — default `frame` mode (first/last frame), see `referenceMode` below |

@@ -235,11 +235,11 @@ style with shallow depth of field
 | 9:16 | 高竖向 | Stories、Reels |
 | 9:21 | 超高竖向 | 竖版长幅横幅（GPT Image 2.5 / 2） |
 | 1:3 | 超高竖向 | 竖版长幅横幅（GPT Image 2.5 / 2） |
-| 1:4, 1:8 | 超高竖向 | 滚动横幅（仅 Nanobanana 2） |
+| 1:4, 1:8 | 超高竖向 | 滚动横幅（Nanobanana 2 / 2.1） |
 | 4:3, 3:2 | 横向 | 桌面壁纸 |
 | 16:9, 21:9 | 宽幅 | 电影画面、超宽屏 |
 | 3:1 | 超宽幅 | 页头横幅（GPT Image 2.5 / 2） |
-| 4:1, 8:1 | 超宽幅 | 全景横幅（仅 Nanobanana 2） |
+| 4:1, 8:1 | 超宽幅 | 全景横幅（Nanobanana 2 / 2.1） |
 
 <Warning>
   并非所有模型都支持所有比例。选择器会自动筛选，仅显示当前模型支持的比例。查看[模型](/zh/features/models)页面了解每个模型支持的比例。
@@ -251,7 +251,7 @@ style with shallow depth of field
 
 | 模型 | 可选分辨率 |
 | --- | --- |
-| Nanobanana 2、Nanobanana Pro、Seedream 4.5 | 2K / 4K（默认 2K） |
+| Nanobanana 2 / 2.1、Nanobanana Pro、Seedream 4.5 | 2K / 4K（默认 2K） |
 | GPT Image 2.5 | 1K / 2K / 4K（桌面端初始 2K，移动端初始 1K） |
 | GPT Image 2.0 | 1K / 2K / 4K（默认 2K） |
 | Grok Imagine Image 2.0、Midjourney V8.2、Seedream 5.0 Pro | 1K / 2K（默认 1K） |
@@ -524,7 +524,7 @@ MeiGen 采用双积分制：
 - **每日积分**：每天赠送的免费额度，UTC 00:00 重置，用于**基础模型** — 当前为 **Flux 2 Klein**、**Agnes Image 2.5 Flash** 两个图片模型。唯一被每日积分覆盖的视频模型 Agnes Video 2.5 Flash 自 2026-09-22 起暂时下线，目前没有基础档视频模型。它们在模型选择器里归在 **Basic Models** 分组下。
 - **购买积分**：侧边栏「Credits」那一行显示的永不过期余额。除每日免费额度外的积分都记在这里 — 包括充值获得的，以及发放到账户的赠送积分（注册赠送、推荐奖励）。可用于所有模型。
 
-生成高级模型（GPT Image 2.5、GPT Image 2.0、Nanobanana 2 / Pro、Seedream、Midjourney V8.2、Grok Imagine Image 2.0、Seedance 2.5 / 2.0、Veo 3.1、Grok Video 1.5 等）需要消耗赠送积分或购买积分 — 无论是否付过费，每日积分都不能用于高级模型。
+生成高级模型（GPT Image 2.5、GPT Image 2.0、Nanobanana 2 / 2.1 / Pro、Seedream、Midjourney V8.2、Grok Imagine Image 2.0、Seedance 2.5 / 2.0、Veo 3.1、Grok Video 1.5 等）需要消耗赠送积分或购买积分 — 无论是否付过费，每日积分都不能用于高级模型。
 
 **API Token 调用**只使用购买积分，不论调用哪个模型；每日积分在 API 路径永远不参与扣费。
 

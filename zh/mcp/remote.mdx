@@ -3,6 +3,10 @@ title: "远程 MCP 服务器"
 description: "通过无状态 Streamable HTTP 接入 14 个托管 MCP 工具。"
 ---
 
+<Tip>
+  使用 ChatGPT？请按[官方商店插件安装指引](/zh/mcp/overview#chatgpt)连接 MeiGen。下方内容适用于手动配置 MCP 的客户端。
+</Tip>
+
 支持 **Streamable HTTP** 的宿主连接以下地址：
 
 ```text
@@ -59,7 +63,7 @@ claude mcp login meigen
 
 如果账号／工作区提供 Developer mode 和自定义 MCP 入口，添加上方地址，选择 **OAuth**，在提供该选项时使用自动注册，然后完成 MeiGen 账号授权。参考 [OpenAI 当前指引](https://developers.openai.com/api/docs/guides/developer-mode#how-to-use)。不要把 MeiGen API Key 填入 OAuth 客户端密钥字段。
 
-这是标准 MCP 连接，与 MeiGen 市场适配器及专属结果卡片不同。可用性受套餐、工作区和服务端开放状态影响。选择 **No Authentication** 时仅支持公开工具，上传、生成、requestId 恢复和私有 Skill 结果都需要授权。ChatGPT 与 Codex 的配置流程不同，不能在 ChatGPT 网页聊天中安装 npm。
+这是手动 MCP 连接，与提供对话内结果卡片的 [ChatGPT 官方插件](/zh/mcp/overview#chatgpt)是不同的接入方式。可用性受套餐、工作区和服务端开放状态影响。选择 **No Authentication** 时仅支持公开工具，上传、生成、requestId 恢复和私有 Skill 结果都需要授权。ChatGPT 与 Codex 的配置流程不同，不能在 ChatGPT 网页聊天中安装 npm。
 
 ### API Key 兼容方式
 

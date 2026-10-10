@@ -16,6 +16,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **GPT Image 2.5** | 4–88 (by resolution × quality) | Depends on quality and variant | 16 | See availability note | Generation and editing, five quality levels, Sunburst / Flare |
 | **GPT Image 2.0** | 2–80 (by resolution × quality) | Fast (~30s) | 16 | ✓ | Instruction following, text rendering, multi-reference scenes |
 | **Nanobanana Pro** | 10 | Fast (~34s) | 14 | ✓ | High quality, complex scenes |
+| **Nanobanana 2.1** | 5 (2K) / 8 (4K) | Varies by request | 14 | ✓ | Text rendering, wide ratio support |
 | **Nanobanana 2** | 5 | Fast (~24s) | 14 | ✓ | General use, wide ratio support |
 | **Seedream 5.0 Pro** | 10 (1K) / 20 (2K) | Slow (~1min 45s) | 10 | Web only | Multi-reference composition (up to 10 refs), character consistency |
 | **Seedream 4.5** | 5 | Fast (~32s) | 10 | Web only | Product photos, marketing |
@@ -99,6 +100,23 @@ You can explicitly request a transparent background in your prompt. Whether the 
 <Warning>
   **Stricter moderation**: prompts involving real people, celebrities, brand logos, or violent/adult content may be rejected. Rephrase to drop specific names or try a different model.
 </Warning>
+
+---
+
+### Nanobanana 2.1
+
+| | |
+| --- | --- |
+| **Model ID** | `nanobanana-2.1` |
+| **Provider** | Google (Gemini) |
+| **Credits** | 5 per image at 2K / 8 at 4K |
+| **Reference images** | Up to 14 |
+| **Resolutions** | 2K, 4K — default 2K |
+| **Aspect ratios** | 1:1, 3:4, 4:5, 2:3, 9:16, 1:4, 1:8, 4:3, 5:4, 3:2, 16:9, 21:9, 4:1, 8:1 |
+
+A separate model alongside Nanobanana 2, with a focus on sharper text rendering. Both remain available; use `nanobanana-2.1` to select this version explicitly. Unlike Nanobanana 2's flat 5-credit price, 2.1 costs 8 credits at 4K.
+
+Available on Web, iOS and Android. This is a premium model: daily free credits do not apply, and 4K is paid-only. API and MCP generation use purchased credits only. Call `list_models` for current availability and pricing.
 
 ---
 

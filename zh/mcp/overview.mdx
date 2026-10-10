@@ -3,7 +3,19 @@ title: "MCP 服务器概览"
 description: "连接 AI 助手，生成图片与视频、搜索画廊，并使用本地工作流。"
 ---
 
-**MeiGen** 是一个开源的 MCP (Model Context Protocol) 服务器，赋予 AI 编程助手生成**图片和视频**的能力。它支持多种生成后端 — 使用 MeiGen 的云端模型、你本地的 ComfyUI 服务器，或任何 OpenAI 兼容 API。
+**MeiGen** 帮你在常用的 AI 工具中发现灵感，使用最新 AI 模型创建图片和视频。你可以安装 ChatGPT 插件、连接远程 MCP，或使用开源本地服务。
+
+## ChatGPT
+
+1. 打开 [ChatGPT 官方商店中的 MeiGen](https://chatgpt.com/plugins/plugin_asdk_app_6ab66d24f56481919361b6c33f7c1928)，选择 **Install**。
+2. 登录 MeiGen 账号并完成连接，无需 API Key 或 Node.js。
+3. 在对话中选择或提及 **MeiGen**，让它搜索灵感，或创建图片和视频。
+
+试试：*“用 MeiGen 搜索极简产品摄影灵感，展示参考图片和对应的提示词。”*
+
+搜索不消耗生成积分。生成使用 MeiGen 账号的充值积分，不使用每日免费积分；生成前确认模型、图片数量和总价。
+
+ChatGPT 插件使用 MeiGen Cloud。ComfyUI、自带 API 和内置离线提示词库属于本地包功能。
 
 <Card title="GitHub 仓库" icon="github" href="https://github.com/jau123/MeiGen-AI-Design-MCP">
   查看源代码、报告问题和贡献代码。
@@ -37,11 +49,11 @@ Skills 只用购买积分，不提供免费次数或每日积分。BYOK/ComfyUI 
 
 ## 选择连接
 
-使用 MeiGen Cloud 优先选择[远程 MCP](/zh/mcp/remote)：无需本地 npm 进程，通过无状态 Streamable HTTP 接入；服务端更新需要后端部署，客户端刷新工具后可用。需要自动读取本地文件、本地偏好、提示词增强或 ComfyUI 时选[本地 npm](/zh/mcp/setup)。Claude 插件的命令、Agent 和 Hook 是独立分发的附加功能，添加远程 URL 不会安装它们。
+ChatGPT 用户使用[官方插件](#chatgpt)。其他兼容客户端使用 MeiGen Cloud 时优先选择[远程 MCP](/zh/mcp/remote)：无需本地 npm 进程，通过无状态 Streamable HTTP 接入；服务端更新需要后端部署，客户端刷新工具后可用。需要自动读取本地文件、本地偏好、提示词增强或 ComfyUI 时选[本地 npm](/zh/mcp/setup)。Claude 插件的命令、Agent 和 Hook 是独立分发的附加功能，添加远程 URL 不会安装它们。
 
 ## 提供商
 
-MeiGen 支持三种图片生成后端 —— 可配置一个或多个。
+本地 MCP 包支持三种图片生成后端，可配置一个或多个。ChatGPT 插件和远程 MCP 使用 MeiGen Cloud。
 
 <CardGroup cols={3}>
   <Card title="MeiGen Cloud" icon="cloud">

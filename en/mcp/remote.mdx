@@ -3,6 +3,10 @@ title: "Remote MCP Server"
 description: "Connect to 14 hosted MCP tools through stateless Streamable HTTP."
 ---
 
+<Tip>
+  Using ChatGPT? Install [MeiGen from the official ChatGPT store](/en/mcp/overview#chatgpt). The guide below covers manual MCP connections.
+</Tip>
+
 Connect a host that supports **Streamable HTTP** to:
 
 ```text
@@ -59,7 +63,7 @@ Field names vary; for example, Claude Code JSON also requires `"type": "http"`. 
 
 If your account/workspace offers Developer mode and custom MCP connections, add the URL above with **OAuth** and use automatic registration when offered. Complete the MeiGen account consent flow. Follow [OpenAI's current setup](https://developers.openai.com/api/docs/guides/developer-mode#how-to-use). Do not put a MeiGen API key in the OAuth client-secret field.
 
-This standard MCP connection is separate from the MeiGen marketplace adapter and its custom result cards. Availability depends on your plan/workspace and server rollout. With **No Authentication**, only public tools work; uploads, generation, requestId recovery and private Skill results require authorization. ChatGPT and Codex have different configuration flows; a chat instruction cannot install npm inside ChatGPT web.
+This manual connection is separate from the [official ChatGPT plugin](/en/mcp/overview#chatgpt), which provides result cards in your conversation. Availability depends on your plan/workspace and server rollout. With **No Authentication**, only public tools work; uploads, generation, requestId recovery and private Skill results require authorization. ChatGPT and Codex have different configuration flows; a chat instruction cannot install npm inside ChatGPT web.
 
 ### API key fallback
 
