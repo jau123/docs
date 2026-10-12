@@ -12,7 +12,7 @@ GET /api/models
 默认活跃列表只包含公开生成模型，不包含技能专属计费项；此类工作流请通过技能界面使用。当前图片默认模型由 `is_default` 标记。只有活跃列表返回 GPT Image 2.5 后，才可请求该模型。
 
 <Note>
-  网页专属模型即使传入 `active=false` 也不会返回，显式适配的 HeyGen Gateway 除外。HeyGen Video 1 目前仍未启用，须出现在 API/MCP 的启用模型清单后再使用；此例外不开放原生 App，也不启用关闭的参考能力。
+  网页专属模型即使传入 `active=false` 也不会返回，显式适配的 HeyGen Gateway 除外。HeyGen Video 1 已在 API/MCP 的启用模型清单开放；此例外不开放原生 App，也不启用关闭的参考能力。
 </Note>
 
 ## 查询参数

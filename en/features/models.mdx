@@ -25,7 +25,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Midjourney V8.2** | 15 (1K) / 20 (2K) | Moderate (~1min) | 1 | ✓ | Photorealistic, universal aesthetics |
 | **Flux 2 Klein** | 2 | Fast (~23s) | None | Web only | General-purpose base model, text rendering |
 | **Agnes Image 2.5 Flash** | 1 | Fast (~30s) | 1 | ✓ | Cheapest model, high-volume drafts, covered by daily free credits |
-| **HeyGen Video 1** | 2–18 credits/sec | 5–15s video | One first frame or 9 content images; audio | — | Affordable, optimized from MiniMax H3; Web rollout pending |
+| **HeyGen Video 1** | 2–18 credits/sec | 5–15s video | One first frame or 9 content images; audio | — | Affordable, optimized from MiniMax H3; Web and MCP |
 | **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec, 1080p 90/sec) | Video, ~2-3min | First/last frame or content reference, plus reference video & audio | ✓ | 4–30s, 480p/720p/1080p, generated audio, multi-clip reference video & audio continuation |
 | **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference, plus reference video & audio | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio, reference video & audio |
 | **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video, ~35s | First frame (required) | ✓ | First-frame image-to-video only, 4–15s, ratio follows input, audio |
@@ -269,7 +269,7 @@ The cheapest model on MeiGen at 1 credit per image, and the only basic-tier **im
 Affordable video, optimized from MiniMax H3, with native audio.
 
 <Note>
-  Web rollout is pending. The MCP/API adapter is implemented, but the model is inactive. Use it only after it appears in the active catalog; native apps remain excluded. Reference-video input remains disabled while the Gateway channel is being verified; upstream model support does not imply availability on MeiGen.
+  Available on Web, API and MCP. Native apps remain excluded. Reference-video input remains disabled while the Gateway channel is being verified; upstream model support does not imply availability on MeiGen.
 </Note>
 
 | Setting | MeiGen configuration |
