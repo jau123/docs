@@ -100,7 +100,7 @@ openclaw mcp login meigen
 
 ## 工具
 
-通用远程 MCP 提供 **19 个工具**：下表的 14 个共享工具及下方五个私人资料库工具。本节描述通用远程端点，不是官方 ChatGPT 插件的参数合同；官方插件升级为 19 个工具的版本仍待商店审核。
+通用远程 MCP 提供 **22 个工具**：15 个共享工具、五个私人资料库工具、`get_credit_balance` 和 `list_characters`。官方 ChatGPT 适配服务也提供 22 个工具，但拥有独立参数和结果卡片。更新后刷新客户端工具缓存；商店介绍版本审核与运行时工具发现分开进行。
 
 | 工具 | 用途 | 账号授权 |
 | --- | --- | --- |
@@ -112,6 +112,7 @@ openclaw mcp login meigen
 | `get_inspiration` | 读取公开画廊条目 | 否 |
 | `list_skills` | 五项工作流、材料、实时价格和输入参数 | 否 |
 | `upload_skill_image` | 准备真实图片 URL 或附件字节 | 是 |
+| `upload_reference_media` | 为支持的模型导入选中的视频／音频 | 是 |
 | `remove_background` | 一张透明抠图 | 是 |
 | `generate_product_detail_images` | 1–6 张付费商品模块图 | 是 |
 | `generate_marketing_poster` | 一张营销海报 | 是 |
@@ -121,9 +122,13 @@ openclaw mcp login meigen
 
 ## 私人资料库
 
-`search_favorites`、`list_boards`、`search_history`、`get_library_item` 和 `save_favorite` 需要 OAuth。读取资料库需同意 `meigen:library:read`，保存收藏需同意 `meigen:library:write`；已有连接需要增量同意这些权限。本地 npm 与任何 API Key 都不提供这些功能。通用远程工具可用不代表 ChatGPT 官方插件也已支持，后者更新仍待商店审核。
+这些工具需要客户端刷新工具清单及对应 OAuth 权限。
 
 列表返回 `promptExcerpt`（最多 500 个 Unicode 码点）、`promptLength`、`promptTruncated`。`get_library_item` 使用原 `contentType`／`sourceId`，`promptOffset` 默认 0、`promptLimit` 默认 8000 且最多 16000；所有长度和偏移按 Unicode 码点计。`prompt.length` 是完整可读提示词总长度，`nextOffset=null` 表示最后一页，详细数据只返回在 `structuredContent`。收藏只接受明确保存意愿，重复调用不覆盖备注，不发布内容；达到权益上限会返回 `favorites_limit_reached`，不是积分不足。
+
+## 积分余额与已有角色
+
+`get_credit_balance` 返回 MCP 可用充值余额，不包含每日免费积分。`list_characters` 需要单独授权 `meigen:characters:read`。选择已有角色后，使用返回的完整 `referenceToken`，先确认模型 `capabilities.characters` 支持。旧授权不会自动增加权限。暂不支持创建角色，API Key 与本地 npm 不能读取或使用私人角色。
 
 ## 首次验证
 
@@ -131,7 +136,7 @@ openclaw mcp login meigen
 
 通用远程 `search_gallery` 默认且**每批最多返回 3 条**。为兼容旧调用，schema 接受 1–30 的整数 `limit`，实际截断到 3 条。搜索支持匿名调用，按 IP 限流。使用 OAuth 时，开始一次搜索计入账号[每日搜索额度](/zh/features/gallery#搜索)，不消耗购买积分；后续翻页不重复计数。
 
-查看下一批时保留 `query`、`limit` 和 `snapshotId`，把 `nextOffset` 传为 `offset`；`hasMore=false` 时停止。快照过期需要明确开始新搜索，换方向时才改查询词。已发布的[官方 ChatGPT 插件](/zh/mcp/overview#chatgpt)最多返回 3 条；待商店审核的更新默认且最多 6 条，必须 OAuth 授权搜索权限。不要把插件的条数和授权规则套到本端点。
+官方 ChatGPT 插件刷新工具后每批默认／最多 6 条，搜索必须 OAuth 授权；不能将其数量或授权规则套用到通用远程端。
 
 远程工具不能读取本地文件路径。请使用公开图片 URL，或通过 `upload_skill_image` 上传实际可读取的字节。Upscale 直接传原图 URL，或使用 `purpose: "upscale"` 上传，不要先按普通参考图缩小。
 
@@ -156,7 +161,11 @@ openclaw mcp login meigen
 
 ### 参考视频与音频
 
-`generate_video` 的参考素材都是数组：`referenceVideos`（mp4 / mov）和 `referenceAudios`（wav / mp3）。**远程工具读不到本地文件路径**，也不接受任意公网 URL。每一项都必须是 `https://images.meigen.ai/...` 地址：此前 MeiGen 生成结果的 `videoUrl`，或通过 [`POST /api/upload/reference-video`](/zh/api-reference/endpoint/generate#上传参考视频与音频) 上传的文件。其他域名一律在扣点前被拒（`invalid_reference_video` / `invalid_reference_audio`）。只有本地 npm 服务器能替你上传本地文件。
+使用 `upload_reference_media`，传入 `kind: "video"` 或 `"audio"`、选定的 `modelId`、可选 `tier` 和直接 HTTPS `sourceUrl`。经用户允许导入后，将返回的 `url` 放入 `referenceVideos`／`referenceAudios`。远程端不能读取本地路径；附件需要客户端可访问的下载网址，官方 ChatGPT 适配服务可直接接收其附件结构。既有本地 npm 仍可准备本地文件。直接把外部视频／音频网址传给生成会在扣费前被拒绝。
+
+准备要求正数充值余额，但不扣积分；按模型限制格式、大小与时长，并有每日字节和并发限制。链接公开且临时，上传七天后进入清理范围，即使已用于生成也不保证长期保留。
+
+`firstFrame`／`lastFrame` 表示首尾帧，`contentReferenceImages` 表示内容／风格／身份参考；仅首尾帧时传空内容数组。按 `capabilities.videoInputs` 及档位覆盖设置遵守角色、数量与互斥约束。尾帧必须搭配首帧，已有角色占用内容槽位，不能与严格首尾帧混用。
 
 ```json
 {
@@ -175,14 +184,14 @@ openclaw mcp login meigen
 }
 ```
 
-`[video1]` 和 `[audio1]` 在提交前会被改写成厂商自己的 `Video 1` / `Audio 1` 写法；直接写 `Video 1` 同样可行。编号从 1 开始、按类型各自计数，顺序即数组顺序。各模型的条数与总时长请从 `list_models` 读取。计费按参考视频时长的**总和** + `duration`，音频不增加费用。数组为空时请整个省略该字段 —— 参考素材属于 `requestId` 输入指纹的一部分。
+引用格式以模型的 `capabilities.videoInputs.referenceMentionSyntax` 为准，各类素材从 1 编号。按 `pricingMode` 和 `capabilities.video.billing` 报价：只有明确声明计入输入的模式才加输入视频秒数，`output_only` 只计输出。音频秒数不计费，但音频或内容图可能触发参考档费率。HeyGen 已适配，模型仍待单独启用。恢复请求时保留原 requestId 和完全相同的素材。
 
 
 ## 远程与本地
 
 | | 远程 | 本地 npm |
 | --- | --- | --- |
-| 工具数 | 19，含 5 个仅支持 OAuth 的资料库工具 | 3.0.0：16 |
+| 工具数 | 22，含资料库、余额与已有角色 | 3.1.0：17 |
 | 安装 | HTTP 连接，不需要 Node.js | npm 进程，建议 Node.js 22+ |
 | 更新 | 后端部署后刷新缓存工具 | 更新已安装/固定的包版本并重启 |
 | 提供商 | MeiGen Cloud | 3.0.0：已有 MeiGen Key 或 OpenAI 兼容；Skills 只支持 MeiGen |

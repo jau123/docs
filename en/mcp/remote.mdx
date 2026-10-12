@@ -100,7 +100,7 @@ Use OAuth for new MeiGen connections. Existing local stdio integrations can reta
 
 ## Tools
 
-Standard remote MCP provides **19 tools**: the 14 shared tools in this table and five private-library tools below. This section describes the standard remote endpoint, not the official ChatGPT plugin schema. The official plugin's 19-tool update is still awaiting store approval.
+Standard remote MCP provides **22 tools**: 15 shared tools, five private-library tools, `get_credit_balance` and `list_characters`. The official ChatGPT adapter also exposes 22 tools, with its own schema and result cards. Refresh the host’s cached tools after an update; store metadata review is separate from runtime discovery.
 
 | Tool | Purpose | Account authorization |
 | --- | --- | --- |
@@ -112,6 +112,7 @@ Standard remote MCP provides **19 tools**: the 14 shared tools in this table and
 | `get_inspiration` | Read a public gallery entry | No |
 | `list_skills` | Five workflows, materials, live prices and input schemas | No |
 | `upload_skill_image` | Prepare real image URLs or attachment bytes | Yes |
+| `upload_reference_media` | Import selected video/audio for a supported model | Yes |
 | `remove_background` | One transparent cutout | Yes |
 | `generate_product_detail_images` | 1–6 paid product modules | Yes |
 | `generate_marketing_poster` | One promotional poster | Yes |
@@ -121,9 +122,13 @@ Standard remote MCP provides **19 tools**: the 14 shared tools in this table and
 
 ## Private library
 
-`search_favorites`, `list_boards`, `search_history`, `get_library_item` and `save_favorite` require OAuth. Approve `meigen:library:read` to read your library and `meigen:library:write` to save favorites; existing connections need consent for these additional permissions. Local npm and all API keys are excluded. These standard remote tools do not imply availability in the official ChatGPT plugin, whose update is still awaiting store approval.
+`search_favorites`, `list_boards`, `search_history`, `get_library_item` and `save_favorite` require OAuth. Approve `meigen:library:read` to read your library and `meigen:library:write` to save favorites; existing connections need consent for these additional permissions. Local npm and all API keys are excluded. The official ChatGPT adapter supports these tools too; their display depends on refreshed host discovery and permission consent.
 
 Lists return `promptExcerpt` (at most 500 Unicode code points), `promptLength` and `promptTruncated`. `get_library_item` takes the original `contentType` / `sourceId`, `promptOffset` (default 0) and `promptLimit` (default 8000, maximum 16000). All offsets and lengths count Unicode code points. `prompt.length` is the total safe prompt length; `nextOffset=null` marks the final page. Detailed data is returned once in `structuredContent`. Saving requires explicit intent, preserves existing notes and never publishes content; `favorites_limit_reached` means the account's favorite entitlement is full, not a generation-credit shortage.
+
+## Balance and saved characters
+
+`get_credit_balance` returns the purchased balance available to this integration, excluding daily free credits. `list_characters` requires separate `meigen:characters:read` consent. Select an existing character, use its exact `referenceToken` in the prompt, and check the chosen model’s `capabilities.characters` first. Existing grants do not gain this permission automatically. Creating characters is not supported; API keys and local npm cannot read or use private characters.
 
 ## First successful check
 
@@ -131,7 +136,7 @@ Reconnect, then ask: **“List MeiGen's available Skills and current prices.”*
 
 Standard remote `search_gallery` defaults to and returns **at most 3 entries per batch**. Its schema accepts integer `limit` values from 1 to 30 for compatibility and clamps them to 3. Search can run anonymously with per-IP limits. With OAuth, starting a search uses the account's [daily search allowance](/en/features/gallery#search), not purchased credits; continuation pages do not count again.
 
-For another batch, preserve `query`, `limit` and `snapshotId`, and use `nextOffset` as `offset`; stop when `hasMore` is false. Snapshot expiry requires an explicit new search. Change the query only for a new direction. The published [official ChatGPT plugin](/en/mcp/overview#chatgpt) returns at most 3 entries. Its update awaiting store approval defaults to and allows at most 6, with OAuth search permission required. Its limit and authorization rules must not be applied to this endpoint.
+For another batch, preserve `query`, `limit` and `snapshotId`, and use `nextOffset` as `offset`; stop when `hasMore` is false. Snapshot expiry requires an explicit new search. Change the query only for a new direction. The [official ChatGPT plugin](/en/mcp/overview#chatgpt) defaults to and allows at most 6 results after discovery refresh, and requires OAuth search permission. Its limits and authorization rules must not be applied to the standard endpoint.
 
 Remote tools cannot read a local filesystem path. Use a public image URL or `upload_skill_image` with actual accessible bytes. For Upscale, pass the original URL directly or upload with `purpose: "upscale"`; do not downsize it as an ordinary reference first.
 
@@ -156,7 +161,11 @@ Check the current model price before submitting this 2K Standard request. Add pu
 
 ### Reference video and audio
 
-`generate_video` takes reference media as arrays: `referenceVideos` (mp4 / mov) and `referenceAudios` (wav / mp3). **Remote tools cannot read a local filesystem path**, and an arbitrary public URL is not accepted either. Every entry must be an `https://images.meigen.ai/...` URL: a previous MeiGen generation's `videoUrl`, or a file you uploaded through [`POST /api/upload/reference-video`](/en/api-reference/endpoint/generate#upload-reference-videos-and-audio). Any other host is rejected before credits are deducted (`invalid_reference_video` / `invalid_reference_audio`). Only the local npm server can upload local files for you.
+Use `upload_reference_media` with `kind: "video"` or `"audio"`, the selected `modelId`, optional `tier`, and a direct HTTPS `sourceUrl`. With the user's permission, import the selected material and pass its returned `url` to `referenceVideos` / `referenceAudios`. Remote tools cannot read local paths; host attachments need an accessible download URL (the official ChatGPT adapter accepts its attachment shape directly). Existing local npm can also prepare local files. An arbitrary external URL passed straight to generation is rejected before charging.
+
+Preparation requires a positive purchased balance, but does not deduct credits. Model-specific size, format and duration limits apply; daily byte and concurrency limits prevent bulk hosting. Links are public, temporary and scheduled for cleanup seven days after upload, including references already used in a generation.
+
+Use `firstFrame` / `lastFrame` for endpoint frames and `contentReferenceImages` for content/style/identity. Pass an empty content array for endpoint-only requests. Check `capabilities.videoInputs`, including tier overrides, for supported roles, counts and mutual exclusions. A last frame requires a first frame; saved characters use content slots and cannot be mixed with strict endpoint frames.
 
 ```json
 {
@@ -175,17 +184,17 @@ Check the current model price before submitting this 2K Standard request. Add pu
 }
 ```
 
-`[video1]` and `[audio1]` are rewritten to the vendor's own `Video 1` / `Audio 1` wording before submission; writing `Video 1` directly works too. Numbering is 1-based per kind, in array order. Read the per-model counts and totals from `list_models`. Billing uses the **sum** of the reference video durations plus `duration`; the audio clip adds nothing. Omit an empty array entirely — reference media are part of the `requestId` input fingerprint.
+Read `capabilities.videoInputs.referenceMentionSyntax` for the model’s binding syntax; numbering is 1-based within each media kind. Use `pricingMode` and `capabilities.video.billing` for the quote: input-video seconds are added only when the model declares that billing mode. `output_only` bills only output. Audio seconds are not charged, but audio/content images can select a reference rate. HeyGen’s adapter is ready but its model remains disabled until separately enabled in the live catalog. Preserve the original requestId and exact references during recovery.
 
 
 ## Remote and local
 
 | | Remote | Local npm |
 | --- | --- | --- |
-| Tools | 19, including 5 OAuth-only library tools | 3.0.0: 16 |
+| Tools | 22, including library, balance and saved characters | 3.1.0: 17 |
 | Installation | HTTP connection; no Node.js | npm process, Node.js 22+ recommended |
 | Updates | Backend deployment, then refresh cached tools | Upgrade the installed/pinned package and restart |
-| Providers | MeiGen Cloud | 3.0.0: existing MeiGen key or OpenAI-compatible; Skills: MeiGen only |
+| Providers | MeiGen Cloud | 3.1.0: existing MeiGen key or OpenAI-compatible; Skills: MeiGen only |
 | Local files | No direct access | Host-readable files can upload automatically |
 | Additional tools | — | Prompt enhancement and local preferences |
 | Results | Image URLs/resource links | General generation may save files; Skills return URLs/resource links |

@@ -57,7 +57,7 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他新用户通过[远程 OAut
 
 ## 工具
 
-以下 **14 个共享工具**构成公共集合。本地 npm 3.0.0 有 16 个工具，包含两个本地辅助工具。通用远程 MCP 有 19 个，包含下方五个私人资料库工具。当前已发布的 ChatGPT 官方插件有 14 个工具；升级为 19 个工具、每批六条搜索结果的版本仍待商店审核。后端或 npm 发布不代表 ChatGPT 新功能已可用。
+以下 **15 个共享工具**包含参考视频／音频准备。本地 npm 3.1.0 共 17 个工具，包含两个本地辅助工具。通用远程 MCP 与官方 ChatGPT 适配服务各提供 22 个工具，另有积分余额、已有角色和五个私人资料库工具。更新后需刷新客户端缓存的工具清单，实际可用能力仍取决于客户端及用户批准的权限。
 
 | 工具 | 用途 | MeiGen 账号授权 |
 | --- | --- | --- |
@@ -69,6 +69,7 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他新用户通过[远程 OAut
 | `get_inspiration` | 读取公开画廊条目 | 否 |
 | `list_skills` | 五项工作流、材料、实时价格和输入参数 | 否 |
 | `upload_skill_image` | 准备真实图片 URL 或附件字节 | 是 |
+| `upload_reference_media` | 为指定模型准备选中的视频／音频网址 | 是 |
 | `remove_background` | 一张透明抠图 | 是 |
 | `generate_product_detail_images` | 1–6 张付费商品模块图 | 是 |
 | `generate_marketing_poster` | 一张营销海报 | 是 |
@@ -81,14 +82,14 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他新用户通过[远程 OAut
 | 公开画廊搜索 | 每批默认／最多条数 | 账号访问 |
 | --- | --- | --- |
 | 通用远程 MCP | 3／3 | 可选 OAuth；匿名搜索按 IP 限流 |
-| 本地 npm 3.0.0 | 3／3 | 匿名，或兼容已有旧版 Key |
-| 官方 ChatGPT 插件 | 已发布版本：3／3；待商店审核的更新：6／6 | 必须 OAuth 授权搜索权限（`meigen:search`） |
+| 本地 npm 3.1.0 | 3／3 | 匿名，或兼容已有旧版 Key |
+| 官方 ChatGPT 插件 | 刷新工具后：6／6 | 必须 OAuth 授权搜索权限（`meigen:search`） |
 
-授权搜索使用账号[每日搜索额度](/zh/features/gallery#搜索)，不消耗生成积分。开始一次搜索计入额度，后续翻页不重复计数。通用远程 MCP 与本地 3.0.0 支持分页；ChatGPT 官方插件的换批卡片属于待商店审核的更新。查看同方向下一批时，保留返回的查询词和快照 ID，将 `nextOffset` 传为 `offset`；`hasMore=false` 时停止。换方向则开始新查询。生成请求恢复仍保留原 ID，不能因超时重新创建付费任务。
+授权搜索使用账号[每日搜索额度](/zh/features/gallery#搜索)，不消耗生成积分。开始一次搜索计入额度，后续翻页不重复计数。通用远程 MCP 与本地 3.0.0 支持分页；ChatGPT 官方适配服务也提供换批卡片，需客户端加载当前工具。查看同方向下一批时，保留返回的查询词和快照 ID，将 `nextOffset` 传为 `offset`；`hasMore=false` 时停止。换方向则开始新查询。生成请求恢复仍保留原 ID，不能因超时重新创建付费任务。
 
 ## 通过远程 OAuth 访问私人资料库
 
-通用远程 MCP 提供 `search_favorites`、`list_boards`、`search_history`、`get_library_item` 和 `save_favorite`。通过 OAuth 连接，并在请求时分别同意资料库读取／写入权限；已有连接不会自动获得新权限。本地 npm 和 API Key 不支持这些工具。ChatGPT 官方插件新增这些工具的版本仍待商店审核。
+通用远程 MCP 提供 `search_favorites`、`list_boards`、`search_history`、`get_library_item` 和 `save_favorite`。通过 OAuth 连接，并在请求时分别同意资料库读取／写入权限；已有连接不会自动获得新权限。本地 npm 和 API Key 不支持这些工具。官方 ChatGPT 适配服务也提供这些能力；看不到时请重新连接或刷新工具。
 
 列表只返回最多 500 个 Unicode 码点的 prompt 摘要。选定作品后用 `get_library_item` 分页读取用户提示词，默认 8000、最多 16000 码点；不返回内部 Skill 提示词。收藏须用户明确要求或事先允许，重复保存不会取消收藏或覆盖备注，只能存入自己的私密画板。收藏是偏好参考，不能代替用户当前要求。
 
@@ -98,14 +99,19 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他新用户通过[远程 OAut
 
   Seedance 2.5 的模型 ID 是 `seedance-2-5`，支持 4–30 秒、480p/720p/1080p 输出和参考视频续写，没有 `tier` 参数。
 
-  `generate_video` 必须显式指定 `model`——平台没有默认模型。参考素材都是数组：`referenceVideos`（mp4 / mov）和 `referenceAudios`（wav / mp3，单条 ≤15MB）。**本地 npm 服务器支持直接传本地文件路径**并自动上传；远程服务器只接受已经指向 `images.meigen.ai` 的地址 —— 此前生成结果的 `videoUrl`，或通过 [`POST /api/upload/reference-video`](/zh/api-reference/endpoint/generate#上传参考视频与音频) 上传的文件。任意公网 URL 会在扣点前被拒。单数形式 `referenceVideo` 仍作为只含一项的别名受理；`referenceVideoDuration` 是已弃用且会被校验的兼容提示，不会决定计费时长 —— 请省略它，服务端会逐条探测。
+  `generate_video` 必须明确选择模型。`firstFrame`／`lastFrame` 表示首尾帧，`contentReferenceImages` 表示内容、身份或风格参考；只使用首尾帧时传 `contentReferenceImages: []`。按 `list_models.capabilities.videoInputs` 及档位覆盖设置遵守互斥规则，不要擅自混合首尾帧、内容参考和角色。
 
-  各模型上限从 `list_models` 读取（`capabilities.video.referenceVideo` 与 `capabilities.video.referenceAudio`）：Seedance 2.5 最多 10 条视频和 10 条音频，每类单条 2–30 秒、合计 30 秒；Seedance 2.0 各最多 3 条，单条 2–15 秒、合计 15 秒。**Seedance 2.0 不能只靠音频生成** —— 它的参考音频必须搭配至少 1 张参考图或 1 条参考视频；Seedance 2.5 则允许纯音频请求。
+  图片使用 `upload_skill_image`；选中的直接 HTTPS 视频／音频网址使用 `upload_reference_media`，随后将返回的 MeiGen URL 放入 `referenceVideos`／`referenceAudios`。官方插件还支持客户端可访问的附件。远程端不能读取本地路径，既有本地 npm 集成仍可准备本地文件。准备素材要求有正数充值余额，但不扣积分。视频／音频链接公开且临时，在上传七天后进入清理范围；应在有效期内复用，不作为永久图床。
 
-  计费按参考视频时长的**总和** + 你的输出时长，且不低于最低计费秒数。参考音频免费：不计入这个总和，只带音频、不带参考视频的请求按该模型的直接生成价计费。
+  报价以实时 `pricingMode` 和 `capabilities.video.billing` 为准：部分模型计入输入视频和输出秒数，`output_only` 只计输出。音频秒数不额外计费，但支持该规则的模型可能因音频或内容图切换到参考档费率。HeyGen 已适配，仍须模型在实时目录启用后才能使用。
+
 </Note>
 
 ---
+
+## 积分余额与已有角色
+
+远程 OAuth 提供 `get_credit_balance`，查询 MCP 可用的充值积分，不包含每日免费积分。`list_characters` 需要单独批准 `meigen:characters:read`，仅读取已有角色。在支持的模型提示词中使用返回的完整 `referenceToken`，先检查 `capabilities.characters`，上传素材的引用格式则以模型 `referenceMentionSyntax` 为准。暂不支持创建角色。本地 npm 和 API Key 不能读取或使用私人角色。
 
 ### GPT Image 2.5
 

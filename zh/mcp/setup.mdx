@@ -9,7 +9,7 @@ ChatGPT 用户[从官方商店安装 MeiGen](/zh/mcp/overview#chatgpt)并登录�
 
 客户端不支持 OAuth 时，请使用兼容客户端或 ChatGPT 官方插件。API Key 仅保留已有旧版集成的兼容，不作为新用户的另一种认证方式。不要在聊天发送凭据。
 
-收藏、画板、历史记录、提示词详情和保存可通过通用远程 MCP 的 OAuth 连接使用，本地 npm 和 API Key 均不可访问。ChatGPT 官方商店的新增工具仍待审核；安装当前已发布插件不会启用这些功能。
+收藏、画板、历史记录、提示词详情和保存可通过通用远程 MCP 的 OAuth 连接使用，本地 npm 和 API Key 均不可访问。连接后刷新客户端工具清单；商店介绍版本审核与运行时工具发现分开进行。
 
 ## 复制给助手连接
 
@@ -27,7 +27,7 @@ ChatGPT 用户[从官方商店安装 MeiGen](/zh/mcp/overview#chatgpt)并登录�
 下列配置仅用于维护现有 stdio／API Key 集成或明确选用的 OpenAI 兼容供应商。本地 npm 没有 OAuth 登录，也不提供私人资料库工具；它可处理宿主可读取的本地文件、保存普通生成结果、增强提示词并记录本机偏好。
 
 <Note>
-  npm **3.0.0 是当前主版本**。升级前阅读 [3.0 迁移说明](/zh/mcp/comfyui)：ComfyUI 与内置提示词库已移除，在线搜索没有离线回退。下方示例均明确固定此版本。
+  npm **3.1.0 是当前版本**。升级前阅读 [3.0 迁移说明](/zh/mcp/comfyui)：ComfyUI 与内置提示词库已移除，在线搜索没有离线回退。下方示例均明确固定此版本。
 </Note>
 
 本地建议 Node.js 22+。仅将现有 Key 私密保留为 `MEIGEN_API_TOKEN`，不要为这些示例创建新的 MeiGen Key。下方片段只展示相关字段，不要用它们整体替换已有条目或配置文件。
@@ -37,7 +37,7 @@ ChatGPT 用户[从官方商店安装 MeiGen](/zh/mcp/overview#chatgpt)并登录�
   "mcpServers": {
     "meigen": {
       "command": "npx",
-      "args": ["-y", "meigen@3.0.0"]
+      "args": ["-y", "meigen@3.1.0"]
     }
   }
 }
@@ -47,7 +47,7 @@ ChatGPT 用户[从官方商店安装 MeiGen](/zh/mcp/overview#chatgpt)并登录�
 
 ### 已有编辑器连接
 
-已有 Cursor、VS Code、Windsurf、Roo 或 Claude 连接，请手动编辑原 MeiGen 条目。只将 `args` 中的包参数改为 `meigen@3.0.0`，保留启动命令、其他参数、`env`、环境变量转发、超时、宿主专属设置及所有其他 MCP 条目。已有私密凭据保持原样。
+已有 Cursor、VS Code、Windsurf、Roo 或 Claude 连接，请手动编辑原 MeiGen 条目。只将 `args` 中的包参数改为 `meigen@3.1.0`，保留启动命令、其他参数、`env`、环境变量转发、超时、宿主专属设置及所有其他 MCP 条目。已有私密凭据保持原样。
 
 不要对已有配置运行已发布 2.0.2 的初始化命令：它可能直接替换 MeiGen 条目，无法保留原设置。启动命令使用不熟悉的包装脚本，或找不到明确的 MeiGen 包参数时，保持配置不变，先核实宿主的配置方式。保留明确的固定版本，不使用无版本包名或 `@latest`，避免将来意外升级主版本。新连接使用[远程 OAuth](/zh/mcp/remote)。
 
@@ -58,7 +58,7 @@ ChatGPT 用户[从官方商店安装 MeiGen](/zh/mcp/overview#chatgpt)并登录�
 ```toml
 [mcp_servers.meigen]
 command = "npx"
-args = ["-y", "meigen@3.0.0"]
+args = ["-y", "meigen@3.1.0"]
 env_vars = ["MEIGEN_API_TOKEN"]
 startup_timeout_sec = 90
 tool_timeout_sec = 240
@@ -78,7 +78,7 @@ Claude marketplace 插件和 OpenClaw bundle 3.x 使用本地 stdio。[OpenClaw 
 mcp_servers:
   meigen:
     command: "npx"
-    args: ["-y", "meigen@3.0.0"]
+    args: ["-y", "meigen@3.1.0"]
     timeout: 2700
     connect_timeout: 120
 ```
@@ -92,9 +92,9 @@ mcp_servers:
 已有 CLI 集成可继续私密使用原 `MEIGEN_API_TOKEN`：
 
 ```bash
-npx -y meigen@3.0.0 gen --prompt "柔和窗光下的陶瓷咖啡杯"
-npx -y meigen@3.0.0 gen -p "产品主图" --ref ~/Desktop/bottle.jpg
-npx -y meigen@3.0.0 gen --help
+npx -y meigen@3.1.0 gen --prompt "柔和窗光下的陶瓷咖啡杯"
+npx -y meigen@3.1.0 gen -p "产品主图" --ref ~/Desktop/bottle.jpg
+npx -y meigen@3.1.0 gen --help
 ```
 
 生成示例属于付费动作，不能用来测试连接。`--json` 返回结构化结果；`--no-wait` 仅提交、不轮询。保留返回的任务 ID 和精确输入以便恢复。

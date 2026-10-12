@@ -57,7 +57,7 @@ The 3.0.0 local image providers are MeiGen (existing legacy key) and OpenAI-comp
 
 ## Tools
 
-These **14 shared tools** form the common set. Local npm 3.0.0 has 16 tools, including two local helpers. Standard remote MCP has 19, including the five private-library tools below. The currently published official ChatGPT plugin has 14 tools; its update to 19 tools and six search results per batch still requires store approval. A backend or npm release does not make those new ChatGPT features available.
+These **15 shared tools** include reference-media preparation. Local npm 3.1.0 has 17 tools, including two local helpers. Standard remote MCP and the official ChatGPT adapter each expose 22 tools, adding credit balance, saved characters and the five private-library tools. Refresh cached tool discovery after an update; access still depends on the host and the permissions you approve.
 
 | Tool | Purpose | MeiGen account authorization |
 | --- | --- | --- |
@@ -69,6 +69,7 @@ These **14 shared tools** form the common set. Local npm 3.0.0 has 16 tools, inc
 | `get_inspiration` | Read a public gallery entry | No |
 | `list_skills` | Five workflows, materials, live prices and input schemas | No |
 | `upload_skill_image` | Prepare real image URLs or attachment bytes | Yes |
+| `upload_reference_media` | Prepare a selected video/audio URL for a specific model | Yes |
 | `remove_background` | One transparent cutout | Yes |
 | `generate_product_detail_images` | 1–6 paid product modules | Yes |
 | `generate_marketing_poster` | One promotional poster | Yes |
@@ -81,14 +82,14 @@ Local additionally provides `enhance_prompt` and `manage_preferences` without a 
 | Public gallery search | Default / maximum results per batch | Account access |
 | --- | --- | --- |
 | Standard remote MCP | 3 / 3 | Optional OAuth; anonymous searches are IP-limited |
-| Local npm 3.0.0 | 3 / 3 | Anonymous, or an existing legacy key |
-| Official ChatGPT plugin | Published version: 3 / 3; update awaiting store approval: 6 / 6 | OAuth with search permission (`meigen:search`) |
+| Local npm 3.1.0 | 3 / 3 | Anonymous, or an existing legacy key |
+| Official ChatGPT plugin | 6 / 6 after tool refresh | OAuth with search permission (`meigen:search`) |
 
-Authorized searches use the account's [daily search allowance](/en/features/gallery#search), not generation credits. Starting a search uses that allowance; continuation pages do not count again. Standard remote MCP and local 3.0.0 support pagination; the official ChatGPT plugin's next-batch cards are part of its update awaiting store approval. To see another batch, preserve the returned query and snapshot ID and pass `nextOffset` as `offset`; stop when `hasMore` is false. A different direction starts a new query. Keep original generation request IDs during recovery; a timeout is not permission for a new paid task.
+Authorized searches use the account's [daily search allowance](/en/features/gallery#search), not generation credits. Starting a search uses that allowance; continuation pages do not count again. Standard remote MCP and local 3.0.0 support pagination; the official ChatGPT adapter also offers a next-batch card when the host loads its current tools. To see another batch, preserve the returned query and snapshot ID and pass `nextOffset` as `offset`; stop when `hasMore` is false. A different direction starts a new query. Keep original generation request IDs during recovery; a timeout is not permission for a new paid task.
 
 ## Private library through remote OAuth
 
-Standard remote MCP provides `search_favorites`, `list_boards`, `search_history`, `get_library_item` and `save_favorite`. Connect with OAuth and approve the separate library read/write permissions when requested; existing connections do not gain them automatically. Local npm and API keys cannot access these tools. Their addition to the official ChatGPT plugin is still awaiting store approval.
+Standard remote MCP provides `search_favorites`, `list_boards`, `search_history`, `get_library_item` and `save_favorite`. Connect with OAuth and approve the separate library read/write permissions when requested; existing connections do not gain them automatically. Local npm and API keys cannot access these tools. The official ChatGPT adapter provides the same library functions; reconnect or refresh its tools if they are missing.
 
 Lists contain prompt excerpts of at most 500 Unicode code points. Use `get_library_item` for a selected user prompt in pages of 8000 code points by default, up to 16000; internal Skill prompts are never returned. Saving requires an explicit request or prior opt-in, preserves existing notes on repeat calls and only supports owned private board destinations. Favorites are context for preferences, not a replacement for current instructions.
 
@@ -98,14 +99,19 @@ Lists contain prompt excerpts of at most 500 Unicode code points. Use `get_libra
 
   Seedance 2.5 uses model ID `seedance-2-5`, supports 4–30 second 480p/720p/1080p output and reference-video continuation, and has no `tier` option.
 
-  `generate_video` requires an explicit `model` — there's no platform default. Reference media are arrays: `referenceVideos` (mp4 / mov) and `referenceAudios` (wav / mp3, ≤15MB per clip). The **local npm server accepts local file paths** here and uploads them for you; the remote server needs URLs that already point at `images.meigen.ai` — a previous generation's `videoUrl`, or a file from [`POST /api/upload/reference-video`](/en/api-reference/endpoint/generate#upload-reference-videos-and-audio). An arbitrary public URL is rejected before charging. The singular `referenceVideo` is still accepted as a one-element alias, and `referenceVideoDuration` is a deprecated, validated compatibility hint that never sets the billed duration — omit it, the server probes every clip itself.
+  `generate_video` requires an explicit model. Use `firstFrame` / `lastFrame` for endpoint frames and `contentReferenceImages` for content, identity or style. Pass `contentReferenceImages: []` for endpoint-only requests. Follow `list_models.capabilities.videoInputs` and its tier overrides; do not mix first/last frames with content references or saved characters when the model forbids it.
 
-  Per-model caps come from `list_models` (`capabilities.video.referenceVideo` and `capabilities.video.referenceAudio`): Seedance 2.5 takes up to 10 videos and 10 audio clips, 2–30s each and 30s in total per kind; Seedance 2.0 takes up to 3 and 3, 2–15s each and 15s in total. **Seedance 2.0 cannot run on audio alone** — its reference audio needs at least one reference image or reference video alongside it, while Seedance 2.5 accepts audio-only requests.
+  Use `upload_skill_image` for images and `upload_reference_media` for selected direct HTTPS video/audio URLs, then pass the returned MeiGen URL to `referenceVideos` / `referenceAudios`. The official plugin also supports accessible host attachments. Remote tools cannot open local paths; existing local npm integrations can still prepare local files. Preparation needs a positive purchased balance but does not deduct credits. Prepared video/audio links are public and temporary, with cleanup scheduled seven days after upload; reuse within that period and do not use this as permanent hosting.
 
-  Billing uses the **sum** of the reference video durations plus your output duration, never below the minimum-billable floor. Reference audio is free: it never enters that sum, and a request carrying audio but no reference video is priced at the model's direct rate.
+  Use the live `pricingMode` and `capabilities.video.billing` to quote a job. Some models bill input-video plus output seconds; `output_only` bills only output. Audio seconds are not added, but audio or content images can select a different reference rate on models that advertise it. HeyGen support is implemented but the model remains unavailable until enabled in the live catalog.
+
 </Note>
 
 ---
+
+## Balance and saved characters
+
+Remote OAuth provides `get_credit_balance` for purchased credits available to MCP; daily free credits are excluded. `list_characters` reads existing saved characters with separate `meigen:characters:read` consent. Use the exact returned `referenceToken` in a supported model’s prompt, check `capabilities.characters`, and use the model’s `referenceMentionSyntax` for uploaded media. Character creation is not supported. Local npm and API keys cannot read or use private saved characters.
 
 ### GPT Image 2.5
 

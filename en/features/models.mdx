@@ -6,6 +6,7 @@ description: "Compare image and video models, quality settings, reference limits
 MeiGen supports multiple AI models for image and video generation. Use the comparison table below to pick one, then scroll to its section for detailed specs.
 
 <Note>
+  Web-only models can differ from the public API list; see each model's availability note.
   Availability and the current default come from [List Models](/en/api-reference/endpoint/models). Use a model only when it appears in the active list, and read `is_default` instead of assuming a permanent default. Prices below describe the listed configuration; confirm the displayed total before submitting.
 </Note>
 
@@ -24,6 +25,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Midjourney V8.2** | 15 (1K) / 20 (2K) | Moderate (~1min) | 1 | ✓ | Photorealistic, universal aesthetics |
 | **Flux 2 Klein** | 2 | Fast (~23s) | None | Web only | General-purpose base model, text rendering |
 | **Agnes Image 2.5 Flash** | 1 | Fast (~30s) | 1 | ✓ | Cheapest model, high-volume drafts, covered by daily free credits |
+| **HeyGen Video 1** | 2–18 credits/sec | 5–15s video | One first frame or 9 content images; audio | — | Affordable, optimized from MiniMax H3; Web rollout pending |
 | **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec, 1080p 90/sec) | Video, ~2-3min | First/last frame or content reference, plus reference video & audio | ✓ | 4–30s, 480p/720p/1080p, generated audio, multi-clip reference video & audio continuation |
 | **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference, plus reference video & audio | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio, reference video & audio |
 | **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video, ~35s | First frame (required) | ✓ | First-frame image-to-video only, 4–15s, ratio follows input, audio |
@@ -261,6 +263,49 @@ The cheapest model on MeiGen at 1 credit per image, and the only basic-tier **im
 ---
 
 ## Video Models
+
+### HeyGen Video 1
+
+Affordable video, optimized from MiniMax H3, with native audio.
+
+<Note>
+  Web rollout is pending. The MCP/API adapter is implemented, but the model is inactive. Use it only after it appears in the active catalog; native apps remain excluded. Reference-video input remains disabled while the Gateway channel is being verified; upstream model support does not imply availability on MeiGen.
+</Note>
+
+| Setting | MeiGen configuration |
+| --- | --- |
+| Model ID | `heygen-video-1` |
+| Duration | 5–15 seconds, integer steps; default 5 |
+| Resolutions | 480p, 768p (default), 1080p, 2K |
+| First frame | One image, no last frame; output follows the image ratio |
+| Content references | Up to 9 images; separate from first-frame mode |
+| Reference audio | Up to 3 WAV/MP3 clips, 1–15 seconds each, 45 seconds total, 16MB each; requires a content-reference image |
+| Combined reference limit | 12 items |
+| Reference video | Not currently available |
+| Ratios | Six ratios at 480p/768p; 16:9 or 9:16 at 1080p/2K. First-frame mode follows the image at every resolution |
+
+First-frame and content-reference inputs use separate panels. Only the selected panel is submitted; switching panels preserves the other panel's materials. Audio is submitted with content references.
+
+HeyGen's `@character` mentions are a MeiGen convenience: saved character images are submitted as ordinary content references, without Seedance assets. Reference up to 3 characters; one character uses up to 2 images, while multiple characters use 1 image each. Character images and uploads share the 9-image and 12-item limits after deduplication and use content-reference pricing. Character mentions select the content panel; the first-frame draft is preserved but not submitted.
+
+#### Pricing
+
+| Resolution | Text / first frame | Content references |
+| --- | --- | --- |
+| 480p | 2 credits/sec | 4 credits/sec |
+| 768p | 3 credits/sec | 6 credits/sec |
+| 1080p | 9 credits/sec | 18 credits/sec |
+| 2K | 9 credits/sec | 18 credits/sec |
+
+Credits = selected output seconds × the rate for the submitted input mode. The interface selects the rate automatically. Audio does not add billable seconds, but requests with content images/audio use the higher content-reference rate. There is no minimum-seconds multiplier. For example, 5 seconds at 768p costs 15 credits with text or a first frame, and 30 credits with content references. This is a premium model and uses purchased credits only.
+
+#### Image and prompt handling
+
+Images reuse MeiGen's shared upload component: JPEG/PNG/WebP/GIF, an 8000px-per-side upload guard, compression targeting 2MB and 2048px when needed, and a 10MB upload-gateway cap. AVIF is converted before upload. These are MeiGen upload settings, not published HeyGen pixel limits. Library/gallery images are also checked before charging: readable image data, a verifiable size no larger than 16MB, and a direct HTTPS URL without redirects.
+
+HeyGen accepts up to 32,000 prompt characters. MeiGen reserves space for protected reference instructions and native reference labels before applying the shared long-prompt compression. Within the remaining budget no compression is needed; beyond it the compressor targets 50 characters below that budget. On compression failure the body is shortened to fit, while reference instructions are protected and checked. The model receives labels such as `<Picture 1>` and `<Audio 1>`; use the editor's `@` mentions to insert them.
+
+Sources: [HeyGen model guide](https://developers.heygen.com/docs/models/heygen-video) and [AI Gateway model](https://vercel.com/ai-gateway/models/heygen-video-1). MeiGen's current UI limits and submit-time credit quote are authoritative.
 
 ### Seedance 2.5
 

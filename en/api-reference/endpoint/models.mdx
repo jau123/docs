@@ -11,6 +11,10 @@ Returns a list of all active AI models available for generation. Public endpoint
 
 The default active list contains public generation models. Skill-specific billing entries are excluded; use the Skills interface for those workflows. Read `is_default` for the current image default. GPT Image 2.5 can be requested only after it appears in this active list.
 
+<Note>
+  Web-only models are excluded even when `active=false`, except the explicit HeyGen gateway adapter. HeyGen Video 1 is still inactive: use it only after it appears in the active API/MCP catalog. This exception does not enable native apps or disabled reference capabilities.
+</Note>
+
 ## Query Parameters
 
 <ParamField query="media_type" type="string">
