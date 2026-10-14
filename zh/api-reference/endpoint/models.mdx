@@ -68,7 +68,7 @@ GET /api/models
 <ResponseField name="capabilities" type="object">
   稳定、向前兼容的能力契约。`capabilities.video` 始终是对象：用 `capabilities.video.valid` 区分视频模型（`true`）与图片模型（`false`）。`valid` 为真时，该对象描述输出时长、参考视频与参考音频限制、计费模式和是否必须提供首帧。**不要写 `if (capabilities.video)`**，因为图片模型也会返回该对象。新集成应读取这份契约，不要从 `extra_config` 自行拼装视频能力。
 
-  `capabilities.video.referenceVideo` 包含 `enabled`、`minSeconds` 和 `maxSeconds`（单条），以及面向整个数组的 `maxCount` 与 `maxTotalSeconds` —— Seedance 2.5 为 10 条、合计 30 秒，Seedance 2.0 为 3 条、合计 15 秒。`capabilities.video.referenceAudio` 结构相同，另加 `formats`（`["wav", "mp3"]`）和 `requiresVisualReference`：为 `true` 时（Seedance 2.0）请求还必须带至少 1 张参考图或 1 条参考视频，纯音频生成会被拒绝。当前响应总是包含这两个对象。早于 2026-09 的缓存响应体仍可能缺少它们，读到没有 `referenceVideo` 或 `referenceAudio` 时按 `{ "enabled": false }` 处理，而不是当作"不限"。参考音频永远不影响计费。
+  `capabilities.video.referenceVideo` 包含 `enabled`、`minSeconds` 和 `maxSeconds`（单条），以及面向整个数组的 `maxCount` 与 `maxTotalSeconds` —— Seedance 2.5 为 10 条、合计 30 秒，Seedance 2.0 为 3 条、合计 15 秒。`capabilities.video.referenceAudio` 结构相同，另加 `formats`（`["wav", "mp3"]`）和 `requiresVisualReference`：为 `true` 时（Seedance 2.0）请求还必须带至少 1 张参考图或 1 条参考视频，纯音频生成会被拒绝。当前响应总是包含这两个对象。早于 2026-09 的缓存响应体仍可能缺少它们，读到没有 `referenceVideo` 或 `referenceAudio` 时按 `{ "enabled": false }` 处理，而不是当作"不限"。增量字段 `referenceAudio.canCombineWithVideo` 缺省按 `true`；为 `false` 时（HeyGen），单独的参考音频不能与参考视频同时提交，视频内置音轨不受影响。音频秒数不计费，但 HeyGen 音频／内容图会选择内容参考费率。
 </ResponseField>
 
 <ResponseField name="extra_config" type="object">

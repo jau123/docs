@@ -103,7 +103,7 @@ Lists contain prompt excerpts of at most 500 Unicode code points. Use `get_libra
 
   Use `upload_skill_image` for images and `upload_reference_media` for selected direct HTTPS video/audio URLs, then pass the returned MeiGen URL to `referenceVideos` / `referenceAudios`. The official plugin also supports accessible host attachments. Remote tools cannot open local paths; existing local npm integrations can still prepare local files. Preparation needs a positive purchased balance but does not deduct credits. Prepared video/audio links are public and temporary, with cleanup scheduled seven days after upload; reuse within that period and do not use this as permanent hosting.
 
-  Use the live `pricingMode` and `capabilities.video.billing` to quote a job. Some models bill input-video plus output seconds; `output_only` bills only output. Audio seconds are not added, but audio or content images can select a different reference rate on models that advertise it. HeyGen support is implemented but the model remains unavailable until enabled in the live catalog.
+  Use the live `pricingMode` and `capabilities.video.billing` to quote a job. Some models bill input-video plus output seconds; `output_only` bills only output. Audio seconds are not added, but audio or content images can select a different reference rate on models that advertise it. HeyGen is available; reference-video availability follows the live catalog. Honor `capabilities.video.referenceAudio.canCombineWithVideo`: when false, do not combine separate audio with video. Embedded audio is allowed. HeyGen bills output seconds plus each reference video’s rounded-up seconds at the reference rate.
 
 </Note>
 

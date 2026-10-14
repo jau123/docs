@@ -25,14 +25,16 @@ POST /api/generate/v2
 
   要生成的图片或视频的文本描述。要引用已创建的角色，在文本中内嵌 `[character:<uuid>]` ——例如 `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`。每次生成最多引用 3 个角色。
 
-  支持范围：所有接受参考图的图片模型（Flux 2 Klein 除外）+ 视频侧 **Seedance 2.5 / 2.0**。角色图片与用户上传图片共用内容参考图预算。模型不支持、角色不存在或无权访问、引用数超限均返回 `400`（`characters_not_supported`、`character_not_found`、`too_many_characters`）；部分角色需要更高的 `tier`（`character_tier_required`）。
+  支持范围：所有接受参考图的图片模型（Flux 2 Klein 除外）+ 视频侧 **Seedance 2.5 / 2.0 和 HeyGen**。角色图片与用户上传图片共用内容参考图预算。模型不支持、角色不存在或无权访问、引用数超限均返回 `400`（`characters_not_supported`、`character_not_found`、`too_many_characters`）；部分角色需要更高的 `tier`（`character_tier_required`）。
 
-  **素材标记** —— 在提示词里内嵌 `[image1]`、`[video1]`、`[audio1]`，用来指明某句话针对哪个参考素材：*"沿用 [image1] 的调色，接续 [video1] 的运动，并按 [audio1] 的节奏配乐"*。编号**从 1 开始、按素材类型各自计数**，顺序与本请求体里 `referenceImages` / `referenceVideos` / `referenceAudios` 的数组顺序一致 —— `[video2]` 指 `referenceVideos` 的第二项，而不是全部素材里的第二个。请求抵达模型前，两类标记的处理方式不同：
+  **素材标记** —— 在提示词里内嵌 `[image1]`、`[video1]`、`[audio1]`，用来指明某句话针对哪个参考素材：*"沿用 [image1] 的调色，接续 [video1] 的运动，并按 [audio1] 的节奏配乐"*。编号**从 1 开始、按素材类型各自计数**，顺序与本请求体里 `referenceImages` / `referenceVideos` / `referenceAudios` 的数组顺序一致 —— `[video2]` 指 `referenceVideos` 的第二项，而不是全部素材里的第二个。Seedance 请求抵达模型前，两类标记的处理方式不同：
 
   - **`[videoN]` / `[audioN]`** 会被改写成厂商自己的写法 —— `Video 1`、`Audio 1`；编号超过本次实际提交条数的标记会被**直接删除**，只传了两条视频却写 `[video3]`，那里什么都不会留下。也可以直接写厂商写法 —— `"Video 1"` —— MCP 和 REST 调用方通常这么写。
   - **`[imageN]` 与 `[character:<uuid>]`** 会被展开成一句描述性短语，点名该标记落到的参考图位次 —— `[image1]` 变成 *"the subject in reference image 1"*，角色标记变成 *"the character in reference image 2"*。参考图在送进模型前可能被合并或重排，因此短语里的位次是模型实际看到的那个，不一定等于 `N`。编号超出你实际提交图片数量的 `[imageN]` **会原样留在提示词里**，不会被删除 —— 所以图片编号不要超过你实际传的张数。
 
   改写只发生在发给模型的那一份上。落库的提示词保留你写的原始标记，重新打开编辑器仍能看到当初的 mention。
+
+  **HeyGen**：内容参考使用 `[imageN]`、`[videoN]`、`[audioN]`，按实际素材编号；越界 token 在扣点前拒绝。普通 `Picture N` / `Video N` 文字不会创建引用。首帧引用改写成自然描述，不生成内容参考 token；角色图占用 9 张内容图额度，首帧不能与内容图／视频／音频／角色混用。
 </ParamField>
 
 <ParamField body="modelId" type="string">
@@ -57,10 +59,11 @@ POST /api/generate/v2
   - **Seedance 2.0 上不传 `aspectRatio`（或传了无法识别的取值）都会解析为 `adaptive`。** 纯文生视频没有可供自适应的参考，因此不带参考图/参考视频时请显式指定比例。
 
   最终采用的比例会同时在本端点的响应和状态端点的 `aspectRatio` 字段返回。
+  HeyGen 文本／内容图／参考视频使用 `auto` 或受支持的固定比例，仅首帧模式使用 `adaptive`；1080p/2K 内容模式只接受 16:9 或 9:16。
 </ParamField>
 
 <ParamField body="resolution" type="string">
-  输出分辨率。可用性取决于模型。不传则使用所选模型的默认分辨率。
+  输出分辨率。HeyGen 支持 `480p`、`768p`（默认）、`1080p`、`2k`（小写 k）。可用性取决于模型。不传则使用所选模型的默认分辨率。
 
   可选值取决于模型：图片模型用 `1K` / `2K` / `3K` / `4K`；视频模型用 `480p` / `720p` / `1080p` / `4k`（视频侧的 k 是小写）。Seedance 2.5 支持 480p / 720p / 1080p；Seedance 2.0 的 `pro` 档增加 1080p / 4k，Veo 3.1 也支持 4k。Seedance 2.0 带 `referenceVideos` 时最高 1080p。完整矩阵见[模型对比](/zh/features/models)。
 </ParamField>
@@ -108,15 +111,15 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="frameReferenceImages" type="string[]">
-  可选的 Seedance 结构化首尾帧输入，顺序为首帧、末帧，最多 2 张。需要同时控制首尾帧与内容参考时，可与 `contentReferenceImages` 一起使用。结构化字段优先于旧的 `referenceImages` / `referenceMode` 组合。
+  HeyGen 在此仅接受 1 张首帧，不支持尾帧，且不可与内容图、视频、音频或角色混用。Seedance 的结构化首尾帧输入为可选，顺序为首帧、末帧，最多 2 张。需要同时控制首尾帧与内容参考时，可与 `contentReferenceImages` 一起使用。结构化字段优先于旧的 `referenceImages` / `referenceMode` 组合。
 </ParamField>
 
 <ParamField body="contentReferenceImages" type="string[]">
-  可选的 Seedance 结构化内容参考图：Seedance 2.5 最多 30 张，Seedance 2.0 最多 9 张。可与 `frameReferenceImages`、`referenceVideos`、`referenceAudios` 和角色引用同时使用。图片、视频、音频是三份互不占用的预算；角色图片计入本图片上限。
+  HeyGen 接受最多 9 张内容图（含角色图），与首帧互斥，可配合视频**或**音频，不能同时配合两者。Seedance 的结构化内容参考图为可选：Seedance 2.5 最多 30 张，Seedance 2.0 最多 9 张。可与 `frameReferenceImages`、`referenceVideos`、`referenceAudios` 和角色引用同时使用。图片、视频、音频是三份互不占用的预算；角色图片计入本图片上限。
 </ParamField>
 
 <ParamField body="referenceMode" type="string" default="frame">
-  仅用于 Seedance 2.5 和 Seedance 2.0，决定其 Provider 如何解读 `referenceImages`。
+  用于 Seedance 2.5、Seedance 2.0 和 HeyGen 的旧字段 `referenceImages`。HeyGen 的 `frame` 最多 1 张，`content` 最多 9 张；新接入建议使用结构化字段。
 
   - `frame`（默认）—— 首/尾帧参考，最多 2 张
   - `content` —— 内容参考，不绑定具体帧位置。当前 API 上限请读 `extra_config.maxContentReferenceImages`（Seedance 2.5 为 30，Seedance 2.0 为 9）
@@ -170,10 +173,11 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="referenceVideos" type="string[]">
-  Seedance 2.5 或 Seedance 2.0 续写所用的参考视频数组。每一项都必须是 `https://images.meigen.ai/...` 地址 —— 要么来自此前 MeiGen 生成结果的 `videoUrl`，要么是通过[参考素材上传端点](#上传参考视频与音频)上传的文件。**不接受任意公网 URL**：其他域名一律在扣点前返回 `400` / `invalid_reference_video`。同一个 URL 只能出现一次，重复条目会在扣点前返回 `400` / `invalid_input`，不会被探测和计费两次。
+  用于 `capabilities.video.referenceVideo.enabled` 模型的参考视频数组，包括 Seedance 和 HeyGen。每一项都必须是 `https://images.meigen.ai/...` 地址 —— 要么来自此前 MeiGen 生成结果的 `videoUrl`，要么是通过[参考素材上传端点](#上传参考视频与音频)上传的文件。**不接受任意公网 URL**：其他域名一律在扣点前返回 `400` / `invalid_reference_video`。同一个 URL 只能出现一次，重复条目会在扣点前返回 `400` / `invalid_input`，不会被探测和计费两次。
 
   | 模型 | 数量 | 单条时长 | 合计时长 | 单条大小 | 带参考视频单价 |
   | --- | --- | --- | --- | --- | --- |
+  | HeyGen Video 1（目录启用后）| 最多 3 条 | 严格 1–5 秒 | ≤15 秒 | ≤16MB | 480p 4 / 768p 6 / 1080p 18 / 2K 18 积分/秒 |
   | Seedance 2.5 | 最多 10 条 | 2–30 秒 | ≤30 秒 | ≤200MB | 480p 11 / 720p 24 / 1080p 54 积分/秒 |
   | Seedance 2.0 | 最多 3 条 | 2–15 秒 | ≤15 秒 | ≤50MB | Mini 480p 7 / 720p 13、Fast 480p 8 / 720p 14、Pro 720p 16 / 1080p 28 积分/秒(带参考视频时 Pro 仅限 720p / 1080p) |
 
@@ -181,20 +185,21 @@ POST /api/generate/v2
 
   `计费秒数 = max(参考视频时长总和 + 输出时长, 最低计费秒数)`
 
-  完整费率和示例见[模型](/zh/features/models)。参考视频、参考音频与内容参考图是三份互不占用的预算。
+  完整费率和示例见[模型](/zh/features/models)。Seedance 的参考视频、音频与内容参考图是独立预算。**HeyGen** 的 MP4 比例需为 1:4–4:1；按输出秒数＋每段参考视频分别向上取整后的秒数计费，无最低秒数门槛；全部参考素材合计不超过 12 项。视频不能与单独音频同时提交（扣点前返回 `reference_video_audio_conflict`），视频自带音轨可保留。
 
   **旧字段别名。** 单数形式 `referenceVideo`（字符串）仍然受理，等价于只含一项的 `referenceVideos` 数组，并会长期保留。两者同时传时，`referenceVideo` 必须是 `referenceVideos` 的第一项；其他组合返回 `400` / `invalid_input`。
 </ParamField>
 
 <ParamField body="referenceAudios" type="string[]">
-  Seedance 2.5 或 Seedance 2.0 的参考音频数组。每一项都必须是通过[参考素材上传端点](#上传参考视频与音频)得到的 `https://images.meigen.ai/...` 地址，格式为 **wav** 或 **mp3**，单条不超过 **15MB**。**不接受任意公网 URL**：其他域名一律在扣点前返回 `400` / `invalid_reference_audio`。格式按文件自身字节校验，不看扩展名或 `Content-Type`。
+  用于 `capabilities.video.referenceAudio.enabled` 模型的参考音频数组，包括 Seedance 和 HeyGen。每一项都必须是通过[参考素材上传端点](#上传参考视频与音频)得到的 `https://images.meigen.ai/...` 地址，格式为 **wav** 或 **mp3**，Seedance 单条不超过 **15MB**，HeyGen 不超过 **16MB**。**不接受任意公网 URL**：其他域名一律在扣点前返回 `400` / `invalid_reference_audio`。格式按文件自身字节校验，不看扩展名或 `Content-Type`。
 
   | 模型 | 数量 | 单条时长 | 合计时长 | 纯音频请求 |
   | --- | --- | --- | --- | --- |
+  | HeyGen Video 1 | 最多 3 条 | 1–15 秒 | ≤45 秒 | 不允许，需搭配内容参考图；不能同时提交参考视频 |
   | Seedance 2.5 | 最多 10 条 | 2–30 秒 | ≤30 秒 | 允许 |
   | Seedance 2.0 | 最多 3 条 | 2–15 秒 | ≤15 秒 | 不允许 —— 至少还要 1 张参考图或 1 条参考视频 |
 
-  **参考音频免费**：它不计入计费秒数，加音频不会让请求变贵。只带参考音频、不带参考视频的请求按该模型的**直接生成**每秒单价计费，不走带参考视频的折扣价。
+  **参考音频秒数不计费**：Seedance 加音频不改变价格；HeyGen 图片／音频输入采用内容参考费率，音频不额外增加秒数。Seedance 只带参考音频、不带参考视频的请求按该模型的**直接生成**每秒单价计费，不走带参考视频的折扣价。
 
   校验失败都是扣费前的 `400`：`reference_audio_not_supported`、`too_many_reference_audios`、`reference_audio_total_seconds_exceeded`、`reference_audio_requires_visual`；音频读不出、不是 wav/mp3、或单条时长越界则是 `invalid_reference_audio`。
 </ParamField>

@@ -103,7 +103,7 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他新用户通过[远程 OAut
 
   图片使用 `upload_skill_image`；选中的直接 HTTPS 视频／音频网址使用 `upload_reference_media`，随后将返回的 MeiGen URL 放入 `referenceVideos`／`referenceAudios`。官方插件还支持客户端可访问的附件。远程端不能读取本地路径，既有本地 npm 集成仍可准备本地文件。准备素材要求有正数充值余额，但不扣积分。视频／音频链接公开且临时，在上传七天后进入清理范围；应在有效期内复用，不作为永久图床。
 
-  报价以实时 `pricingMode` 和 `capabilities.video.billing` 为准：部分模型计入输入视频和输出秒数，`output_only` 只计输出。音频秒数不额外计费，但支持该规则的模型可能因音频或内容图切换到参考档费率。HeyGen 已适配，仍须模型在实时目录启用后才能使用。
+  报价以实时 `pricingMode` 和 `capabilities.video.billing` 为准：部分模型计入输入视频和输出秒数，`output_only` 只计输出。音频秒数不额外计费，但支持该规则的模型可能因音频或内容图切换到参考档费率。HeyGen 已开放，参考视频是否可用以实时目录为准。遵守 `capabilities.video.referenceAudio.canCombineWithVideo`：为 false 时，不可同时提交视频与单独音频，视频自带音轨可保留。HeyGen 按输出秒数＋每段参考视频向上取整后的秒数，以参考档单价计费。
 
 </Note>
 

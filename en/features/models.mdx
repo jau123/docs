@@ -269,22 +269,22 @@ The cheapest model on MeiGen at 1 credit per image, and the only basic-tier **im
 Affordable video, optimized from MiniMax H3, with native audio.
 
 <Note>
-  Available on Web, API and MCP. Native apps remain excluded. Reference-video input remains disabled while the Gateway channel is being verified; upstream model support does not imply availability on MeiGen.
+  Available on Web, API and MCP. Compatible App versions receive HeyGen through capability negotiation; older versions keep their existing model list. Reference-video availability follows the live model catalog and is available to existing HeyGen-compatible App versions.
 </Note>
 
 | Setting | MeiGen configuration |
 | --- | --- |
 | Model ID | `heygen-video-1` |
 | Duration | 5–15 seconds, integer steps; default 5 |
-| Resolutions | 480p (default), 768p, 1080p, 2K |
+| Resolutions | 480p, 768p (default), 1080p, 2K |
 | First frame | One image, no last frame; output follows the image ratio |
 | Content references | Up to 9 images; separate from first-frame mode |
 | Reference audio | Up to 3 WAV/MP3 clips, 1–15 seconds each, 45 seconds total, 16MB each; requires a content-reference image |
 | Combined reference limit | 12 items |
-| Reference video | Not currently available |
+| Reference video | When enabled in the live catalog: up to 3 MP4 clips, 1–5s each, 15s total, 16MB each; aspect ratio 1:4–4:1 |
 | Ratios | Auto (default) uses the prompt and reference image. Six ratios at 480p/768p; 16:9 or 9:16 at 1080p/2K. First-frame mode follows the image at every resolution |
 
-First-frame and content-reference inputs use separate panels. Only the selected panel is submitted; switching panels preserves the other panel's materials. Audio is submitted with content references.
+First-frame and content-reference inputs use separate panels. Only the selected panel is submitted; switching panels preserves the other panel's materials. Video or audio is submitted with content references. Video-only and image + video requests are supported. **Reference video cannot currently be combined with separate reference audio**; embedded video audio is allowed. This is a temporary MeiGen/Gateway compatibility restriction based on testing, not a published HeyGen model limit. Conflicting requests are rejected before charging; images + audio remain supported.
 
 HeyGen's `@character` mentions are a MeiGen convenience: saved character images are submitted as ordinary content references, without Seedance assets. Reference up to 3 characters; one character uses up to 2 images, while multiple characters use 1 image each. Character images and uploads share the 9-image and 12-item limits after deduplication and use content-reference pricing. Character mentions select the content panel; the first-frame draft is preserved but not submitted.
 
@@ -297,7 +297,7 @@ HeyGen's `@character` mentions are a MeiGen convenience: saved character images 
 | 1080p | 9 credits/sec | 18 credits/sec |
 | 2K | 9 credits/sec | 18 credits/sec |
 
-Credits = selected output seconds × the rate for the submitted input mode. The interface selects the rate automatically. Audio does not add billable seconds, but requests with content images/audio use the higher content-reference rate. There is no minimum-seconds multiplier. For example, 5 seconds at 768p costs 15 credits with text or a first frame, and 30 credits with content references. This is a premium model and uses purchased credits only.
+Credits = (output seconds + the sum of each reference video’s duration rounded up to whole seconds) × the rate for the submitted input mode. With no reference video, only output seconds count. The interface selects the rate automatically. Audio does not add billable seconds, but requests with content images, videos or audio use the higher content-reference rate. There is no minimum-seconds multiplier. For example, 5 seconds at 768p costs 15 credits with text or a first frame, and 30 credits with content references. A 4.1s reference video + 5s output at 768p costs (5 + 5) × 6 = 60 credits. This is a premium model and uses purchased credits only.
 
 #### Image and prompt handling
 

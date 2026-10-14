@@ -131,6 +131,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 | `invalid_reference_video` | 400 | `referenceVideos` 中某一条无法读取，或不符合该模型的单条限制。请读取 `capabilities.video.referenceVideo`：Seedance 2.5 单条 2–30 秒、≤200MB；Seedance 2.0 单条 2–15 秒、≤50MB；每一项都必须是 `https://images.meigen.ai/...` 地址 —— 任意公网 URL 会在这里被拒 |
 | `too_many_reference_videos` | 400 | `referenceVideos` 条数超过该模型上限 —— 读 `capabilities.video.referenceVideo.maxCount`（Seedance 2.5 为 10，Seedance 2.0 为 3）|
 | `reference_video_total_seconds_exceeded` | 400 | 各条参考视频单独合规，但时长总和超过 `capabilities.video.referenceVideo.maxTotalSeconds`（Seedance 2.5 为 30 秒，Seedance 2.0 为 15 秒）|
+| `reference_video_audio_conflict` | 400 | 当前模型不能同时使用参考视频与单独的参考音频；移除其中一种，扣点前拒绝。视频自带音轨可保留。 |
 | `reference_audio_not_supported` | 400 | 该模型不接受 `referenceAudios` —— 读 `capabilities.video.referenceAudio.enabled` |
 | `invalid_reference_audio` | 400 | `referenceAudios` 中某一条不是 `https://images.meigen.ai/...` 地址、无法读取、不是 wav / mp3、超过 15MB，或单条时长越界（Seedance 2.5 为 2–30 秒，Seedance 2.0 为 2–15 秒）|
 | `too_many_reference_audios` | 400 | `referenceAudios` 条数超过该模型上限 —— 读 `capabilities.video.referenceAudio.maxCount`（Seedance 2.5 为 10，Seedance 2.0 为 3）|

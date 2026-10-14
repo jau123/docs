@@ -184,7 +184,7 @@ Use `firstFrame` / `lastFrame` for endpoint frames and `contentReferenceImages` 
 }
 ```
 
-Read `capabilities.videoInputs.referenceMentionSyntax` for the model’s binding syntax; numbering is 1-based within each media kind. Use `pricingMode` and `capabilities.video.billing` for the quote: input-video seconds are added only when the model declares that billing mode. `output_only` bills only output. Audio seconds are not charged, but audio/content images can select a reference rate. HeyGen’s adapter is ready but its model remains disabled until separately enabled in the live catalog. Preserve the original requestId and exact references during recovery.
+Read `capabilities.videoInputs.referenceMentionSyntax` for the model’s binding syntax; numbering is 1-based within each media kind. Use `pricingMode` and `capabilities.video.billing` for the quote: input-video seconds are added only when the model declares that billing mode. `output_only` bills only output. Audio seconds are not charged, but audio/content images can select a reference rate. HeyGen is available; reference-video availability follows the live catalog. Honor `capabilities.video.referenceAudio.canCombineWithVideo`: when false, do not combine separate audio with video. Embedded audio is allowed. HeyGen bills output seconds plus each reference video’s rounded-up seconds at the reference rate. Preserve the original requestId and exact references during recovery.
 
 
 ## Remote and local

@@ -184,7 +184,7 @@ openclaw mcp login meigen
 }
 ```
 
-引用格式以模型的 `capabilities.videoInputs.referenceMentionSyntax` 为准，各类素材从 1 编号。按 `pricingMode` 和 `capabilities.video.billing` 报价：只有明确声明计入输入的模式才加输入视频秒数，`output_only` 只计输出。音频秒数不计费，但音频或内容图可能触发参考档费率。HeyGen 已适配，模型仍待单独启用。恢复请求时保留原 requestId 和完全相同的素材。
+引用格式以模型的 `capabilities.videoInputs.referenceMentionSyntax` 为准，各类素材从 1 编号。按 `pricingMode` 和 `capabilities.video.billing` 报价：只有明确声明计入输入的模式才加输入视频秒数，`output_only` 只计输出。音频秒数不计费，但音频或内容图可能触发参考档费率。HeyGen 已开放，参考视频是否可用以实时目录为准。遵守 `capabilities.video.referenceAudio.canCombineWithVideo`：为 false 时，不可同时提交视频与单独音频，视频自带音轨可保留。HeyGen 按输出秒数＋每段参考视频向上取整后的秒数，以参考档单价计费。恢复请求时保留原 requestId 和完全相同的素材。
 
 
 ## 远程与本地
