@@ -28,7 +28,7 @@ generate or spend credits just to verify setup. Explain any unverified step.
 The following configuration is for maintaining an existing stdio/API-key integration or an explicitly selected OpenAI-compatible image provider. Local npm has no OAuth login and does not expose private account-library tools. It can prepare readable local files, save ordinary generation results, enhance prompts and store machine-local preferences.
 
 <Note>
-  npm **3.1.0 is the current release**. Before upgrading, read the [3.0 migration notes](/en/mcp/comfyui): ComfyUI and the bundled prompt library are removed, with no offline search fallback. The examples below pin this version explicitly.
+  npm **3.1.1 is the current release**. Before upgrading, read the [3.0 migration notes](/en/mcp/comfyui): ComfyUI and the bundled prompt library are removed, with no offline search fallback. The examples below pin this version explicitly. HeyGen reference videos require 3.1.1 or later; earlier local versions misread its per-clip and total duration limits.
 </Note>
 
 Node.js 22+ is recommended. Preserve an existing key privately as `MEIGEN_API_TOKEN`; do not create a new MeiGen key for these examples. The snippets below show relevant fields only; do not replace an existing entry or configuration file with them.
@@ -38,7 +38,7 @@ Node.js 22+ is recommended. Preserve an existing key privately as `MEIGEN_API_TO
   "mcpServers": {
     "meigen": {
       "command": "npx",
-      "args": ["-y", "meigen@3.1.0"]
+      "args": ["-y", "meigen@3.1.1"]
     }
   }
 }
@@ -48,7 +48,7 @@ Set existing credentials in the MCP process environment or host private settings
 
 ### Existing editor connections
 
-For an existing Cursor, VS Code, Windsurf, Roo or Claude connection, edit its MeiGen entry manually. Change only the package argument in `args` to `meigen@3.1.0`; preserve the command, other arguments, `env`, environment forwarding, timeouts, host-specific settings and all other MCP entries. Keep any existing private credentials in place.
+For an existing Cursor, VS Code, Windsurf, Roo or Claude connection, edit its MeiGen entry manually. Change only the package argument in `args` to `meigen@3.1.1`; preserve the command, other arguments, `env`, environment forwarding, timeouts, host-specific settings and all other MCP entries. Keep any existing private credentials in place.
 
 Do not run the published 2.0.2 initializer against existing configuration: it can replace the MeiGen entry rather than preserve its settings. If the command uses an unfamiliar wrapper or has no identifiable MeiGen package argument, leave it unchanged and inspect that host's configuration before editing. Keep an explicit version pin instead of an unversioned package or `@latest` to avoid an unintended future major upgrade. New connections use [remote OAuth](/en/mcp/remote).
 
@@ -59,7 +59,7 @@ New users should use [remote OAuth](/en/mcp/remote). Existing local integrations
 ```toml
 [mcp_servers.meigen]
 command = "npx"
-args = ["-y", "meigen@3.1.0"]
+args = ["-y", "meigen@3.1.1"]
 env_vars = ["MEIGEN_API_TOKEN"]
 startup_timeout_sec = 90
 tool_timeout_sec = 240
@@ -79,7 +79,7 @@ New MeiGen connections should use [remote OAuth](/en/mcp/remote). For an existin
 mcp_servers:
   meigen:
     command: "npx"
-    args: ["-y", "meigen@3.1.0"]
+    args: ["-y", "meigen@3.1.1"]
     timeout: 2700
     connect_timeout: 120
 ```
@@ -93,9 +93,9 @@ A host timeout does not cancel or refund an accepted task. Prefer `wait: false` 
 An existing CLI integration may continue using its privately configured `MEIGEN_API_TOKEN`:
 
 ```bash
-npx -y meigen@3.1.0 gen --prompt "a ceramic coffee mug in soft window light"
-npx -y meigen@3.1.0 gen -p "product hero shot" --ref ~/Desktop/bottle.jpg
-npx -y meigen@3.1.0 gen --help
+npx -y meigen@3.1.1 gen --prompt "a ceramic coffee mug in soft window light"
+npx -y meigen@3.1.1 gen -p "product hero shot" --ref ~/Desktop/bottle.jpg
+npx -y meigen@3.1.1 gen --help
 ```
 
 These generation examples are paid actions, not connection tests. `--json` returns structured output; `--no-wait` submits without polling. Preserve returned task IDs and exact inputs for recovery.
