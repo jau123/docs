@@ -62,6 +62,10 @@ POST /api/generate/v2
   HeyGen 文本／内容图／参考视频使用 `auto` 或受支持的固定比例，仅首帧模式使用 `adaptive`；1080p/2K 内容模式只接受 16:9 或 9:16。
 </ParamField>
 
+<ParamField body="draft" type="boolean" default="false">
+  显式启用 Seedance 2.5 付费草稿，固定为 480p。先检查 `capabilities.draft.enabled`，普通生成不传此字段。草稿完成后可确认当前费用并单独付费生成 1080p 成片，详见[视频草稿](/zh/mcp/drafts)。
+</ParamField>
+
 <ParamField body="resolution" type="string">
   输出分辨率。HeyGen 支持 `480p`、`768p`（默认）、`1080p`、`2k`（小写 k）。可用性取决于模型。不传则使用所选模型的默认分辨率。
 
@@ -578,3 +582,9 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 ```
 
 实际采用的比例会通过 `aspectRatio` 字段返回 —— 本次请求的响应和状态端点里都有。
+
+## 生成草稿成片
+
+`POST /api/generate/v2/draft-final` 要求同一账户认证及 `meigen:generate` 权限。API 凭据调用须传 `idempotencyKey`（持久化 UUID）、`sourceDraftGenerationId` 和 `confirmedCredits`，先从草稿的认证状态查询中读取当前 `seedanceDraft.finalCredits` 报价。仅在单独授权重试失败成片时传 `retryFailedGenerationId`。使用 `meigen:read` 权限，通过 `/api/generate/v2/requests/{requestId}` 恢复任务。
+
+报价变化返回 `409 price_changed` 及 `required`；重新确认后，使用新 ID 和新金额提交。`410 draft_expired` 表示不能再生成新成片。成片仅能来自本账户草稿，沿用原任务，API 调用只扣购买积分。同一请求 ID 不会自动替换失败任务。

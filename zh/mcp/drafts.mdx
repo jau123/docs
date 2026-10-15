@@ -1,0 +1,40 @@
+---
+title: "视频草稿"
+description: "先预览 Seedance 2.5 视频，再单独确认高清成片的费用。"
+---
+
+<Note>
+以当前连接的工具清单为准：需要 `generate_video.draft`、`render_video_draft`，以及模型的 `capabilities.draft.enabled`。服务更新后刷新工具清单或重新连接。已发布的本地 npm `meigen@3.1.1` 尚不包含这些工具，本地用户需等待后续版本。本文不表示服务或安装包已经升级。
+</Note>
+
+## 先看草稿，再决定是否生成成片
+
+1. 查询 Seedance 2.5 当前能力和 **480p 草稿价格**，包括参考视频的计费方式。获得费用授权后再提交。
+2. 调用 `generate_video`，传入 `modelId: "seedance-2-5"`、`draft: true` 和持久化的 `requestId`。草稿固定为 **480p**。普通生成不传 `draft`，不会自动切换为草稿。
+3. 使用原请求 ID 调用 `check_generation`。展示已完成的视频，以及 `seedanceDraft` 中的 `expiresAt`、`finalCredits` 和已有的 `finalGenerationId`。
+4. 用户满意后，展示当前**另外收取的 1080p 成片费用**并获得授权。调用 `render_video_draft`，使用独立请求 ID，将草稿的 `generationId` 作为 `sourceDraftGenerationId`，将确认的报价作为 `confirmedCredits`。
+5. 使用成片自己的请求 ID 查询结果。成片沿用原草稿、时长和参考素材，不接受新的提示词或替换素材。
+
+草稿和成片是**两笔独立计费的任务**。成片收取完整的 1080p 报价，并非 480p 升级至 1080p 的差价。MCP 仅使用购买积分。普通 480p 视频不一定是草稿。
+
+草稿可转成片的期限为上游创建任务后的七天，以返回的 `expiresAt` 为准，不从下载时间起算。没有返回成片报价时，不要猜测价格或发起成片。报价变化后需重新确认。
+
+## 工具参数
+
+| 工具 | 参数 |
+| --- | --- |
+| `generate_video` | 普通视频参数加 `draft: true`；遵守当前模型的参考素材限制。 |
+| `check_generation` | 原 `requestId`；已完成草稿返回公开的 `seedanceDraft` 摘要，条件允许时包含当前成片报价。 |
+| `render_video_draft` | `requestId`、`sourceDraftGenerationId`、`confirmedCredits`；仅在用户单独授权重试失败成片时传 `retryFailedGenerationId`。 |
+
+官方 ChatGPT 插件调用这些工具时传 `responseVersion: 3`，保留草稿信息，同时兼容旧调用方的响应格式。结果卡片中的**确认成片方案**按钮只引导在对话中确认费用，点击本身不会提交付费任务。通用远程与 npm MCP 不使用 `responseVersion`。
+
+## 中断和失败处理
+
+- 超时或断开连接不能证明生成失败。先查询原请求 ID，不要为了找回结果而创建替代任务。
+- 相同输入重试沿用原 ID；确认价格等参数发生变化后，经用户授权再使用新 ID。
+- 失败时说明原因及 `creditsStatus`；仅在后端确认退款时才能说积分已退还。
+- 有意重试失败成片时，先确认当前费用，再将该失败成片的生成 ID 传为 `retryFailedGenerationId`，并使用新请求 ID。不得自动重试。
+- 过期草稿不能发起新成片，但已有成片任务仍可查询。重新生成草稿是一笔新的付费操作。
+
+新连接使用[远程 OAuth](/zh/mcp/setup)。已有旧版 API Key 集成保留生成兼容及购买积分计费；此功能不开放私人资料库或角色权限。

@@ -37,6 +37,7 @@
                 "pages": [
                   "en/mcp/overview",
                   "en/mcp/composable-workflows",
+                  "en/mcp/drafts",
                   "en/mcp/remote",
                   "en/mcp/setup",
                   "en/mcp/comfyui"
@@ -110,6 +111,7 @@
                 "pages": [
                   "zh/mcp/overview",
                   "zh/mcp/composable-workflows",
+                  "zh/mcp/drafts",
                   "zh/mcp/remote",
                   "zh/mcp/setup",
                   "zh/mcp/comfyui"

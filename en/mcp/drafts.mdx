@@ -1,0 +1,40 @@
+---
+title: "Video drafts"
+description: "Preview a Seedance 2.5 video before separately authorizing a full-resolution render."
+---
+
+<Note>
+Availability follows your connected server's tool list. You need `generate_video.draft`, `render_video_draft`, and a model with `capabilities.draft.enabled`. Refresh or reconnect after the server update. Published local npm `meigen@3.1.1` does not include these tools; local users need the subsequent release. These instructions do not mean that a server or package has already been upgraded.
+</Note>
+
+## Preview, then decide
+
+1. Ask for the current Seedance 2.5 capabilities and **480p draft price**, including any reference-video billing. Authorize that cost before generating.
+2. Call `generate_video` with `modelId: "seedance-2-5"`, `draft: true`, and a persistent `requestId`. A draft is always **480p**. Omit `draft` for ordinary generation; draft mode is never enabled automatically.
+3. Query `check_generation` using the same request ID. Show the completed video and its `seedanceDraft` details: `expiresAt`, `finalCredits`, and any existing `finalGenerationId`.
+4. If the user likes it, show the current **additional 1080p final cost** and obtain authorization. Call `render_video_draft` with a separate request ID, the draft's `generationId` as `sourceDraftGenerationId`, and that quote as `confirmedCredits`.
+5. Check the final with its own request ID. It reuses the original draft, duration and references; this step does not accept a new prompt or replacement references.
+
+Draft and final are **two separately charged jobs**. The final costs the full quoted 1080p amount, not the difference between 480p and 1080p. MCP uses purchased credits only. A normal 480p video is not necessarily a draft.
+
+The draft is usable for final rendering for seven days from provider creation; use the returned `expiresAt`, not the time you downloaded it. If no quote is returned, do not guess a price or start a final. A price change requires a new confirmation.
+
+## Tool inputs
+
+| Tool | Inputs |
+| --- | --- |
+| `generate_video` | Ordinary video inputs plus `draft: true`. Use current model reference limits. |
+| `check_generation` | The original `requestId`; completed drafts return a public `seedanceDraft` summary and current final quote when available. |
+| `render_video_draft` | `requestId`, `sourceDraftGenerationId`, `confirmedCredits`; optionally `retryFailedGenerationId` only for a separately authorized retry of that failed final. |
+
+For the official ChatGPT plugin, pass `responseVersion: 3` on these calls. It preserves draft details while old callers keep their prior response format. The result card's **Review final render** action asks for confirmation in the conversation; clicking it alone does not submit a paid job. Standard remote and npm MCP do not use `responseVersion`.
+
+## Recover safely
+
+- A timeout or disconnection does not prove failure. Check the original request ID; never start a replacement merely to recover a lost response.
+- Keep the same ID and exact inputs for an unchanged retry. Changed confirmed pricing needs a new ID after authorization.
+- On failure, report the reason and `creditsStatus`; say credits were refunded only when the backend confirms it.
+- To deliberately retry a failed final, first obtain approval for the current price, then pass its generation ID as `retryFailedGenerationId` and use a new request ID. Do not retry automatically.
+- Expired drafts cannot create a new final. Existing final tasks remain recoverable. A new draft is a new paid operation.
+
+New connections use [remote OAuth](/en/mcp/setup). Existing legacy API-key integrations retain generation compatibility and purchased-credit billing; this feature does not grant access to private libraries or characters.

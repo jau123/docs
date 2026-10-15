@@ -63,6 +63,10 @@ Submits a generation request. The output is generated asynchronously — use the
   The final ratio used is returned both in this endpoint's response and in the status endpoint's `aspectRatio` field.
 </ParamField>
 
+<ParamField body="draft" type="boolean" default="false">
+  Opt in to a paid Seedance 2.5 draft, fixed at 480p. Check `capabilities.draft.enabled` first. Omit for ordinary generation. A completed draft can be rendered as a separately paid 1080p final after reviewing its current quote; see [video drafts](/en/mcp/drafts).
+</ParamField>
+
 <ParamField body="resolution" type="string">
   The output resolution. HeyGen supports `480p`, `768p` (default), `1080p`, `2k` (lowercase k). Availability depends on the model. If omitted, the selected model's default is used.
 
@@ -583,3 +587,9 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
 ```
 
 The actual ratio used is returned as `aspectRatio` — both in the response to this request and on the status endpoint.
+
+## Render a completed draft
+
+`POST /api/generate/v2/draft-final` requires the same authenticated account and `meigen:generate` permission. For API credentials, pass `idempotencyKey` (a persistent UUID), `sourceDraftGenerationId` and `confirmedCredits`. Check the draft's authenticated status for the live `seedanceDraft.finalCredits` quote first. An optional `retryFailedGenerationId` is only for a separately authorized replacement of that failed final. Recover using `/api/generate/v2/requests/{requestId}` with `meigen:read`.
+
+A changed price returns `409 price_changed` with `required`; confirm it before using a new ID and changed amount. `410 draft_expired` prevents new final renders. Final creation is owner-scoped, reuses the original draft, and charges purchased credits for API calls. Reusing the same ID never automatically replaces a failed job.

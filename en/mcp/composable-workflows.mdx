@@ -3,7 +3,7 @@ title: "Composable workflows"
 description: "Persist task IDs, generate frames and videos, and resume within an approved budget."
 ---
 
-<Note>3.1.1 is a major release that removes ComfyUI and the offline prompt library. New account connections use remote OAuth; API keys remain only for existing legacy local integrations. See [migration notes](/en/mcp/comfyui).</Note>
+<Note>3.0 was the major release that removed ComfyUI and the offline prompt library. New account connections use remote OAuth; API keys remain only for existing legacy local integrations. See [migration notes](/en/mcp/comfyui).</Note>
 
 [中文](/zh/mcp/composable-workflows) · [Connection setup](/en/mcp/setup) · [Five Skills HTTP API](/en/api-reference/skills/overview)
 
@@ -138,3 +138,7 @@ Local `wait: true` retries transient status-query errors within bounds: stop aft
 For ordinary tasks, remote `attemptId` remains a legacy compatibility handle. Prefer UUID `requestId` in new integrations. Older receipts may lack the normalized input data needed to verify all past parameter mismatches; do not assume the new protection can retroactively validate every old task.
 
 **Legacy key rotation:** when an old `attemptId` submission lost its response, recover it using the original key before revoking that key. The old handle incorporates the key; a new key cannot reconstruct an unrecorded old identity. Keep a returned `generationId` when available, and do not automatically resubmit an unresolved legacy attempt with a new key.
+
+## Draft-first video steps
+
+Treat draft creation and final rendering as separate authorized steps with separate request IDs and budget reservations. Never schedule `render_video_draft` automatically after a draft completes. See [the draft workflow](/en/mcp/drafts).

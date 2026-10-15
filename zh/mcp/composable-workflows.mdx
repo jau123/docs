@@ -3,7 +3,7 @@ title: "组合工作流"
 description: "保存任务 ID，生成首帧和视频，在已批准预算内恢复工作流。"
 ---
 
-<Note>3.1.1 是移除了 ComfyUI 与离线提示词库的主版本。新账号连接使用远程 OAuth，API Key 仅保留已有旧版本地兼容。详见[迁移说明](/zh/mcp/comfyui)。</Note>
+<Note>3.0 是移除了 ComfyUI 与离线提示词库的主版本。新账号连接使用远程 OAuth，API Key 仅保留已有旧版本地兼容。详见[迁移说明](/zh/mcp/comfyui)。</Note>
 
 [English](/en/mcp/composable-workflows) · [连接设置](/zh/mcp/setup) · [五项 Skills HTTP API](/zh/api-reference/skills/overview)
 
@@ -137,3 +137,7 @@ const video = await client.callTool({
 远程普通生成保留旧版 `attemptId` 兼容入口；新集成优先使用 UUID `requestId`。旧回执可能没有核验所有历史参数所需的标准化输入，因此不能宣称新保护能够追溯验证每一个旧任务。
 
 **旧请求与换 Key：** 使用旧 `attemptId` 提交但丢失响应时，应先用原 Key 恢复，再撤销该 Key。旧句柄包含 Key，新 Key 无法重建尚未记录的旧身份。已有 `generationId` 时应保存；不要用新 Key 自动重交仍未明确的旧尝试。
+
+## 先草稿后成片的视频步骤
+
+草稿与成片分别作为独立的授权步骤，保留各自请求 ID 和预算预留。不要在草稿完成后自动调度 `render_video_draft`。详见[草稿流程](/zh/mcp/drafts)。
