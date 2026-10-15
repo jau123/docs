@@ -57,12 +57,13 @@ The 3.0.0 local image providers are MeiGen (existing legacy key) and OpenAI-comp
 
 ## Tools
 
-These **15 shared tools** include reference-media preparation. Local npm 3.1.1 has 17 tools, including two local helpers. Standard remote MCP and the official ChatGPT adapter each expose 22 tools, adding credit balance, saved characters and the five private-library tools. Refresh cached tool discovery after an update; access still depends on the host and the permissions you approve.
+These **16 shared tools** include reference-media preparation. Local npm 3.2.0 has 18 tools, including two local helpers. Standard remote MCP and the official ChatGPT adapter each expose 23 tools, adding credit balance, saved characters and the five private-library tools. Refresh cached tool discovery after an update; access still depends on the host and the permissions you approve.
 
 | Tool | Purpose | MeiGen account authorization |
 | --- | --- | --- |
 | `generate_image` | General image generation; local can use configured backends | For MeiGen Cloud |
-| `generate_video` | MeiGen Cloud video generation | Yes |
+| `generate_video` | MeiGen Cloud video generation, including opt-in drafts | Yes |
+| `render_video_draft` | Separately confirmed 1080p final from a completed draft | Yes |
 | `check_generation` | Status/recovery by generationId or requestId | Request-ID lookup requires the owning account |
 | `list_models` | Available models and capabilities | No |
 | `search_gallery` | Search public prompts and image previews; batch limits vary below | Standard MCP/local: optional; official ChatGPT plugin: required |
@@ -82,7 +83,7 @@ Local additionally provides `enhance_prompt` and `manage_preferences` without a 
 | Public gallery search | Default / maximum results per batch | Account access |
 | --- | --- | --- |
 | Standard remote MCP | 3 / 3 | Optional OAuth; anonymous searches are IP-limited |
-| Local npm 3.1.1 | 3 / 3 | Anonymous, or an existing legacy key |
+| Local npm 3.2.0 | 3 / 3 | Anonymous, or an existing legacy key |
 | Official ChatGPT plugin | 6 / 6 after tool refresh | OAuth with search permission (`meigen:search`) |
 
 Authorized searches use the account's [daily search allowance](/en/features/gallery#search), not generation credits. Starting a search uses that allowance; continuation pages do not count again. Standard remote MCP and local 3.0.0 support pagination; the official ChatGPT adapter also offers a next-batch card when the host loads its current tools. To see another batch, preserve the returned query and snapshot ID and pass `nextOffset` as `offset`; stop when `hasMore` is false. A different direction starts a new query. Keep original generation request IDs during recovery; a timeout is not permission for a new paid task.
