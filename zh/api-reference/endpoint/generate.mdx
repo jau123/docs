@@ -70,6 +70,8 @@ POST /api/generate/v2
   输出分辨率。HeyGen 支持 `480p`、`768p`（默认）、`1080p`、`2k`（小写 k）。可用性取决于模型。不传则使用所选模型的默认分辨率。
 
   可选值取决于模型：图片模型用 `1K` / `2K` / `3K` / `4K`；视频模型用 `480p` / `720p` / `1080p` / `4k`（视频侧的 k 是小写）。Seedance 2.5 支持 480p / 720p / 1080p；Seedance 2.0 的 `pro` 档增加 1080p / 4k，Veo 3.1 也支持 4k。Seedance 2.0 带 `referenceVideos` 时最高 1080p。完整矩阵见[模型对比](/zh/features/models)。
+
+  Grok Video 1.5 的 Lite / Standard 两档均支持 `480p`、`720p`、`1080p`，默认 `480p`。同时省略 `tier` 和 `duration` 时使用 Lite × 4 秒（480p 共 16 积分）。两档的 `modelId` 都是 `grok-video`。
 </ParamField>
 
 <ParamField body="quality" type="string">
@@ -174,6 +176,7 @@ POST /api/generate/v2
 
   - Seedance 2.0:`mini`(默认)、`fast` 或 `pro`
   - Veo 3.1:`fast`(默认)或 `pro`
+  - Grok Video 1.5：`lite`（默认）或 `standard`，两档都必须提供一张首帧图
 
   Seedance 2.5 没有档位，请省略该字段。更高档位画质更好、价格也更高；不传则使用模型默认档，Seedance 2.0 默认为 `mini`。完整价格矩阵见[模型](/zh/features/models)。
 </ParamField>

@@ -28,7 +28,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **HeyGen Video 1** | 2–18 credits/sec | 5–15s video | One first frame or 9 content images; audio | — | Affordable, optimized from MiniMax H3; Web and MCP |
 | **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec, 1080p 90/sec) | Video, ~2-3min | First/last frame or content reference, plus reference video & audio | ✓ | 4–30s, 480p/720p/1080p, generated audio, multi-clip reference video & audio continuation |
 | **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference, plus reference video & audio | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio, reference video & audio |
-| **Grok Video 1.5** | Per-second (480p 16/sec, 720p 28/sec) | Video, ~35s | First frame (required) | ✓ | First-frame image-to-video only, 4–15s, ratio follows input, audio |
+| **Grok Video 1.5** | Per-second (Lite 4–28/sec, Standard 16–50/sec) | Varies by tier and resolution | First frame (required) | ✓ | Lite (default) / Standard, 480p/720p/1080p, 4–15s, ratio follows input, audio |
 | **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-8min | Up to 2 (first/last frame) | Web only | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
 | **Agnes Video 2.5 Flash** | 10 per video (720p, 2/sec × 5s) | Video, ~2min | First frame (single image) | ✓ | **Temporarily unavailable since 2026-09-22.** Fixed 5s / 720p, the only video model covered by daily free credits |
 
@@ -431,34 +431,41 @@ Output length is always your selected duration (4–15), independent of the refe
 
 | | |
 | --- | --- |
-| **Model ID** | `grok-video` |
+| **Model ID** | `grok-video` (shared by both tiers) |
 | **Provider** | xAI |
-| **Credits** | Per-second (see below) |
-| **Duration** | 4-15 seconds (default 4) |
+| **Tier** | Lite (`lite`, default) / Standard (`standard`) |
+| **Credits** | Per-second, by tier × resolution (see below) |
+| **Duration** | 4–15 seconds (default 4) |
 | **Reference images** | 1 — first frame **required** (image-to-video only) |
 | **Reference video** | Not supported |
 | **Reference audio** | Not supported |
-| **Resolutions** | 480p, 720p (default 480p) |
+| **Resolutions** | 480p, 720p, 1080p on both tiers (default 480p) |
 | **Aspect ratios** | Follows the first-frame image automatically (no manual ratio selection) |
-| **Audio** | Auto-generated |
+| **Audio** | Auto-generated, included in the price |
 
-xAI's image-to-video model. A starting (first-frame) image is **required** — pure text-to-video is not supported. The output aspect ratio always follows your input image, and AI-generated audio is included.
+MeiGen offers Lite and Standard tiers through Vercel AI Gateway. Both require a starting (first-frame) image — text-only generation is not supported in this integration. Output follows the image's aspect ratio and includes generated audio. Generation time varies by tier, resolution and provider load.
 
 #### Pricing
 
-| Resolution | Rate |
-| --- | --- |
-| 480p | 16 credits/sec |
-| 720p | 28 credits/sec |
+| Resolution | Lite (default) | Standard |
+| --- | --- | --- |
+| 480p | 4 credits/sec | 16 credits/sec |
+| 720p | 6 credits/sec | 28 credits/sec |
+| 1080p | 28 credits/sec | 50 credits/sec |
+
+Total credits = the selected tier's rate at the selected resolution × output seconds. Default settings are **Lite, 480p, 4 seconds — 16 credits**. Lite remains a premium model; daily free credits do not apply.
 
 **Examples:**
 
 | Scenario | Calculation | Total |
 | --- | --- | --- |
-| 480p × 4s | 16 × 4 | **64** |
-| 480p × 10s | 16 × 10 | **160** |
-| 720p × 4s | 28 × 4 | **112** |
-| 720p × 10s | 28 × 10 | **280** |
+| Lite 480p × 4s (default) | 4 × 4 | **16** |
+| Lite 720p × 10s | 6 × 10 | **60** |
+| Lite 1080p × 4s | 28 × 4 | **112** |
+| Standard 480p × 4s | 16 × 4 | **64** |
+| Standard 1080p × 4s | 50 × 4 | **200** |
+
+API and MCP keep the model ID `grok-video`. Set `tier` to `lite` or `standard`; omitting it uses Lite. Set `resolution` to `480p`, `720p`, or `1080p`. Read current defaults and pricing from [List Models](/en/api-reference/endpoint/models); do not send the upstream provider's model ID as `modelId`.
 
 <Note>
   If generation fails, the **full** credit amount is automatically refunded.
@@ -601,8 +608,8 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
     Grok Video 1.5 is image-to-video only — you **must** upload a starting (first-frame) image. Pure text-to-video is not supported. The output aspect ratio follows your input image. If you want text-to-video, use Seedance 2.5, Seedance 2.0, or Veo 3.1.
   </Accordion>
 
-  <Accordion title="Grok Video 1.5 — 480p / 720p only" icon="triangle-exclamation">
-    Grok Video 1.5 outputs at 480p or 720p only. For 1080p, use Seedance 2.5 or Seedance 2.0 Pro; for 4K, use Seedance 2.0 Pro or Veo 3.1.
+  <Accordion title="Grok Video 1.5 — Lite / Standard and 1080p" icon="triangle-exclamation">
+    Both tiers support 480p, 720p and 1080p. Lite is the default; price depends on both tier and resolution. For 4K, use Seedance 2.0 Pro or Veo 3.1.
   </Accordion>
 
   <Accordion title="Veo 3.1 — Limited aspect ratios" icon="triangle-exclamation">

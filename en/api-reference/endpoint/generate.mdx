@@ -71,6 +71,8 @@ Submits a generation request. The output is generated asynchronously — use the
   The output resolution. HeyGen supports `480p`, `768p` (default), `1080p`, `2k` (lowercase k). Availability depends on the model. If omitted, the selected model's default is used.
 
   Available values depend on the model: image models use `1K` / `2K` / `3K` / `4K`; video models use `480p` / `720p` / `1080p` / `4k` (note the lowercase `k` on video). Seedance 2.5 supports 480p / 720p / 1080p. Seedance 2.0 adds 1080p / 4k on `pro`; Veo 3.1 also supports 4k. With Seedance 2.0 `referenceVideos`, the ceiling is 1080p. See [Models](/en/features/models) for the complete matrix.
+
+  Grok Video 1.5 accepts `480p`, `720p`, or `1080p` on both Lite and Standard, defaulting to `480p`. With `tier` and `duration` also omitted, it uses Lite × 4 seconds (16 credits at 480p). Keep `modelId: "grok-video"` for either tier.
 </ParamField>
 
 <ParamField body="quality" type="string">
@@ -177,6 +179,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   - Seedance 2.0: `mini` (default), `fast` or `pro`
   - Veo 3.1: `fast` (default) or `pro`
+  - Grok Video 1.5: `lite` (default) or `standard`; both require one first-frame image
 
   Seedance 2.5 has no tier; omit this field. Higher tiers render at higher fidelity for a higher price. If omitted, the model's own default tier is used — Seedance 2.0 defaults to `mini`. See [Models](/en/features/models) for the full pricing matrix.
 </ParamField>

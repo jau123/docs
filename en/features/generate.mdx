@@ -330,7 +330,7 @@ MeiGen offers several video models — the current list and full specs are on th
 - **Seedance 2.5** — one quality level, per-second pricing, 4–30 seconds, up to 10 reference videos (30s in total, 200MB each) and up to 10 reference audio clips (30s in total)
 - **Seedance 2.0** — three tiers, per-second pricing, 4–15 seconds, up to 3 reference videos (15s in total, 50MB each) and up to 3 reference audio clips (15s in total)
 - **Veo 3.1** — two tiers, per-generation pricing, 4 / 6 / 8 seconds, audio always on
-- **Grok Video 1.5** — per-second pricing, 4–15 seconds, a first-frame image is required
+- **Grok Video 1.5** — Lite (default) / Standard, both at 480p / 720p / 1080p, 4–15 seconds; a first-frame image is required. Default Lite 480p × 4s costs 16 credits.
 - **Agnes Video 2.5 Flash** — per-second pricing, fixed 5 seconds, covered by daily free credits. **Temporarily unavailable since 2026-09-22**; it is not returned by List Models and requests to it are rejected until it is re-enabled.
 
 Open the video sidebar from the **Generate Video** button in the floating dock on desktop, or from **Generate** in the bottom dock on mobile.
@@ -404,6 +404,12 @@ Content-reference images, reference videos and reference audio can all be submit
 <Warning>
   **Adding reference videos makes the total credit cost depend on their length**: billed seconds = "the **sum** of every reference video's duration + your chosen duration" (never below the minimum-billable floor). More clips, or longer ones, cost more. **Reference audio adds nothing** — it is never billed, and a request carrying audio but no video is priced at the plain direct rate. The sidebar shows the exact total before you submit — confirm before clicking Generate.
 </Warning>
+
+### Grok Video 1.5 — Lite / Standard
+
+Select Lite (default) or Standard under the model picker. Both support 480p / 720p / 1080p and 4–15 second videos. Upload exactly one first-frame image; output follows its aspect ratio and includes generated audio. Reference videos and audio are not supported.
+
+Credits = tier-and-resolution rate × seconds: Lite costs 4 / 6 / 28 credits/sec at 480p / 720p / 1080p; Standard costs 16 / 28 / 50. Default Lite 480p × 4s costs **16 credits**. Review the displayed total before submitting; see [Models → Grok Video 1.5](/en/features/models#grok-video-15).
 
 ### Veo 3.1 — Two Tiers, Native Audio
 
@@ -490,7 +496,7 @@ Typical generation times by model:
 | Nanobanana Pro | ~34 seconds |
 | Midjourney V8.2 | ~1 min |
 | Seedream 5.0 Pro | ~1 min 43 sec |
-| Grok Video 1.5 (video) | ~35 seconds |
+| Grok Video 1.5 (video) | Varies by tier, resolution and provider load |
 | Agnes Video 2.5 Flash (video, temporarily unavailable) | ~2 min |
 | Seedance 2.5 (video) | ~2–3 min; longer outputs can take longer |
 | Seedance 2.0 (video) | ~2–3 min (Mini, default) / ~2–4 min (Fast) / ~3–6 min (Pro, longer at 4K) |

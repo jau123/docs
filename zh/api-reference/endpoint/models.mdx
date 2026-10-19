@@ -82,14 +82,17 @@ GET /api/models
   | `variants` / `defaultVariant` | GPT Image 2.5 | `modelVariant` 的合法值（`sunburst`、`flare`）与配置默认值（`sunburst`） |
   | `defaultResolution` | 图片 / 视频 | 请求省略 `resolution` 时使用的分辨率 |
   | `pricing` | 按配置计价的图片模型 | 按分辨率与质量取积分，如 `pricing["2K"]["low"]`；部分模型每个分辨率直接对应一个数字 |
-  | `tierResolutions` | Seedance 2.0 | 各档位实际可用的分辨率，按档位分级。优先于顶层 `resolutions` |
-  | `tiers` | Seedance 2.0 / Veo 3.1 | 可选档位，通过 `tier` 选择（Seedance 2.0：`mini` / `fast` / `pro`；Veo 3.1：`fast` / `pro`）|
+  | `tierResolutions` | Seedance 2.0 / Grok Video 1.5 | 各档位实际可用的分辨率，按档位分级。优先于顶层 `resolutions` |
+  | `tiers` | Seedance 2.0 / Veo 3.1 / Grok Video 1.5 | `tier` 可选值：Seedance 2.0 为 `mini` / `fast` / `pro`；Veo 3.1 为 `fast` / `pro`；Grok Video 1.5 为 `lite` / `standard` |
+  | `defaultTier` | 有档位的视频模型 | 省略 `tier` 时使用的档位；Grok Video 1.5 默认为 `lite` |
   | `durations` | 视频模型 | `duration` 允许的取值（秒）|
   | `pricingPerSec` | Seedance 2.5 / Seedance 2.0 / Grok Video 1.5 / Agnes Video 2.5 Flash | 直接生成每秒积分，按分辨率分级；有档位的模型先按档位再按分辨率 |
   | `pricingPerCall` | Veo 3.1 | 每次生成消耗的积分，按档位再按 `duration` 二维查表。与 `pricingPerSec` 互斥，存在时优先 |
   | `pricingPerSecWithVideo` | Seedance 2.5 / Seedance 2.0 | **只要带了参考视频**就适用的每秒积分，按分辨率或档位 + 分辨率分级。只带参考音频不会切到这档价，纯音频请求按 `pricingPerSec` 计费 |
   | `minBillableTable` | Seedance 2.5 / Seedance 2.0 | 按输出 `duration` 的最低计费秒数；计费取 `max(参考视频时长总和 + 输出, 最低值)`。参考音频时长从不计入 |
   | `maxContentReferenceImages` | Seedance 2.5 / Seedance 2.0 | `referenceMode` 为 `content` 时的图片上限；与 `max_reference_images` 的首帧/末帧槽位分开 |
+
+  Grok Video 1.5 使用嵌套矩阵 `pricingPerSec[tier][resolution]`。480p / 720p / 1080p 下，当前 Lite 为 4 / 6 / 28，Standard 为 16 / 28 / 50 积分/秒。默认 `lite`、`480p`、4 秒（16 积分）。应读取当前值，不要继续沿用旧的仅按分辨率索引的价格结构。
 
   上述定价相关的键属于契约的一部分；响应里可能出现其它键，仅供参考。
 </ResponseField>
