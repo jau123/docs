@@ -25,7 +25,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   The text description of the image or video to generate. To reference a saved character, include `[character:<uuid>]` inline — e.g. `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`. Up to 3 character references per generation.
 
-  Supported on image models that accept reference images (all except Flux 2 Klein) and on **Seedance 2.5 / 2.0 and HeyGen** for video. Character images consume the same content-reference image budget as user-uploaded images. An unsupported model, a nonexistent or inaccessible character, or too many references returns `400` (`characters_not_supported`, `character_not_found`, `too_many_characters`); some characters require a higher `tier` (`character_tier_required`).
+  Supported on image models that accept reference images (all except Flux 3 Image Klein) and on **Seedance 2.5 / 2.0 and HeyGen** for video. Character images consume the same content-reference image budget as user-uploaded images. An unsupported model, a nonexistent or inaccessible character, or too many references returns `400` (`characters_not_supported`, `character_not_found`, `too_many_characters`); some characters require a higher `tier` (`character_tier_required`).
 
   **Asset tokens** — write `[image1]`, `[video1]` or `[audio1]` inline to tell the model which reference asset a sentence is about: *"Match the grade of [image1] and continue the motion of [video1], scored to [audio1]"*. Numbering is **1-based and per kind**, following the order of `referenceImages` / `referenceVideos` / `referenceAudios` in this request body — `[video2]` is the second entry of `referenceVideos`, not the second asset overall. For Seedance, the two kinds are resolved differently before the request reaches the model:
 
@@ -112,7 +112,7 @@ Submits a generation request. The output is generated asynchronously — use the
   | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5, Seedance 2.0, Veo 3.1 — default `frame` mode (first/last frame), see `referenceMode` below |
   | 1 | Midjourney V8.2, Agnes Image 2.5 Flash, Agnes Video 2.5 Flash, Grok Video 1.5 (**required** — image-to-video only) |
-  | 0 | Flux 2 Klein |
+  | 0 | Flux 3 Image Klein |
 
   In `content` mode, Seedance 2.5 accepts up to 30 images and Seedance 2.0 accepts up to 9. When character tokens are present, their resolved images count toward the same limit.
 </ParamField>

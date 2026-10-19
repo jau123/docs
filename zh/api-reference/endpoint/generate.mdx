@@ -25,7 +25,7 @@ POST /api/generate/v2
 
   要生成的图片或视频的文本描述。要引用已创建的角色，在文本中内嵌 `[character:<uuid>]` ——例如 `"[character:550e8400-e29b-41d4-a716-446655440000] standing in a neon-lit alley, cinematic lighting"`。每次生成最多引用 3 个角色。
 
-  支持范围：所有接受参考图的图片模型（Flux 2 Klein 除外）+ 视频侧 **Seedance 2.5 / 2.0 和 HeyGen**。角色图片与用户上传图片共用内容参考图预算。模型不支持、角色不存在或无权访问、引用数超限均返回 `400`（`characters_not_supported`、`character_not_found`、`too_many_characters`）；部分角色需要更高的 `tier`（`character_tier_required`）。
+  支持范围：所有接受参考图的图片模型（Flux 3 Image Klein 除外）+ 视频侧 **Seedance 2.5 / 2.0 和 HeyGen**。角色图片与用户上传图片共用内容参考图预算。模型不支持、角色不存在或无权访问、引用数超限均返回 `400`（`characters_not_supported`、`character_not_found`、`too_many_characters`）；部分角色需要更高的 `tier`（`character_tier_required`）。
 
   **素材标记** —— 在提示词里内嵌 `[image1]`、`[video1]`、`[audio1]`，用来指明某句话针对哪个参考素材：*"沿用 [image1] 的调色，接续 [video1] 的运动，并按 [audio1] 的节奏配乐"*。编号**从 1 开始、按素材类型各自计数**，顺序与本请求体里 `referenceImages` / `referenceVideos` / `referenceAudios` 的数组顺序一致 —— `[video2]` 指 `referenceVideos` 的第二项，而不是全部素材里的第二个。Seedance 请求抵达模型前，两类标记的处理方式不同：
 
@@ -109,7 +109,7 @@ POST /api/generate/v2
   | 3 | Grok Imagine Image 2.0 |
   | 2 | Seedance 2.5、Seedance 2.0、Veo 3.1 —— 默认 `frame` 模式（首/尾帧），见下方 `referenceMode` |
   | 1 | Midjourney V8.2、Agnes Image 2.5 Flash、Agnes Video 2.5 Flash、Grok Video 1.5(**必传** —— 仅支持图生视频) |
-  | 0 | Flux 2 Klein |
+  | 0 | Flux 3 Image Klein |
 
   `content` 模式下，Seedance 2.5 最多接受 30 张图片，Seedance 2.0 最多 9 张；使用角色时，角色解析出的图片也计入同一上限。
 </ParamField>

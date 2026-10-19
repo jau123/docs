@@ -80,7 +80,7 @@ You don't need to attach the character's images as reference images again — se
 <Note>
   **Limits** — there is a cap on how many characters an account can keep, and on how many you can create per day. The dialog tells you when you reach it; delete unused characters under **My Characters** to free up room.
 
-  **Availability** — image models that accept reference images (all except Flux 2 Klein), plus **Seedance 2.5** and **Seedance 2.0** for video. Selecting a character on a text-only model returns an error.
+  **Availability** — image models that accept reference images (all except Flux 3 Image Klein), plus **Seedance 2.5** and **Seedance 2.0** for video. Selecting a character on a text-only model returns an error.
 
   If you submit a work that mentions a character to the public gallery, that character's main image becomes publicly visible alongside it — the publish dialog asks you to confirm first.
 </Note>
@@ -153,7 +153,7 @@ Upload reference images as visual context to guide the AI's output — for style
 - **Auto-compression** — images are automatically compressed to max 2MB / 2048px before upload
 - **Maximum source dimensions** — an image whose width or height exceeds **8000 pixels** is rejected before upload, with a message asking you to resize it. Everyday files stay well clear of this: a 4K photo is 3840px on its long edge, and an A4 scan at 300dpi is 2480×3508. Only print-scale source files (large-format banners, poster artwork at full print resolution) run into it — scale those down before uploading
 - **Thumbnail grid** — uploaded images appear as thumbnails with an × button to remove each one
-- **Per-model limits** — the maximum number of reference images varies by model (0–16; GPT Image 2.5 and GPT Image 2 each accept up to 16). Models that don't support references (currently Flux 2 Klein) hide this section entirely.
+- **Per-model limits** — the maximum number of reference images varies by model (0–16; GPT Image 2.5 and GPT Image 2 each accept up to 16). Models that don't support references (currently Flux 3 Image Klein) hide this section entirely.
 
 <Note>
   See the [Models](/en/features/models) page for the exact reference image limit of each model.
@@ -255,7 +255,7 @@ The resolution options come from the model you picked — the selector only offe
 | GPT Image 2.5 | 1K / 2K / 4K (desktop starts at 2K; mobile at 1K) |
 | GPT Image 2.0 | 1K / 2K / 4K (default 2K) |
 | Grok Imagine Image 2.0, Midjourney V8.2, Seedream 5.0 Pro | 1K / 2K (default 1K) |
-| Flux 2 Klein, Agnes Image 2.5 Flash | Fixed — no resolution selector |
+| Flux 3 Image Klein, Agnes Image 2.5 Flash | Fixed — no resolution selector |
 
 <Note>
   **The highest option of each model is paid-only** and shows a lock icon for free users. On a 1K / 2K model that means 2K is locked; on a 2K / 4K model it's 4K; on a 2K / 3K model it's 3K. The same rule applies to 4k on video (Seedance 2.0 Pro and Veo 3.1).
@@ -482,7 +482,7 @@ Typical generation times by model:
 | Model | Typical Time |
 | --- | --- |
 | Grok Imagine Image 2.0 | ~25 seconds |
-| Flux 2 Klein | ~23 seconds |
+| Flux 3 Image Klein | ~10–35 seconds (provisional, based on local testing) |
 | Nanobanana 2 | ~24 seconds |
 | GPT Image 2.0 | ~29 seconds |
 | Agnes Image 2.5 Flash | ~31 seconds |
@@ -527,7 +527,7 @@ The card also shows the aspect ratio and resolution labels in the bottom-left co
 
 MeiGen uses a dual credit system:
 
-- **Daily credits**: a free daily allowance that resets at 00:00 UTC, usable on **basic models** — currently **Flux 2 Klein** and **Agnes Image 2.5 Flash**, both image models. Agnes Video 2.5 Flash, the only video model daily credits covered, has been temporarily unavailable since 2026-09-22, so there is no basic-tier video model right now. They are grouped under **Basic Models** in the model picker.
+- **Daily credits**: a free daily allowance that resets at 00:00 UTC, usable on **basic models** — currently **Flux 3 Image Klein** and **Agnes Image 2.5 Flash**, both image models. Agnes Video 2.5 Flash, the only video model daily credits covered, has been temporarily unavailable since 2026-09-22, so there is no basic-tier video model right now. They are grouped under **Basic Models** in the model picker.
 - **Purchased credits**: your non-expiring balance, shown as **Credits** in the sidebar. It covers everything outside the daily allowance — credits you topped up, plus any bonus credits granted to your account (sign-up welcome bonus, referral rewards). Usable on all models.
 
 Generating with premium models (GPT Image 2.5, GPT Image 2.0, Nanobanana 2 / 2.1 / Pro, Seedream, Midjourney V8.2, Grok Imagine Image 2.0, Seedance 2.5 / 2.0, Veo 3.1, Grok Video 1.5, and so on) requires welcome or purchased credits — daily credits never apply to them, whether or not you have purchased before.

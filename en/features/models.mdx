@@ -23,7 +23,7 @@ MeiGen supports multiple AI models for image and video generation. Use the compa
 | **Seedream 4.5** | 5 | Fast (~32s) | 10 | Web only | Product photos, marketing |
 | **Grok Imagine Image 2.0** | 10–14 (Standard) / 14–18 (Medium) | Fast (~25s) | 3 | ✓ | Precise editing, high-quality generation, text-to-image + image-to-image |
 | **Midjourney V8.2** | 12 (1K) / 18 (2K) | Moderate (~1min) | 1 | ✓ | Photorealistic, universal aesthetics |
-| **Flux 2 Klein** | 2 | Fast (~23s) | None | Web only | General-purpose base model, text rendering |
+| **Flux 3 Image Klein** | 2 | Fast (provisional: ~10–35s) | None | Web only | General-purpose base model, text rendering |
 | **Agnes Image 2.5 Flash** | 1 | Fast (~30s) | 1 | ✓ | Cheapest model, high-volume drafts, covered by daily free credits |
 | **HeyGen Video 1** | 2–18 credits/sec | 5–15s video | One first frame or 9 content images; audio | — | Affordable, optimized from MiniMax H3; Web and MCP |
 | **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec, 1080p 90/sec) | Video, ~2-3min | First/last frame or content reference, plus reference video & audio | ✓ | 4–30s, 480p/720p/1080p, generated audio, multi-clip reference video & audio continuation |
@@ -232,18 +232,18 @@ Midjourney's photorealistic flagship. Returns 4 candidate images per generation 
 
 ---
 
-### Flux 2 Klein
+### Flux 3 Image Klein
 
 | | |
 | --- | --- |
-| **Model ID** | `flux2-klein` |
+| **Model ID** | `flux2-klein` — compatibility identifier retained from Flux 2 Klein; use the model name returned by List Models for display. |
 | **Provider** | Black Forest Labs |
 | **Credits** | 2 per image |
 | **Daily free credits** | Eligible |
 | **Reference images** | Not supported |
 | **Aspect ratios** | Auto, 1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3 |
 
-A base model from Black Forest Labs, suited to everyday general-purpose creation.
+A basic text-to-image tier powered by Black Forest Labs through Vercel AI Gateway, fixed at 1K (about 1 MP). It costs 2 credits per image and remains eligible for daily free credits. Reference images and characters are not enabled in this MeiGen tier.
 
 ---
 
@@ -565,7 +565,7 @@ Duration is fixed at 5 seconds, so every generation costs **10 credits**.
     This model is more sensitive to content involving real people, celebrities, brand logos, and face-swap requests. Prompts that work on other models may be rejected here. If you get a content violation error, rephrase your prompt to remove specific names or try a different model.
   </Accordion>
 
-  <Accordion title="Flux 2 Klein — No reference images" icon="triangle-exclamation">
+  <Accordion title="Flux 3 Image Klein — No reference images" icon="triangle-exclamation">
     This base model generates images from text only. The reference image upload section is hidden while it is selected. If you need reference images, switch to another model.
   </Accordion>
 
