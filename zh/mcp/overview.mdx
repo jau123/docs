@@ -57,7 +57,7 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他新用户通过[远程 OAut
 
 ## 工具
 
-以下 **16 个共享工具**包含参考视频／音频准备。本地 npm 3.2.0 共 18 个工具，包含两个本地辅助工具。通用远程 MCP 与官方 ChatGPT 适配服务各提供 23 个工具，另有积分余额、已有角色和五个私人资料库工具。更新后需刷新客户端缓存的工具清单，实际可用能力仍取决于客户端及用户批准的权限。
+以下 **16 个共享工具**包含参考视频／音频准备。本地 npm 3.3.0 共 18 个工具，包含两个本地辅助工具。通用远程 MCP 与官方 ChatGPT 适配服务各提供 23 个工具，另有积分余额、已有角色和五个私人资料库工具。更新后需刷新客户端缓存的工具清单，实际可用能力仍取决于客户端及用户批准的权限。
 
 | 工具 | 用途 | MeiGen 账号授权 |
 | --- | --- | --- |
@@ -83,10 +83,38 @@ ChatGPT 用户使用[官方插件](#chatgpt)。其他新用户通过[远程 OAut
 | 公开画廊搜索 | 每批默认／最多条数 | 账号访问 |
 | --- | --- | --- |
 | 通用远程 MCP | 3／3 | 可选 OAuth；匿名搜索按 IP 限流 |
-| 本地 npm 3.2.0 | 3／3 | 匿名，或兼容已有旧版 Key |
+| 本地 npm 3.3.0 | 3／3 | 匿名，或兼容已有旧版 Key |
 | 官方 ChatGPT 插件 | 刷新工具后：6／6 | 必须 OAuth 授权搜索权限（`meigen:search`） |
 
 授权搜索使用账号[每日搜索额度](/zh/features/gallery#搜索)，不消耗生成积分。开始一次搜索计入额度，后续翻页不重复计数。通用远程 MCP 与本地 3.0.0 支持分页；ChatGPT 官方适配服务也提供换批卡片，需客户端加载当前工具。查看同方向下一批时，保留返回的查询词和快照 ID，将 `nextOffset` 传为 `offset`；`hasMore=false` 时停止。换方向则开始新查询。生成请求恢复仍保留原 ID，不能因超时重新创建付费任务。
+
+## Midjourney 参数
+
+通用远程 MCP、官方 ChatGPT 插件，以及使用 MeiGen 供应商的本地 npm **3.3.0 或更高版本**均支持这些 `generate_image` 参数。远程连接请刷新工具清单，本地连接请更新包版本并重启。**Midjourney V8.2** 继续使用稳定模型 ID `midjourney-v8.1`。
+
+| 输入 | 用法 |
+| --- | --- |
+| `referenceImages` | 用 `upload_skill_image` 准备选中的参考图，传入返回的 URL；本地 npm 也可上传宿主可读取的文件。遵守实时模型参考图上限。 |
+| `referenceType` | `content`（默认，内容参考）或 `style`（风格参考）。传入风格参考图时优先于 `niji7Options.sref`；已有角色仍作为内容参考。 |
+| `niji7Options` | `stylize`（0–1000）、`chaos`（0–100）、`raw`（布尔值）、`iw`（0–3）、`sref`、`sw`（0–1000）、`profile` 和 MJ `quality`（`"1"` 或 `"4"`）。V8.2 固定使用 `sv=6`，忽略 `weird`。 |
+| `resolution` | `1K` 或 `2K`。每次返回 4 张候选图，只收费一次：当前 1K 12 积分、2K 18 积分。提交前按实时 `list_models` 报价。 |
+
+下面是普通 `generate_image` 工具参数示例；实际提交会付费，不能用来验证连接。每个新获准任务都应将示例 `requestId` 换成新的 UUID 并持久保存：
+
+```json
+{
+  "requestId": "03c08bc1-d158-40af-a667-7ba901788a7f",
+  "modelId": "midjourney-v8.1",
+  "prompt": "柔和窗光下的一只陶瓷咖啡杯",
+  "aspectRatio": "2:3",
+  "resolution": "2K",
+  "niji7Options": { "stylize": 100, "raw": false, "quality": "4" }
+}
+```
+
+MJ 画质放在 `niji7Options.quality` 内，顶层 `quality` 是其他图片模型的独立设置。优先使用结构化参数。`sref` 接受数字风格码、`random` 或图片 URL；`profile` 接受以空格或逗号分隔的字母数字档案码。官方 ChatGPT 插件的参考图和图片型 `sref` 仅接受 `images.meigen.ai` 的直接素材 URL，外部图片先上传。通用远程 MCP 和本地 npm 可使用公开 HTTPS 图片作为 `sref`；本地文件路径应放在本地 npm 的 `referenceImages`，不能放进 `sref`。
+
+远程已有角色需现有角色读取权限，并使用 `list_characters` 返回的准确 `referenceToken`；组合输入前检查 `capabilities.characters` 和参考图限制。后端继续处理提示词翻译和超长提示词压缩。恢复任务时保留原 `requestId`、参考图角色和全部参数值，不能改参后复用同一 ID。完整字段见[生成参数说明](/zh/api-reference/endpoint/generate)。
 
 ## 通过远程 OAuth 访问私人资料库
 

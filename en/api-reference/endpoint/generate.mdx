@@ -142,9 +142,11 @@ Submits a generation request. The output is generated asynchronously — use the
   | stylize | number | 100 | 0–1000 | |
   | chaos | number | 5 | 0–100 | |
   | raw | boolean | false | — | |
-  | iw | number | 1 | 0–2 | |
-  | sref | string | — | URL or text | |
+  | iw | number | 1 | 0–3 | Content image weight |
+  | sref | string | — | Numeric codes, `random`, or image URLs | The official ChatGPT plugin requires direct MeiGen-hosted asset URLs |
   | sw | number | 100 | 0–1000 | |
+  | sv | number | 6 | V8.2 uses `6` | Legacy values are accepted for compatibility, but V8.2 fixes this to 6 |
+  | weird | number | — | 0–3000 | Accepted for compatibility; ignored by V8.2 |
   | profile | string | — | Alphanumeric code | Midjourney personalization profile; works alongside `sref` |
   | quality | string | `4` | `1` or `4` | Defaults to High (4× compute, no extra cost) |
 </ParamField>

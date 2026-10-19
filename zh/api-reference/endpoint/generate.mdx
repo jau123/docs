@@ -139,9 +139,11 @@ POST /api/generate/v2
   | stylize | number | 100 | 0-1000 | |
   | chaos | number | 5 | 0-100 | |
   | raw | boolean | false | — | |
-  | iw | number | 1 | 0-2 | |
-  | sref | string | — | URL 或文本 | |
+  | iw | number | 1 | 0–3 | 内容参考图权重 |
+  | sref | string | — | 数字风格码、`random` 或图片 URL | 官方 ChatGPT 插件仅接受 MeiGen 托管素材的直接 URL |
   | sw | number | 100 | 0-1000 | |
+  | sv | number | 6 | V8.2 使用 `6` | 兼容接受旧值，但 V8.2 固定使用 6 |
+  | weird | number | — | 0–3000 | 兼容接受此字段，V8.2 忽略 |
   | profile | string | — | 字母数字档案码 | Midjourney 个性化档案；可与 `sref` 同时使用 |
   | quality | string | `4` | `1` 或 `4` | 默认 High（4 倍算力，不额外计费）|
 </ParamField>

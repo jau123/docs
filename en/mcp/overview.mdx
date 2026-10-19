@@ -57,7 +57,7 @@ The 3.0.0 local image providers are MeiGen (existing legacy key) and OpenAI-comp
 
 ## Tools
 
-These **16 shared tools** include reference-media preparation. Local npm 3.2.0 has 18 tools, including two local helpers. Standard remote MCP and the official ChatGPT adapter each expose 23 tools, adding credit balance, saved characters and the five private-library tools. Refresh cached tool discovery after an update; access still depends on the host and the permissions you approve.
+These **16 shared tools** include reference-media preparation. Local npm 3.3.0 has 18 tools, including two local helpers. Standard remote MCP and the official ChatGPT adapter each expose 23 tools, adding credit balance, saved characters and the five private-library tools. Refresh cached tool discovery after an update; access still depends on the host and the permissions you approve.
 
 | Tool | Purpose | MeiGen account authorization |
 | --- | --- | --- |
@@ -83,10 +83,38 @@ Local additionally provides `enhance_prompt` and `manage_preferences` without a 
 | Public gallery search | Default / maximum results per batch | Account access |
 | --- | --- | --- |
 | Standard remote MCP | 3 / 3 | Optional OAuth; anonymous searches are IP-limited |
-| Local npm 3.2.0 | 3 / 3 | Anonymous, or an existing legacy key |
+| Local npm 3.3.0 | 3 / 3 | Anonymous, or an existing legacy key |
 | Official ChatGPT plugin | 6 / 6 after tool refresh | OAuth with search permission (`meigen:search`) |
 
 Authorized searches use the account's [daily search allowance](/en/features/gallery#search), not generation credits. Starting a search uses that allowance; continuation pages do not count again. Standard remote MCP and local 3.0.0 support pagination; the official ChatGPT adapter also offers a next-batch card when the host loads its current tools. To see another batch, preserve the returned query and snapshot ID and pass `nextOffset` as `offset`; stop when `hasMore` is false. A different direction starts a new query. Keep original generation request IDs during recovery; a timeout is not permission for a new paid task.
+
+## Midjourney controls
+
+`generate_image` supports these controls on standard remote MCP, the official ChatGPT plugin, and local npm **3.3.0 or later** with the MeiGen provider. Refresh hosted tools or update the local package pin and restart. Use model ID `midjourney-v8.1` for **Midjourney V8.2**; the stable ID has not changed.
+
+| Input | Use |
+| --- | --- |
+| `referenceImages` | Prepare the selected reference with `upload_skill_image` and pass its returned URL. Local npm can also upload a host-readable file. Follow the live model reference limit. |
+| `referenceType` | `content` (default) or `style`. A supplied style image takes precedence over `niji7Options.sref`; saved characters remain content references. |
+| `niji7Options` | `stylize` (0–1000), `chaos` (0–100), `raw` (boolean), `iw` (0–3), `sref`, `sw` (0–1000), `profile`, and MJ `quality` (`"1"` or `"4"`). V8.2 always uses `sv=6` and ignores `weird`. |
+| `resolution` | `1K` or `2K`. Each request returns four candidates, billed once: currently 12 credits at 1K or 18 at 2K. Quote the live `list_models` price before submission. |
+
+For example, these are ordinary `generate_image` tool arguments; submitting them is a paid action, not a connection check. Replace the sample `requestId` with a new persisted UUID for each newly authorized job:
+
+```json
+{
+  "requestId": "03c08bc1-d158-40af-a667-7ba901788a7f",
+  "modelId": "midjourney-v8.1",
+  "prompt": "A ceramic coffee mug in soft window light",
+  "aspectRatio": "2:3",
+  "resolution": "2K",
+  "niji7Options": { "stylize": 100, "raw": false, "quality": "4" }
+}
+```
+
+MJ quality belongs inside `niji7Options`; top-level `quality` is a separate image-model setting. Prefer structured options over prompt flags. `sref` accepts numeric codes, `random`, or image URLs; `profile` accepts alphanumeric codes separated by spaces or commas. The official ChatGPT plugin requires direct `images.meigen.ai` asset URLs for reference images and image-valued `sref`; upload external images first. Standard remote MCP and local npm accept public HTTPS `sref` image URLs. Local file paths belong in local npm `referenceImages`, never `sref`.
+
+Remote saved characters require the existing character-read permission and exact `referenceToken` from `list_characters`; check `capabilities.characters` and reference limits before combining inputs. Prompt translation and long-prompt compression continue in the backend. During recovery, keep the original `requestId`, reference role, and all option values unchanged. See the [full parameter reference](/en/api-reference/endpoint/generate).
 
 ## Private library through remote OAuth
 
