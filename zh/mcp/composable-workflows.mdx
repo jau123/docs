@@ -9,7 +9,7 @@ description: "保存任务 ID，生成首帧和视频，在已批准预算内恢
 
 MeiGen 可以作为已有 agent、Skill、脚本或应用中的一个调用步骤。上层负责创意计划、提示词、模型／供应商、数量、已批准预算、调度和展示。MeiGen 创意助手是可选能力，不是调用工具的前置条件；任何工作流都可以使用发现工具。上层已经确定的计划，无需为每张首帧、每段视频或每批结果重复确认。
 
-本地使用 [**`meigen` 3.3.0**](https://www.npmjs.com/package/meigen/v/3.3.0)（`npx -y meigen@3.3.0`），或通过 OAuth 连接远程端点 **`https://www.meigen.ai/api/mcp`**。重新连接并检查实际 schema 是否包含 `requestId`、`wait` 和按请求查询。后端回滚时仍须保留恢复端点及幂等 POST 合同。
+本地使用 [**`meigen` 3.3.3**](https://www.npmjs.com/package/meigen/v/3.3.3)（`npx -y meigen@3.3.3`），或通过 OAuth 连接远程端点 **`https://www.meigen.ai/api/mcp`**。重新连接并检查实际 schema 是否包含 `requestId`、`wait` 和按请求查询。后端回滚时仍须保留恢复端点及幂等 POST 合同。
 
 ## 普通生成任务合同
 
