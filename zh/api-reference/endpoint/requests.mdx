@@ -25,6 +25,8 @@ curl --fail-with-body --silent --show-error \
 
 HTTP 200 可包含 `success`、`requestId`、`generationId`、`deduped`、`status`（`processing`、`completed`、`failed`）、`modelId`、`creditsUsed`、`creditsStatus`、`aspectRatio`、`mediaType`、`imageUrl`、`imageUrls`、`videoUrl`、`error` 和 `failureCode`，实际字段取决于任务状态。只有完成后的媒体 URL 才是可用结果；退款须依据 `creditsStatus`，不能只看一般错误文案。
 
+失败回执以及 `/api/generate/v2/status/{id}` 可额外返回可选字段 `failureDetail`：`video_edit_duration` 表示原视频与所选编辑时长必须一致；`reference_video_frame_rate` 表示需将参考视频重新导出为 24–60 FPS。这两项对应 `failureCode: "invalid_request"`。请忽略未知的未来子类值；这些提示不代表可以自动重做或重试付费任务，退款仍须单独核实 `creditsStatus`。
+
 | HTTP／code | 含义与下一步 |
 | --- | --- |
 | 200／processing | 原任务正在运行。保存句柄，继续查询状态。 |

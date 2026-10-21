@@ -325,6 +325,8 @@ Sources: [HeyGen model guide](https://developers.heygen.com/docs/models/heygen-v
 
 Seedance 2.5 is the long-duration Seedance model on MeiGen. It supports text-to-video, first/last-frame image-to-video, up to 30 content-reference images, and reference-video continuation. Content images, reference videos and reference audio can all be used in the same request and are three independent budgets. Frame references and reference-video continuation use `adaptive` ratio so the output follows the input media; text-to-video and content-reference requests can use an explicit supported ratio.
 
+**Editing versus continuation (Seedance 2.5).** To continue a clip, describe what happens next. To edit the existing clip (for example, remove lettering or replace a person), use a 4–30 second source and set `duration` to that source’s rounded whole-second length. If multiple videos could be selected for editing, every source must match the requested duration; using one source avoids ambiguity. The backend may recover an explicit edit-duration rejection once by inheriting the source duration, only when this preserves the already billed output seconds. A mismatch fails and follows normal refund settlement; it never authorizes extra charging. Keep passing a **positive integer**: `duration=-1` and `omni_reference_task_type` are internal provider parameters, not public API inputs. After a failed/refunded job, correcting the inputs requires a separately authorized new request ID. Retrying an uncertain submission keeps its original ID and exact inputs.
+
 #### Pricing
 
 | Resolution | Direct | With reference video |

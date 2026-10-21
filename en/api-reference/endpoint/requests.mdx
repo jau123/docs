@@ -25,6 +25,8 @@ curl --fail-with-body --silent --show-error \
 
 HTTP 200 can include `success`, `requestId`, `generationId`, `deduped`, `status` (`processing`, `completed`, `failed`), `modelId`, `creditsUsed`, `creditsStatus`, `aspectRatio`, `mediaType`, `imageUrl`, `imageUrls`, `videoUrl`, `error` and `failureCode`. Availability depends on the job state. Only completed media URLs are usable artifacts. Confirm refunds from `creditsStatus`, not a generic failure message.
 
+Failed receipts and `/api/generate/v2/status/{id}` may also include optional `failureDetail`: `video_edit_duration` means the source and requested edit duration must match; `reference_video_frame_rate` means re-export the reference at 24–60 FPS. Both use `failureCode: "invalid_request"`. Unknown future detail values should be ignored. This is guidance, not permission to replace or retry a paid job; confirm `creditsStatus` separately.
+
 | HTTP / code | Meaning and next step |
 | --- | --- |
 | 200 / processing | Existing job is running. Preserve its handle and continue status observation. |

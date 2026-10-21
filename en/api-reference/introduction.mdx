@@ -129,6 +129,7 @@ For `POST /api/generate/v2`, error bodies include extra fields useful for debugg
 | `first_frame_required` | 400 | This model requires a first-frame image |
 | `reference_video_not_supported` | 400 | This model/tier/resolution doesn't support reference-video continuation |
 | `invalid_reference_video` | 400 | A `referenceVideos` entry couldn't be read or violates the selected model's per-clip limits. Read `capabilities.video.referenceVideo`: Seedance 2.5 accepts 2–30s / ≤200MB per clip; Seedance 2.0 accepts 2–15s / ≤50MB per clip. Every entry must be an `https://images.meigen.ai/...` URL — an arbitrary public URL fails here |
+| `unsupported_reference_video_frame_rate` | 400 | Reference video has a reliably measured frame rate outside 23.8–60 FPS. Re-export at 24–60 FPS; rejected before charging. |
 | `too_many_reference_videos` | 400 | More `referenceVideos` entries than this model allows — read `capabilities.video.referenceVideo.maxCount` (Seedance 2.5: 10; Seedance 2.0: 3) |
 | `reference_video_total_seconds_exceeded` | 400 | The reference videos are individually valid but their durations add up past `capabilities.video.referenceVideo.maxTotalSeconds` (Seedance 2.5: 30s; Seedance 2.0: 15s) |
 | `reference_video_audio_conflict` | 400 | This model cannot combine reference video with separate reference audio; remove one type. Rejected before charging. Embedded video audio is allowed. |

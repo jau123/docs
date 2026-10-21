@@ -199,6 +199,10 @@ POST /api/generate/v2
   **旧字段别名。** 单数形式 `referenceVideo`（字符串）仍然受理，等价于只含一项的 `referenceVideos` 数组，并会长期保留。两者同时传时，`referenceVideo` 必须是 `referenceVideos` 的第一项；其他组合返回 `400` / `invalid_input`。
 </ParamField>
 
+**编辑与续写（Seedance 2.5）。** 续写应描述接下来发生的剧情；去掉文字、替换人物等属于编辑原视频。编辑请使用 4–30 秒的原视频，并把 `duration` 设为原视频四舍五入后的整数秒数。多段视频都可能被选作编辑对象时，每段都必须与所选输出时长一致；使用单段原视频可避免歧义。上游明确返回编辑时长限制后，后端仅在不改变已计费输出秒数的条件下，尝试一次继承原视频时长的恢复。时长不匹配则失败并按正常流程退款，不会自动追加扣费。公开 API 仍只接受**正整数**；`duration=-1` 和 `omni_reference_task_type` 仅为内部供应商参数。已失败并退款的任务若需修改输入重做，必须另行授权并使用新请求 ID；结果不确定的提交仍用原 ID 和完全相同的输入恢复。
+
+Seedance 参考视频若能可靠测得帧率且不在 23.8–60 FPS 内，会在扣费前以 `400` / `unsupported_reference_video_frame_rate` 拒绝；请重新导出为 24–60 FPS。分片或不完整的时间表可能无法可靠确定帧率，仍可能由上游拒绝；此时以任务终态和实际退款状态为准。
+
 <ParamField body="referenceAudios" type="string[]">
   用于 `capabilities.video.referenceAudio.enabled` 模型的参考音频数组，包括 Seedance 和 HeyGen。每一项都必须是通过[参考素材上传端点](#上传参考视频与音频)得到的 `https://images.meigen.ai/...` 地址，格式为 **wav** 或 **mp3**，Seedance 单条不超过 **15MB**，HeyGen 不超过 **16MB**。**不接受任意公网 URL**：其他域名一律在扣点前返回 `400` / `invalid_reference_audio`。格式按文件自身字节校验，不看扩展名或 `Content-Type`。
 
