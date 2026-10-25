@@ -57,6 +57,19 @@ Use an original still JPEG, PNG or WebP. **Crisp** preserves its structure; **Cr
 
 App versions with local Upscale upload preparation accept originals up to **64 MiB / 64 million pixels**, preparing uploads within **10 MiB**. It removes metadata without pixel decoding when the sanitized image already fits; otherwise it uses native decoding with a size limit and compresses the result. Reducing oversized dimensions requires acceptance; flattening a PNG requires a separate confirmation. The server checks the actual image again before generation. New local Upscale uploads remove EXIF/GPS/XMP before becoming public, while preserving image orientation and color configuration. If your installed App does not support these confirmations, use the Web interface. App updates are released separately from this API/MCP update. For MCP and HTTP limits, use the separate [Upscale API guide](/en/api-reference/skills/upscale).
 
+## Video Enhancement (Upscale)
+
+Choose video in **Skills → Upscale** on Web/App, or open the enhancement menu on a generated video. Video enhancement currently uses **Topaz Starlight Precise 2.6** and consumes purchased credits only; daily free credits do not apply.
+
+| Output | Credits per second | Maximum source duration |
+| --- | --- | --- |
+| 1080P | **15** | 90 seconds |
+| 4K | **33** | 30 seconds |
+
+The maximum file size is **500 MB**. The server verifies the source duration and rounds it up to whole seconds, capped at the selected duration limit. Confirm the displayed total before submitting. For example, a **5.2-second** source is billed as **6 seconds**: **90 credits** at 1080P or **198 credits** at 4K. Processing time varies with clip length and queue conditions; check generation history for progress and results.
+
+Video enhancement is available through the Web/App interface and is not exposed by the public Skills API or MCP. `upscale_image` still handles only still images.
+
 ## Where Results Go
 
 Skills output lands in your regular [generation history](/en/features/generate#generation-history) alongside everything else you create — you can save it to favorites or [publish it to the gallery](/en/features/gallery#publishing-your-work-to-the-gallery) the same way.
