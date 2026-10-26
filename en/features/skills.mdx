@@ -59,14 +59,14 @@ App versions with local Upscale upload preparation accept originals up to **64 M
 
 ## Video Enhancement (Upscale)
 
-Choose video in **Skills → Upscale** on Web/App, or open the enhancement menu on a generated video. Video enhancement currently uses **Topaz Starlight Precise 2.6** and consumes purchased credits only; daily free credits do not apply.
+Choose video in **Skills → Upscale** on Web/App, or open the enhancement menu on a generated video. Video enhancement consumes purchased credits only; daily free credits do not apply. Temporary service failures are retried automatically, with a backup service when needed, without increasing your accepted price.
 
 | Output | Credits per second | Maximum source duration |
 | --- | --- | --- |
-| 1080P | **15** | 90 seconds |
-| 4K | **33** | 30 seconds |
+| 1080P | **7** | 90 seconds |
+| 4K | **20** | 30 seconds |
 
-The maximum file size is **500 MB**. The server verifies the source duration and rounds it up to whole seconds, capped at the selected duration limit. Confirm the displayed total before submitting. For example, a **5.2-second** source is billed as **6 seconds**: **90 credits** at 1080P or **198 credits** at 4K. Processing time varies with clip length and queue conditions; check generation history for progress and results.
+The maximum file size is **500 MB**. The server verifies the source duration and rounds it up to whole seconds, capped at the selected duration limit. Confirm the displayed total before submitting. For example, a **5.2-second** source is billed as **6 seconds**: **42 credits** at 1080P or **120 credits** at 4K. Processing time varies with clip length and queue conditions; check generation history for progress and results.
 
 Video enhancement is available through the Web/App interface and is not exposed by the public Skills API or MCP. `upscale_image` still handles only still images.
 
