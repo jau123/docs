@@ -186,7 +186,7 @@ POST /api/generate/v2
 
   | 模型 | 数量 | 单条时长 | 合计时长 | 单条大小 | 带参考视频单价 |
   | --- | --- | --- | --- | --- | --- |
-  | HeyGen Video 1（目录启用后）| 最多 3 条 | 严格 1–5 秒 | ≤15 秒 | ≤16MB | 480p 4 / 768p 6 / 1080p 18 / 2K 18 积分/秒 |
+  | HeyGen Video 1（目录启用后）| 最多 3 条 | 严格 1–5 秒 | ≤15 秒 | ≤16MB | 480p 15 / 768p 20 / 1080p 35 / 2K 35 积分/秒 |
   | Seedance 2.5 | 最多 10 条 | 2–30 秒 | ≤30 秒 | ≤200MB | 480p 11 / 720p 24 / 1080p 54 积分/秒 |
   | Seedance 2.0 | 最多 3 条 | 2–15 秒 | ≤15 秒 | ≤50MB | Mini 480p 7 / 720p 13、Fast 480p 8 / 720p 14、Pro 720p 16 / 1080p 28 积分/秒(带参考视频时 Pro 仅限 720p / 1080p) |
 
@@ -212,7 +212,7 @@ Seedance 参考视频若能可靠测得帧率且不在 23.8–60 FPS 内，会�
   | Seedance 2.5 | 最多 10 条 | 2–30 秒 | ≤30 秒 | 允许 |
   | Seedance 2.0 | 最多 3 条 | 2–15 秒 | ≤15 秒 | 不允许 —— 至少还要 1 张参考图或 1 条参考视频 |
 
-  **参考音频秒数不计费**：Seedance 加音频不改变价格；HeyGen 图片／音频输入采用内容参考费率，音频不额外增加秒数。Seedance 只带参考音频、不带参考视频的请求按该模型的**直接生成**每秒单价计费，不走带参考视频的折扣价。
+  **参考音频秒数不计费**：Seedance 加音频不改变价格；HeyGen 的文本、首帧和内容参考使用相同的分辨率单价，图片数量和音频不额外增加积分。Seedance 只带参考音频、不带参考视频的请求按该模型的**直接生成**每秒单价计费，不走带参考视频的折扣价。
 
   校验失败都是扣费前的 `400`：`reference_audio_not_supported`、`too_many_reference_audios`、`reference_audio_total_seconds_exceeded`、`reference_audio_requires_visual`；音频读不出、不是 wav/mp3、或单条时长越界则是 `invalid_reference_audio`。
 </ParamField>

@@ -189,7 +189,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   | Model | Clips | Per clip | Total across clips | Size per clip | With-video rates |
   | --- | --- | --- | --- | --- | --- |
-  | HeyGen Video 1 (when enabled) | up to 3 | 1–5s, strict | ≤15s | ≤16MB | 480p 4 / 768p 6 / 1080p 18 / 2K 18 credits/sec |
+  | HeyGen Video 1 (when enabled) | up to 3 | 1–5s, strict | ≤15s | ≤16MB | 480p 15 / 768p 20 / 1080p 35 / 2K 35 credits/sec |
   | Seedance 2.5 | up to 10 | 2–30s | ≤30s | ≤200MB | 480p 11 / 720p 24 / 1080p 54 credits/sec |
   | Seedance 2.0 | up to 3 | 2–15s | ≤15s | ≤50MB | Mini 480p 7 / 720p 13, Fast 480p 8 / 720p 14, Pro 720p 16 / 1080p 28 credits/sec (with a reference video, Pro is limited to 720p / 1080p) |
 
@@ -215,7 +215,7 @@ For Seedance, a reliably measured reference-video frame rate outside 23.8–60 F
   | Seedance 2.5 | up to 10 | 2–30s | ≤30s | Allowed |
   | Seedance 2.0 | up to 3 | 2–15s | ≤15s | Not allowed — needs at least 1 reference image or 1 reference video |
 
-  **Reference audio seconds are not billed.** For Seedance, adding audio does not change the price. HeyGen selects the content-reference rate for image/audio input; audio does not add seconds. A Seedance request that carries reference audio but no reference video is billed at the model's **direct** (no-video) per-second rate, not the discounted with-video rate.
+  **Reference audio seconds are not billed.** For Seedance, adding audio does not change the price. HeyGen uses the same rate per resolution for text, first frames and content references; image count and audio add no credits. A Seedance request that carries reference audio but no reference video is billed at the model's **direct** (no-video) per-second rate, not the discounted with-video rate.
 
   Rejections are pre-charge `400`s: `reference_audio_not_supported`, `too_many_reference_audios`, `reference_audio_total_seconds_exceeded`, `reference_audio_requires_visual`, or `invalid_reference_audio` for a clip that can't be read, isn't wav/mp3, or falls outside the per-clip duration range.
 </ParamField>
