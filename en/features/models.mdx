@@ -27,7 +27,7 @@ Enhancing an existing video with [Video Enhancement (Upscale)](/en/features/skil
 | **Midjourney V8.2** | 12 (1K) / 18 (2K) | Moderate (~1min) | 1 | ✓ | Photorealistic, universal aesthetics |
 | **Flux 3 Image Klein** | 2 | Fast (provisional: ~10–35s) | None | Web only | General-purpose base model, text rendering |
 | **Agnes Image 2.5 Flash** | 1 | Fast (~30s) | 1 | ✓ | Cheapest model, high-volume drafts, covered by daily free credits |
-| **HeyGen Video 1** | 15–35 credits/sec | 5–15s video | One first frame or 9 content images; audio | — | Optimized from MiniMax H3, with native audio; Web and MCP |
+| **HeyGen Video 1** | 2–16 credits/sec | 5–15s video | One first frame or 9 content images; audio | — | Optimized from MiniMax H3, with native audio; Web and MCP |
 | **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec, 1080p 90/sec) | Video, ~2-3min | First/last frame or content reference, plus reference video & audio | ✓ | 4–30s, 480p/720p/1080p, generated audio, multi-clip reference video & audio continuation |
 | **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference, plus reference video & audio | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio, reference video & audio |
 | **Grok Video 1.5** | Per-second (Lite 4–28/sec, Standard 16–50/sec) | Varies by tier and resolution | First frame (required) | ✓ | Lite (default) / Standard, 480p/720p/1080p, 4–15s, ratio follows input, audio |
@@ -278,7 +278,7 @@ Video optimized from MiniMax H3, with native audio and multimodal references.
 | --- | --- |
 | Model ID | `heygen-video-1` |
 | Duration | 5–15 seconds, integer steps; default 5 |
-| Resolutions | 480p, 768p (default), 1080p, 2K |
+| Resolutions | 480p (default), 768p, 1080p, 2K |
 | First frame | One image, no last frame; output follows the image ratio |
 | Content references | Up to 9 images; separate from first-frame mode |
 | Reference audio | Up to 3 WAV/MP3 clips, 1–15 seconds each, 45 seconds total, 16MB each; requires a content-reference image |
@@ -292,14 +292,16 @@ HeyGen's `@character` mentions are a MeiGen convenience: saved character images 
 
 #### Pricing
 
+The rates below include the 50% MeiGen discount. The default video model is MiniMax H3 HeyGen, with 480p and 5 seconds selected (10 credits).
+
 | Resolution | Single rate |
 | --- | --- |
-| 480p | 15 credits/sec |
-| 768p | 16 credits/sec |
-| 1080p | 35 credits/sec |
-| 2K | 35 credits/sec |
+| 480p | 2 credits/sec |
+| 768p | 5 credits/sec |
+| 1080p | 12 credits/sec |
+| 2K | 16 credits/sec |
 
-Credits = (output seconds + the sum of each reference video’s duration rounded up to whole seconds) × the rate for the resolution. With no reference video, only output seconds count. Text, first frames and content references use the same rate; the number of reference images and audio add no credits. There is no minimum-seconds multiplier. For example, 5 seconds at 768p costs 80 credits with or without reference images. A 4.1s reference video + 5s output at 768p costs (5 + 5) × 16 = 160 credits. This is a premium model and uses purchased credits only; check the live catalog and submission price for current rates.
+Credits = (output seconds + the sum of each reference video’s duration rounded up to whole seconds) × the rate for the resolution. With no reference video, only output seconds count. Text, first frames and content references use the same rate; the number of reference images and audio add no credits. There is no minimum-seconds multiplier. For example, 5 seconds at 768p costs 25 credits with or without reference images. A 4.1s reference video + 5s output at 768p costs (5 + 5) × 5 = 50 credits. This is a premium model and uses purchased credits only; check the live catalog and submission price for current rates.
 
 #### Image and prompt handling
 

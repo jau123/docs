@@ -68,7 +68,7 @@ Submits a generation request. The output is generated asynchronously — use the
 </ParamField>
 
 <ParamField body="resolution" type="string">
-  The output resolution. HeyGen supports `480p`, `768p` (default), `1080p`, `2k` (lowercase k). Availability depends on the model. If omitted, the selected model's default is used.
+  The output resolution. HeyGen supports `480p` (default), `768p`, `1080p`, `2k` (lowercase k). Availability depends on the model. If omitted, the selected model's default is used.
 
   Available values depend on the model: image models use `1K` / `2K` / `3K` / `4K`; video models use `480p` / `720p` / `1080p` / `4k` (note the lowercase `k` on video). Seedance 2.5 supports 480p / 720p / 1080p. Seedance 2.0 adds 1080p / 4k on `pro`; Veo 3.1 also supports 4k. With Seedance 2.0 `referenceVideos`, the ceiling is 1080p. See [Models](/en/features/models) for the complete matrix.
 
@@ -189,7 +189,7 @@ Submits a generation request. The output is generated asynchronously — use the
 
   | Model | Clips | Per clip | Total across clips | Size per clip | With-video rates |
   | --- | --- | --- | --- | --- | --- |
-  | HeyGen Video 1 (when enabled) | up to 3 | 1–5s, strict | ≤15s | ≤16MB | 480p 15 / 768p 20 / 1080p 35 / 2K 35 credits/sec |
+  | HeyGen Video 1 (when enabled) | up to 3 | 1–5s, strict | ≤15s | ≤16MB | 480p 2 / 768p 5 / 1080p 12 / 2K 16 credits/sec |
   | Seedance 2.5 | up to 10 | 2–30s | ≤30s | ≤200MB | 480p 11 / 720p 24 / 1080p 54 credits/sec |
   | Seedance 2.0 | up to 3 | 2–15s | ≤15s | ≤50MB | Mini 480p 7 / 720p 13, Fast 480p 8 / 720p 14, Pro 720p 16 / 1080p 28 credits/sec (with a reference video, Pro is limited to 720p / 1080p) |
 
