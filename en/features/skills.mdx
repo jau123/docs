@@ -55,11 +55,11 @@ Turn a one-line idea into a promotional, event, or recruitment poster.
 
 Use an original still JPEG, PNG or WebP. **Crisp** preserves its structure; **Creative** rebuilds detail and can change the appearance. Review the displayed price and any resizing decision before starting. Oversized images may need to shrink first, so the output can be smaller than the original.
 
-App versions with local Upscale upload preparation accept originals up to **64 MiB / 64 million pixels**, preparing uploads within **10 MiB**. It removes metadata without pixel decoding when the sanitized image already fits; otherwise it uses native decoding with a size limit and compresses the result. Reducing oversized dimensions requires acceptance; flattening a PNG requires a separate confirmation. The server checks the actual image again before generation. New local Upscale uploads remove EXIF/GPS/XMP before becoming public, while preserving image orientation and color configuration. If your installed App does not support these confirmations, use the Web interface. App updates are released separately from this API/MCP update. For MCP and HTTP limits, use the separate [Upscale API guide](/en/api-reference/skills/upscale).
+On compatible App versions, choose an original up to **64 MiB and 64 million pixels**. The app asks before reducing image dimensions or flattening a transparent PNG. Local uploads remove location and other photo metadata while preserving orientation and color. If you don’t see these choices, use the web app. For automation, see the [Upscale API guide](/en/api-reference/skills/upscale).
 
 ## Video Enhancement (Upscale)
 
-Choose video in **Skills → Upscale** on Web/App, or open the enhancement menu on a generated video. Video enhancement consumes purchased credits only; daily free credits do not apply. Temporary service failures are retried automatically, with a backup service when needed, without increasing your accepted price.
+Choose video in **Skills → Upscale** on Web/App, or open the enhancement menu on a generated video. Video enhancement consumes purchased credits only; daily free credits do not apply. Automatic retries do not increase the price you accepted.
 
 | Output | Credits per second | Maximum source duration |
 | --- | --- | --- |
@@ -72,11 +72,11 @@ Video enhancement is available through the Web/App interface and is not exposed 
 
 ## Where Results Go
 
-Skills output lands in your regular [generation history](/en/features/generate#generation-history) alongside everything else you create — you can save it to favorites or [publish it to the gallery](/en/features/gallery#publishing-your-work-to-the-gallery) the same way.
+Skills output lands in your regular [generation history](/en/features/generate#generation-history) alongside everything else you create — you can save it to favorites or submit it to the public gallery the same way.
 
 ## Credits
 
-These workflows have **their own Skill prices**, separate from the general image generator. Their GPT Image 2.5 configuration uses **Sunburst at 2K**; the workflow selects the model for you.
+These workflows have **their own Skill prices**, separate from the general image generator.
 
 | Workflow | Option | Credits per generated image |
 | --- | --- | --- |
@@ -84,6 +84,6 @@ These workflows have **their own Skill prices**, separate from the general image
 | Marketing Poster | Fast / Pro | 5 / 18 |
 | White Background (White mode only) | Fixed quality | 5 |
 
-Fast uses Standard quality; Pro uses High quality. A multi-image set costs the per-image price multiplied by the number of images. Check the workflow's displayed total and availability before submitting; these prices do not apply to a general `gpt-image-2.5` API request. AI Backgrounds in Smart or Custom mode uses another model and the price shown in its interface. Other Skills may also use different models and prices.
+For a set of images, multiply the price per image by the number requested. Check the displayed total for your workflow and mode before submitting.
 
 For general generation, see the [model comparison page](https://www.meigen.ai/model-comparison).

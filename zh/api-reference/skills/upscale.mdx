@@ -9,7 +9,7 @@ MCP: `upscale_image`
 
 必须提供一张原始静态图片，模式可选。直接使用原图 URL，不先通过参考图上传缩小。本接口只开放图片增强，Web 视频增强和 AI 扩图不在 API 范围内。每个接收的请求生成一张付费图。
 
-提交前先阅读[通用认证、上传与恢复指南](/zh/api-reference/skills/overview)。此工作流需要 MeiGen API Key 和购买积分，不提供免费次数或每日积分。
+[认证、素材上传与请求恢复](/zh/api-reference/skills/overview)
 
 ## 参数
 
@@ -43,15 +43,15 @@ curl -sS 'https://www.meigen.ai/api/skills/upscale/run' \
 
 ## 缩图与价格确认
 
-服务端准备的供应商输入须在**每边 4096px、1600 万像素、10 MB**以内。原图超过任一像素阈值时，在开始生成和扣点前返回 **409 `upscale_resize_required`**，包含 `sourceWidth`、`sourceHeight`。需要说明必须缩小，输出可能小于原图、清晰度提升也可能有限。接受后，以**新的 `requestId`**、相同原图/模式和 `allowDownscale: true` 提交，不要持续轮询被拒绝的请求。
+如果原图任一边超过 **4,096 像素**，或总像素超过 **1,600 万**，接口会在扣费前返回 **409 `upscale_resize_required`**，包含 `sourceWidth`、`sourceHeight`。需要说明必须缩小，输出可能小于原图、清晰度提升也可能有限。接受后，以**新的 `requestId`**、相同原图/模式和 `allowDownscale: true` 提交，不要持续轮询被拒绝的请求。
 
 用 `confirmedCredits` 表达从 `GET /api/skills?skill=upscale` 查询并已接受的价格。若预检实时价格超过此值，接口在开始生成和扣点前返回 **409 `price_changed`**，包含 `quotedCredits` 和 `confirmedCredits`。确认接受新价格后，以**新的 `requestId`** 和已接受的 `confirmedCredits` 提交。参数变化不能沿用原 UUID 回放；已存在的任务应优先恢复，不要重新确认后再建单。
 
-服务端在**下载和解码前**检查初始报价、模型可用性和足额的可用积分，并在**预处理后、派发前**再次查价，不是原子消费上限或价格锁定：账本事务按实时价格扣费，查价与扣费之间仍可能变价。需要严格原子消费上限的客户端不能把此字段当作该保证。
+`confirmedCredits` 用于核对报价，不锁定价格，也不保证最终扣费上限。
 
-原图服务返回 429 或 5xx 时，本接口返回临时 503。先查状态，允许恢复时使用**原 requestId 和原参数**重试，不因该网络失败新建付费请求。
+原图暂时无法访问时，接口可能返回 503。先查状态，允许恢复时使用**原 requestId 和原参数**重试，不因该网络失败新建付费请求。
 
-本地 npm 文件的源限制为 64 MiB / 6400 万像素，编码必须在**不缩小像素尺寸**的前提下不超过 **9,500,000 字节**，否则使用原始公开 URL（最多 64 MiB / 6400 万像素）。附件通过 `/api/skills/upload` 或 `upload_skill_image` 发送，并设 `purpose: "upscale"`；base64 仍限解码后 3 MiB。只接受静态 JPEG/PNG/WebP，保留透明通道，去除元数据。
+本地 npm 接受不超过 64 MiB、6,400 万像素的原图。如果文件太大，无法以原尺寸上传，请改用原图公开 URL。附件通过 `/api/skills/upload` 或 `upload_skill_image` 发送，并设 `purpose: "upscale"`；base64 仍限解码后 3 MiB。只接受静态 JPEG/PNG/WebP，保留透明通道，去除元数据。
 
 API 图片预处理要求购买积分余额大于零；402 时先为同一账号充值再重试。已受理的任务在零余额时仍可恢复。编码超时属于临时处理失败，不代表原图损坏。
 

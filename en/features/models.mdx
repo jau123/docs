@@ -3,8 +3,6 @@ title: "AI Model Comparison"
 description: "Compare image and video models, quality settings, reference limits, and credit prices."
 ---
 
-MeiGen supports multiple AI models for image and video generation. Use the comparison table below to pick one, then scroll to its section for detailed specs.
-
 <Note>
   Web-only models can differ from the public API list; see each model's availability note.
   Availability and the current default come from [List Models](/en/api-reference/endpoint/models). Use a model only when it appears in the active list, and read `is_default` instead of assuming a permanent default. Prices below describe the listed configuration; confirm the displayed total before submitting.
@@ -27,16 +25,13 @@ Enhancing an existing video with [Video Enhancement (Upscale)](/en/features/skil
 | **Midjourney V8.2** | 12 (1K) / 18 (2K) | Moderate (~1min) | 1 | ✓ | Photorealistic, universal aesthetics |
 | **Flux 3 Image Klein** | 2 | Fast (provisional: ~10–35s) | None | Web only | General-purpose base model, text rendering |
 | **Agnes Image 2.5 Flash** | 1 | Fast (~30s) | 1 | ✓ | Cheapest model, high-volume drafts, covered by daily free credits |
-| **HeyGen Video 1** | 2–16 credits/sec | 5–15s video | One first frame or 9 content images; audio | — | Optimized from MiniMax H3, with native audio; Web and MCP |
+| **HeyGen Video 1** | 2–16 credits/sec | 5–15s video | One first frame or 9 content images; audio | Compatible versions | 5–15s with generated audio, first frame or content references |
 | **Seedance 2.5** | Per-second (480p 18/sec, 720p 39/sec, 1080p 90/sec) | Video, ~2-3min | First/last frame or content reference, plus reference video & audio | ✓ | 4–30s, 480p/720p/1080p, generated audio, multi-clip reference video & audio continuation |
 | **Seedance 2.0** | Per-second (Mini 9–16/sec, Fast 13–20/sec, Pro 14–100/sec) | Video, ~2-6min | First/last frame or content reference, plus reference video & audio | ✓ | Three tiers (Mini / Fast / Pro), up to 4K on Pro, 4–15s, audio, reference video & audio |
 | **Grok Video 1.5** | Per-second (Lite 4–28/sec, Standard 16–50/sec) | Varies by tier and resolution | First frame (required) | ✓ | Lite (default) / Standard, 480p/720p/1080p, 4–15s, ratio follows input, audio |
 | **Veo 3.1** | Per generation (Fast 80–165, Pro 220–435) | Video, ~1-8min | Up to 2 (first/last frame) | Web only | Two tiers (Fast / Pro), 4/6/8s, 720p/1080p/4k same price, audio |
-| **Agnes Video 2.5 Flash** | 10 per video (720p, 2/sec × 5s) | Video, ~2min | First frame (single image) | ✓ | **Temporarily unavailable since 2026-09-22.** Fixed 5s / 720p, the only video model covered by daily free credits |
 
 > ✓ = available on the iOS/Android app and web. Web only = browser only for now.
->
-> GPT image 1.5 was retired on 2026-04-22 (replaced by GPT Image 2.0). Midjourney V7 was replaced by V8.1 on 2026-05-09, then upgraded in place to V8.2 on 2026-09-02 (same model ID). Happyhorse 1.1 was retired on 2026-07-31. Seedream 5.0 Lite was retired on 2026-08-13 (Seedream 5.0 Pro and Seedream 4.5 remain available). Z Image Turbo was retired on 2026-08-21.
 
 ## Image Models
 
@@ -68,7 +63,7 @@ When selected, the configured starting settings are **2K Standard (6 credits) on
 
 Both variants accept text-only prompts and reference images. For an edit, specify what to change and what to preserve. For a person, product, or style reference, explain the role of each image. Attaching a reference does not automatically switch variants.
 
-You can explicitly request a transparent background in your prompt. Whether the result has an alpha channel depends on intent detection and the generated output; use **Cutout** to remove the background from an existing image.
+You can explicitly request a transparent background in your prompt. A transparent result is not guaranteed; use **Cutout** to remove the background from an existing image.
 
 GPT Image 2.5 uses welcome or purchased credits; daily free credits do not apply. 4K is paid-only. See [API parameters](/en/api-reference/endpoint/generate) for `quality` and `modelVariant`.
 
@@ -84,7 +79,7 @@ GPT Image 2.5 uses welcome or purchased credits; daily free credits do not apply
 | **Reference images** | Up to 16 |
 | **Resolutions** | 1K, 2K, 4K |
 | **Quality** | Standard / Medium / High |
-| **Transparent background** | Request it explicitly in your prompt; output depends on intent detection and generation |
+| **Transparent background** | Request it explicitly in your prompt; transparency is not guaranteed |
 | **Aspect ratios** | 1:1, 3:2, 2:3, 16:9, 9:16, 4:3, 3:4, 5:4, 4:5, 21:9, 9:21, 3:1, 1:3 |
 
 **Credit matrix:**
@@ -99,7 +94,7 @@ All resolutions consume welcome or purchased credits (premium model — daily fr
 
 GPT Image 2 remains a separate model with its original three quality levels and prices. It supports instruction following, in-image text, and multi-element scenes. Its `medium` and `high` settings are not interchangeable with the same labels on 2.5.
 
-You can explicitly request a transparent background in your prompt. Whether the result has an alpha channel depends on intent detection and the generated output. Use **Cutout** when you need to remove the background from an existing image.
+You can explicitly request a transparent background in your prompt. A transparent result is not guaranteed. Use **Cutout** when you need to remove the background from an existing image.
 
 <Warning>
   **Stricter moderation**: prompts involving real people, celebrities, brand logos, or violent/adult content may be rejected. Rephrase to drop specific names or try a different model.
@@ -245,7 +240,7 @@ Midjourney's photorealistic flagship. Returns 4 candidate images per generation 
 | **Reference images** | Not supported |
 | **Aspect ratios** | Auto, 1:1, 4:3, 3:4, 16:9, 9:16, 3:2, 2:3 |
 
-A basic text-to-image tier powered by Black Forest Labs through Vercel AI Gateway, fixed at 1K (about 1 MP). It costs 2 credits per image and remains eligible for daily free credits. Reference images and characters are not enabled in this MeiGen tier.
+This text-to-image model generates 1K images (about 1 MP) for 2 credits each. Daily free credits apply. It does not accept reference images or characters.
 
 ---
 
@@ -253,7 +248,7 @@ A basic text-to-image tier powered by Black Forest Labs through Vercel AI Gatewa
 
 | | |
 | --- | --- |
-| **Model ID** | `agnes-image-2.1-flash` — stable identifier, not a version number. The backend was upgraded in place to Agnes Image 2.5 Flash on 2026-09-14; existing integrations keep working unchanged. |
+| **Model ID** | `agnes-image-2.1-flash` — stable identifier, not a version number. The model was updated to Agnes Image 2.5 Flash on 2026-09-14; existing integrations keep working unchanged. |
 | **Provider** | Agnes |
 | **Credits** | 1 per image |
 | **Daily free credits** | Eligible |
@@ -271,7 +266,7 @@ The cheapest model on MeiGen at 1 credit per image, and the only basic-tier **im
 Video optimized from MiniMax H3, with native audio and multimodal references.
 
 <Note>
-  Available on Web, API and MCP. Compatible App versions receive HeyGen through capability negotiation; older versions keep their existing model list. Reference-video availability follows the live model catalog and is available to existing HeyGen-compatible App versions.
+  Available on Web, API, MCP and compatible versions of the mobile app. Check the model list in your app for availability.
 </Note>
 
 | Setting | MeiGen configuration |
@@ -286,9 +281,9 @@ Video optimized from MiniMax H3, with native audio and multimodal references.
 | Reference video | When enabled in the live catalog: up to 3 MP4 clips, 1–5s each, 15s total, 16MB each; aspect ratio 1:4–4:1 |
 | Ratios | Auto (default) uses the prompt and reference image. Six ratios at 480p/768p; 16:9 or 9:16 at 1080p/2K. First-frame mode follows the image at every resolution |
 
-First-frame and content-reference inputs use separate panels. Only the selected panel is submitted; switching panels preserves the other panel's materials. Video or audio is submitted with content references. Video-only and image + video requests are supported. **Reference video cannot currently be combined with separate reference audio**; embedded video audio is allowed. This is a temporary MeiGen/Gateway compatibility restriction based on testing, not a published HeyGen model limit. Conflicting requests are rejected before charging; images + audio remain supported.
+Choose either the first-frame panel or the content-reference panel. Only the selected panel’s materials are used; switching panels keeps your selections. A reference video can be used on its own or with images. It can keep its own soundtrack, but cannot be combined with a separate audio reference. To use a separate audio clip, attach a content-reference image instead.
 
-HeyGen's `@character` mentions are a MeiGen convenience: saved character images are submitted as ordinary content references, without Seedance assets. Reference up to 3 characters; one character uses up to 2 images, while multiple characters use 1 image each. Character images and uploads share the 9-image and 12-item limits after deduplication; image count does not add credits. Character mentions select the content panel; the first-frame draft is preserved but not submitted.
+Use `@character` to select a saved character as a content reference. Reference up to 3 characters; one character uses up to 2 images, while multiple characters use 1 image each. Character images and uploads share the 9-image and 12-item limits after deduplication; image count does not add credits. Character mentions select the content panel; the first-frame draft is preserved but not submitted.
 
 #### Pricing
 
@@ -303,13 +298,11 @@ The rates below include the 50% MeiGen discount. The default video model is Mini
 
 Credits = (output seconds + the sum of each reference video’s duration rounded up to whole seconds) × the rate for the resolution. With no reference video, only output seconds count. Text, first frames and content references use the same rate; the number of reference images and audio add no credits. There is no minimum-seconds multiplier. For example, 5 seconds at 768p costs 25 credits with or without reference images. A 4.1s reference video + 5s output at 768p costs (5 + 5) × 5 = 50 credits. This is a premium model and uses purchased credits only; check the live catalog and submission price for current rates.
 
-#### Image and prompt handling
+#### Images and prompts
 
-Images reuse MeiGen's shared upload component: JPEG/PNG/WebP/GIF, an 8000px-per-side upload guard, compression targeting 2MB and 2048px when needed, and a 10MB upload-gateway cap. AVIF is converted before upload. These are MeiGen upload settings, not published HeyGen pixel limits. Library/gallery images are also checked before charging: readable image data, a verifiable size no larger than 16MB, and a direct HTTPS URL without redirects.
+Use JPEG, PNG, WebP, GIF or AVIF images with neither edge longer than 8,000 pixels. The upload size limit is 10 MB. For a library or gallery image, choose a directly accessible HTTPS image of 16 MB or less.
 
-HeyGen accepts up to 32,000 prompt characters. MeiGen reserves space for protected reference instructions and native reference labels before applying the shared long-prompt compression. Within the remaining budget no compression is needed; beyond it the compressor targets 50 characters below that budget. On compression failure the body is shortened to fit, while reference instructions are protected and checked. The model receives labels such as `<Picture 1>` and `<Audio 1>`; use the editor's `@` mentions to insert them.
-
-Sources: [HeyGen model guide](https://developers.heygen.com/docs/models/heygen-video) and [AI Gateway model](https://vercel.com/ai-gateway/models/heygen-video-1). MeiGen's current UI limits and submit-time credit quote are authoritative.
+Keep prompts within 32,000 characters. Type `@` in the editor to refer to an attached image, video or audio clip.
 
 ### Seedance 2.5
 
@@ -329,7 +322,7 @@ Sources: [HeyGen model guide](https://developers.heygen.com/docs/models/heygen-v
 
 Seedance 2.5 is the long-duration Seedance model on MeiGen. It supports text-to-video, first/last-frame image-to-video, up to 30 content-reference images, and reference-video continuation. Content images, reference videos and reference audio can all be used in the same request and are three independent budgets. Frame references and reference-video continuation use `adaptive` ratio so the output follows the input media; text-to-video and content-reference requests can use an explicit supported ratio.
 
-**Editing versus continuation (Seedance 2.5).** To continue a clip, describe what happens next. To edit the existing clip (for example, remove lettering or replace a person), use a 4–30 second source and set `duration` to that source’s rounded whole-second length. If multiple videos could be selected for editing, every source must match the requested duration; using one source avoids ambiguity. The backend may recover an explicit edit-duration rejection once by inheriting the source duration, only when this preserves the already billed output seconds. A mismatch fails and follows normal refund settlement; it never authorizes extra charging. Keep passing a **positive integer**: `duration=-1` and `omni_reference_task_type` are internal provider parameters, not public API inputs. After a failed/refunded job, correcting the inputs requires a separately authorized new request ID. Retrying an uncertain submission keeps its original ID and exact inputs.
+**Editing versus continuation (Seedance 2.5).** To continue a clip, describe what happens next. To edit the existing clip (for example, remove lettering or replace a person), use a 4–30 second source and set `duration` to that source’s rounded whole-second length. If multiple videos could be selected for editing, every source must match the requested duration; using one source avoids ambiguity.
 
 #### Pricing
 
@@ -449,7 +442,7 @@ Output length is always your selected duration (4–15), independent of the refe
 | **Aspect ratios** | Follows the first-frame image automatically (no manual ratio selection) |
 | **Audio** | Auto-generated, included in the price |
 
-MeiGen offers Lite and Standard tiers through Vercel AI Gateway. Both require a starting (first-frame) image — text-only generation is not supported in this integration. Output follows the image's aspect ratio and includes generated audio. Generation time varies by tier, resolution and provider load.
+Choose Lite or Standard and upload a first-frame image. Both tiers require an image. The video follows its aspect ratio and includes generated audio.
 
 #### Pricing
 
@@ -471,7 +464,7 @@ Total credits = the selected tier's rate at the selected resolution × output se
 | Standard 480p × 4s | 16 × 4 | **64** |
 | Standard 1080p × 4s | 50 × 4 | **200** |
 
-API and MCP keep the model ID `grok-video`. Set `tier` to `lite` or `standard`; omitting it uses Lite. Set `resolution` to `480p`, `720p`, or `1080p`. Read current defaults and pricing from [List Models](/en/api-reference/endpoint/models); do not send the upstream provider's model ID as `modelId`.
+API and MCP keep the model ID `grok-video`. Set `tier` to `lite` or `standard`; omitting it uses Lite. Set `resolution` to `480p`, `720p`, or `1080p`. Read current defaults and pricing from [List Models](/en/api-reference/endpoint/models).
 
 <Note>
   If generation fails, the **full** credit amount is automatically refunded.
@@ -527,102 +520,4 @@ Per generation. Price depends on **tier** (Fast / Pro) × **duration** (4 / 6 / 
 
 ### Agnes Video 2.5 Flash
 
-<Warning>
-  **Temporarily unavailable since 2026-09-22.** This model is currently disabled: it is not
-  returned by [List Models](/en/api-reference/endpoint/models) and generation requests for
-  `agnes-video-2.0` are rejected with `400`. The details below describe its behaviour when
-  enabled and are kept for existing integrations. Check List Models for current availability.
-</Warning>
-
-| | |
-| --- | --- |
-| **Model ID** | `agnes-video-2.0` — stable identifier, not a version number. The backend was upgraded in place to Agnes Video 2.5 Flash on 2026-08-31; existing integrations keep working unchanged. |
-| **Provider** | Agnes |
-| **Credits** | 10 per video |
-| **Daily free credits** | Eligible (when enabled) |
-| **Duration** | 5 seconds (fixed) |
-| **Reference images** | 1 (first frame, image-to-video) |
-| **Reference video** | Not supported |
-| **Reference audio** | Not supported |
-| **Resolutions** | 720p |
-| **Aspect ratios** | Auto, 16:9, 9:16, 1:1, 4:3, 3:4 |
-
-The only basic-tier video model — and the only one your daily free credits cover — while it is enabled. Supports text-to-video and single-image first-frame image-to-video at a fixed 5 seconds / 720p. For longer clips or higher resolutions, use Seedance 2.5 (up to 30s and 1080p); for 4K, use Seedance 2.0 Pro or Veo 3.1.
-
-<Note>
-  **Image-to-video ignores the requested aspect ratio** — the output follows the first frame.
-  Images you generated or uploaded on MeiGen are cropped to your selected ratio at the CDN
-  edge first, so the result matches your choice. Images from anywhere else (API callers may
-  pass any public URL or `data:` base64) are used as-is, and the output ratio follows that
-  image.
-</Note>
-
-#### Pricing
-
-| Resolution | Rate |
-| --- | --- |
-| 720p | 2 credits/sec |
-
-Duration is fixed at 5 seconds, so every generation costs **10 credits**.
-
-<Note>
-  If generation fails, the **full** credit amount is automatically refunded.
-</Note>
-
----
-
-## Known Limitations
-
-<AccordionGroup>
-  <Accordion title="Nanobanana 2 — Stricter content filtering" icon="triangle-exclamation">
-    This model is more sensitive to content involving real people, celebrities, brand logos, and face-swap requests. Prompts that work on other models may be rejected here. If you get a content violation error, rephrase your prompt to remove specific names or try a different model.
-  </Accordion>
-
-  <Accordion title="Flux 3 Image Klein — No reference images" icon="triangle-exclamation">
-    This base model generates images from text only. The reference image upload section is hidden while it is selected. If you need reference images, switch to another model.
-  </Accordion>
-
-  <Accordion title="Midjourney V8.2 — Single reference image only" icon="triangle-exclamation">
-    Midjourney V8.2 accepts only 1 reference image, while other image models accept between 3 and 16. In exchange it offers more control over how the reference is used (content vs. style reference).
-  </Accordion>
-
-  <Accordion title="Midjourney V8.2 — Returns 4 candidate images" icon="info-circle">
-    Unlike other models that return a single image, Midjourney V8.2 returns 4 candidate images per generation. All candidates are saved and can be browsed in the image detail dialog. You are only charged once (12 credits at 1K / 18 credits at 2K) for all 4 images.
-  </Accordion>
-
-  <Accordion title="GPT Image 2.0 — Stricter moderation" icon="triangle-exclamation">
-    GPT Image 2.0 applies stricter moderation than other models to real people, celebrities, brand logos, and adult/violent content. Rephrase your prompt to drop specific names, or try a different model.
-  </Accordion>
-
-  <Accordion title="Seedance 2.0 — Per-second pricing + With-reference-video minimum" icon="circle-info">
-    Seedance bills **per second**, not per image — and uploading a reference video switches to a separate rate table with a minimum-billable floor. With several reference videos, the billed seconds use the **sum** of their durations plus your selected output duration, so each extra clip raises the total. Reference audio is free and never enters that sum, and a request with audio but no reference video stays on the direct rate. See the **Seedance 2.0** section above for the full rates and formula.
-  </Accordion>
-
-  <Accordion title="Seedance 2.0 — Reference audio needs an image or video" icon="triangle-exclamation">
-    On Seedance 2.0, reference audio only works alongside at least one reference image (a saved character counts) or one reference video — audio on its own is rejected before any credits are deducted. Seedance 2.5 has no such requirement and accepts audio-only requests.
-  </Accordion>
-
-  <Accordion title="Seedance 2.5 — No Mini / Fast / Pro tier" icon="circle-info">
-    Seedance 2.5 has one quality level and supports 480p / 720p / 1080p. Do not send `tier`; use Seedance 2.0 Pro when you specifically need 4K.
-  </Accordion>
-
-  <Accordion title="Seedance 2.0 Mini — 480p / 720p only" icon="triangle-exclamation">
-    The Mini tier (the default) is the lightweight option, capped at 720p. For 1080p or 4K output, switch to **Pro** — note that reference-video continuation on Pro tops out at 1080p (4K needs direct generation with no reference video).
-  </Accordion>
-
-  <Accordion title="Grok Video 1.5 — First frame required" icon="triangle-exclamation">
-    Grok Video 1.5 is image-to-video only — you **must** upload a starting (first-frame) image. Pure text-to-video is not supported. The output aspect ratio follows your input image. If you want text-to-video, use Seedance 2.5, Seedance 2.0, or Veo 3.1.
-  </Accordion>
-
-  <Accordion title="Grok Video 1.5 — Lite / Standard and 1080p" icon="triangle-exclamation">
-    Both tiers support 480p, 720p and 1080p. Lite is the default; price depends on both tier and resolution. For 4K, use Seedance 2.0 Pro or Veo 3.1.
-  </Accordion>
-
-  <Accordion title="Veo 3.1 — Limited aspect ratios" icon="triangle-exclamation">
-    Veo 3.1 only supports 16:9 / 9:16 (plus Auto). Square (1:1), 4:3 / 3:4 portrait, and other ratios are not available. For wider ratio support, use Seedance 2.5 or Seedance 2.0.
-  </Accordion>
-
-  <Accordion title="Veo 3.1 — 4k costs no extra credits, but needs a paid account" icon="circle-info">
-    720p / 1080p / 4k all cost the same on Veo 3.1, so 4k costs no extra credits. Two things to know: 4k is **locked for free accounts** (selecting it opens the upgrade dialog), and rendering takes longer — 4k typically takes 6–8 minutes versus 1–4 minutes for 720p / 1080p. The same 4k lock applies to Seedance 2.0 Pro.
-  </Accordion>
-</AccordionGroup>
+Currently unavailable. Check [List Models](/en/api-reference/endpoint/models) before requesting `agnes-video-2.0`.

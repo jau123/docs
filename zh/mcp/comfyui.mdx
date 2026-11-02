@@ -15,16 +15,8 @@ description: "为已移除的 ComfyUI 和内置提示词库调整已有集成。
 
 请从 MCP 环境与私密 `~/.config/meigen/config.json` 中移除旧设置，并修改依赖旧 provider／工具的脚本。用户自己的 `~/.config/meigen/workflows/` 文件不会被删除或自动迁移。显式请求 ComfyUI 会被拒绝，不会转向付费云端供应商。
 
-## 连接方式
-
-新用户通过[远程 OAuth](/zh/mcp/remote)登录，或安装 [ChatGPT 官方插件](/zh/mcp/overview#chatgpt)。已有 API Key 的生成、公开搜索和 Skills及明确选用的 BYOK 工作流保留[旧版本地兼容](/zh/mcp/setup)，不引导新用户创建 MeiGen Key。
-
-本地 3.0.0 有 16 个工具，不提供私人资料库。收藏、画板、历史、条目详情和保存可通过通用远程 MCP 的 OAuth 连接使用；ChatGPT 官方插件新增这些工具的版本仍待商店审核。
-
 ## 升级顺序
 
 1. 检查现有流程，移除 ComfyUI／离线库相关依赖。
-2. 只将现有包参数改为 `meigen@3.0.0`，按[本地配置](/zh/mcp/setup)保留凭据和宿主设置。跟随 npm 默认标签可能自动收到主版本更新，应明确固定版本。Claude／OpenClaw 插件包独立更新。
+2. 按[本地配置说明](/zh/mcp/setup)更新已有配置中的包版本，保留凭据和客户端设置。
 3. 重启／重连并核对实际工具参数。未完成生成仍按原请求 ID 恢复，升级不代表可以创建新的付费任务。
-
-版本状态见[源码仓发布说明](https://github.com/jau123/MeiGen-AI-Design-MCP)。保留此 URL，以便旧 ComfyUI 文档链接继续指向迁移说明。

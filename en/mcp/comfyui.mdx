@@ -15,16 +15,8 @@ description: "Upgrade existing integrations after the removal of ComfyUI and bun
 
 Remove these settings from your MCP environment and private `~/.config/meigen/config.json`, and update scripts that call the removed provider/tool. User-owned files in `~/.config/meigen/workflows/` are not deleted or automatically migrated. An explicit ComfyUI request is rejected rather than redirected to a paid cloud provider.
 
-## Connection choices
-
-New users connect [remote MCP with OAuth](/en/mcp/remote) or install the [official ChatGPT plugin](/en/mcp/overview#chatgpt). Existing API-key calls for generation, public search and Skills and explicitly selected BYOK workflows retain [legacy local compatibility](/en/mcp/setup). Do not create a new MeiGen key as a new-user alternative.
-
-Local 3.0.0 has 16 tools and no private-library tools. Favorites, boards, history, item details and saving are available through standard remote MCP with OAuth. The official ChatGPT plugin update adding these tools is still awaiting store approval.
-
 ## Upgrade sequence
 
 1. Review workflows and remove unsupported ComfyUI/offline-library assumptions.
-2. Update only the existing package argument to `meigen@3.0.0`, preserving credentials and host settings as described in [local setup](/en/mcp/setup). Configurations following the default npm tag can receive a new major automatically; keep an explicit pin. Claude/OpenClaw plugin bundles update separately.
+2. Update the package version in your existing configuration as described in [local setup](/en/mcp/setup). Preserve the credentials and host settings.
 3. Restart/reconnect and inspect actual tool schemas. Keep original request IDs for any interrupted generation; upgrading does not authorize a new paid attempt.
-
-See the [source release notes](https://github.com/jau123/MeiGen-AI-Design-MCP) for release status. This URL is retained so old ComfyUI documentation links continue to explain the migration.

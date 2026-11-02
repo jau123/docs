@@ -4,7 +4,7 @@ description: "Preview a Seedance 2.5 video before separately authorizing a full-
 ---
 
 <Note>
-Availability follows your connected server's tool list. You need `generate_video.draft`, `render_video_draft`, and a model with `capabilities.draft.enabled`. Refresh or reconnect after the server update. Local npm requires `meigen@3.2.0` or later; update an existing package pin and restart the host. Remote OAuth and the official ChatGPT plugin use the deployed backend; refresh cached tool discovery.
+Availability follows your connected server's tool list. You need `generate_video.draft`, `render_video_draft`, and a model with `capabilities.draft.enabled`. Refresh or reconnect after the server update. Local npm requires `meigen@3.2.0` or later; update an existing package pin and restart the host.
 </Note>
 
 ## Preview, then decide
@@ -17,7 +17,7 @@ Availability follows your connected server's tool list. You need `generate_video
 
 Draft and final are **two separately charged jobs**. The final costs the full quoted 1080p amount, not the difference between 480p and 1080p. MCP uses purchased credits only. A normal 480p video is not necessarily a draft.
 
-The draft is usable for final rendering for seven days from provider creation; use the returned `expiresAt`, not the time you downloaded it. If no quote is returned, do not guess a price or start a final. A price change requires a new confirmation.
+The draft is usable for final rendering for seven days from creation; use the returned `expiresAt`, not the time you downloaded it. If no quote is returned, do not guess a price or start a final. A price change requires a new confirmation.
 
 ## Tool inputs
 
@@ -33,7 +33,7 @@ For the official ChatGPT plugin, pass `responseVersion: 3` on these calls. It pr
 
 - A timeout or disconnection does not prove failure. Check the original request ID; never start a replacement merely to recover a lost response.
 - Keep the same ID and exact inputs for an unchanged retry. Changed confirmed pricing needs a new ID after authorization.
-- On failure, report the reason and `creditsStatus`; say credits were refunded only when the backend confirms it.
+- On failure, report the reason and check `creditsStatus` before reporting a refund.
 - To deliberately retry a failed final, first obtain approval for the current price, then pass its generation ID as `retryFailedGenerationId` and use a new request ID. Do not retry automatically.
 - Expired drafts cannot create a new final. Existing final tasks remain recoverable. A new draft is a new paid operation.
 

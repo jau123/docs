@@ -11,9 +11,7 @@ The MeiGen API lets you generate images and videos programmatically, plus [five 
 
 ## Authentication
 
-API requests require a Bearer token. There are two authentication methods:
-
-### API Token (Recommended)
+Authenticate API requests with a MeiGen API token.
 
 Use an API key that starts with `meigen_sk_`. Create one in a desktop browser on the [API Keys page](https://www.meigen.ai/profile/api-keys).
 
@@ -25,9 +23,6 @@ Authorization: Bearer meigen_sk_YOUR_API_KEY
   API tokens can only use **purchased credits**. Daily free credits are not available for API calls. Ensure your account has purchased credits before making API requests.
 </Warning>
 
-### Session Token
-
-For meigen.ai's own browser integration, a logged-in session access token is accepted. Daily free credits cover **basic models only** (currently Flux 3 Image Klein and Agnes Image 2.5 Flash; Agnes Video 2.5 Flash has been temporarily unavailable since 2026-09-22, so no video model is on the basic tier right now); every other model always requires welcome or purchased credits. Third-party integrations should always use the API Token above.
 
 ## Base URL
 
@@ -138,7 +133,7 @@ For `POST /api/generate/v2`, error bodies include extra fields useful for debugg
 | `too_many_reference_audios` | 400 | More `referenceAudios` entries than this model allows — read `capabilities.video.referenceAudio.maxCount` (Seedance 2.5: 10; Seedance 2.0: 3) |
 | `reference_audio_total_seconds_exceeded` | 400 | The reference audio clips add up past `capabilities.video.referenceAudio.maxTotalSeconds` (Seedance 2.5: 30s; Seedance 2.0: 15s) |
 | `reference_audio_requires_visual` | 400 | This model can't run on audio alone — send at least 1 reference image or 1 reference video alongside `referenceAudios` (Seedance 2.0; `capabilities.video.referenceAudio.requiresVisualReference`) |
-| `reference_probe_timeout` | 503 | Server-side validation of the reference videos or audio did not finish within its budget (a CDN hiccup, a slow origin). **Nothing was charged**, and the body carries `retryable: true` — resubmit the identical request with the same `requestId` / `idempotencyKey` rather than creating a new attempt |
+| `reference_probe_timeout` | 503 | Reference video or audio validation timed out. **Nothing was charged**, and the body carries `retryable: true` — resubmit the identical request with the same `requestId` / `idempotencyKey` rather than creating a new attempt |
 | `invalid_input` | 400 | Malformed JSON or invalid generation parameters, including inconsistent `referenceVideo`/`referenceVideos`. Also the fallback for terminal 400/422 validation errors without a more specific code; inspect the validation message. |
 | `invalid_reference_url` | 400 | A `referenceImages` entry is not an accepted URL or base64 value |
 | `frame_reference_limit` | 400 | `referenceMode: "frame"` allows at most 2 images — use `referenceMode: "content"` for more |

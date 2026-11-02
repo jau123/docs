@@ -9,7 +9,7 @@ MCP: `generate_marketing_poster`
 
 A subject is required; image assets are optional. Supply accurate dates, discounts and product facts. Set autoCopy to false when wording must be preserved. One request creates one paid poster.
 
-Use the [shared authentication, upload and recovery guide](/en/api-reference/skills/overview) before submitting. This workflow requires a MeiGen API key and purchased credits; no free attempts or daily credits apply.
+[Authentication, uploads and request recovery](/en/api-reference/skills/overview)
 
 ## Parameters
 
@@ -72,7 +72,7 @@ The following is a `client.callTool(...)` parameter object, not the REST request
 }
 ```
 
-Call `list_skills` with `{"skill":"brand-poster"}` when current styles, output specifications or prices are needed. Queueing, planning and provider execution affect timing; polling intervals and HTTP timeouts are not completion estimates. Follow returned status and `nextAction`.
+Call `list_skills` with `{"skill":"brand-poster"}` when current styles, output specifications or prices are needed. Completion time varies; polling intervals and HTTP timeouts are not completion estimates. Follow returned status and `nextAction`.
 
 ## Result and recovery
 

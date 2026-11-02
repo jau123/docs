@@ -44,6 +44,6 @@ This behavior is for ordinary image/video generation. The five [Skills APIs](/en
 
 ## Input consistency and legacy requests
 
-New API-token attempts compare caller inputs before defaults: object-key order does not matter, but other values must match. A changed model, prompt, image URL, duration or quality is not a retry of the same inputs. Persist resolved reference URLs so an unchanged source is not re-uploaded under a different URL during recovery.
+Reuse the same inputs when retrying a request. A changed model, prompt, image URL, duration or quality is not a retry of the same inputs. Persist resolved reference URLs so an unchanged source is not re-uploaded under a different URL during recovery.
 
-Legacy jobs may not contain the full original input fingerprint. Compatibility lookup can recover them, but cannot retroactively prove every historical parameter match. Use a persistent UUID for each new logical attempt. See [N scripts → frames → videos](/en/mcp/composable-workflows) for budget and scheduling boundaries.
+Use a persistent UUID for each new logical attempt. See [N scripts → frames → videos](/en/mcp/composable-workflows) for budget and scheduling boundaries.

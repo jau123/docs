@@ -1,6 +1,6 @@
 ---
 title: "远程 MCP 服务器"
-description: "通过远程 OAuth 与无状态 Streamable HTTP 连接 MeiGen。"
+description: "通过远程 OAuth 与 Streamable HTTP 连接 MeiGen。"
 ---
 
 <Tip>
@@ -13,19 +13,13 @@ description: "通过远程 OAuth 与无状态 Streamable HTTP 连接 MeiGen。"
 https://www.meigen.ai/api/mcp
 ```
 
-远程访问不需要 Node.js 或 npm 进程。连接层无状态，付费任务与恢复回执仍保存在后端。服务端改动需要部署后端，宿主可能需要重连或刷新缓存的工具清单。远程并不代表离线或无需部署。
-
-## 作为上层工作流的工具
-
-保留上层脚本、提示词、模型／供应商、数量和已批准预算，创意助手可选。使用持久化 UUID `requestId`、`wait: false`、结构化结果及 `check_generation` 提交首帧／视频并恢复，无需逐步重复审批。有限并发调度、预览和下载由上层负责。详见[完整工作流合同与示例](/zh/mcp/composable-workflows)。
+远程连接无需安装 Node.js 或 npm。如果找不到新工具，请刷新工具清单或重新连接。断线后，可用原请求 ID 查询已提交的付费任务。
 
 ## 账号登录
 
-客户端支持 Streamable HTTP 和 OAuth 时，添加上方服务地址，选择**连接／认证**，在浏览器登录 MeiGen 并确认权限即可，无需复制 API Key 或申请共享客户端密钥。客户端通过公开身份资料（CIMD）或动态注册（DCR）接入，不需要按品牌加入 MeiGen 白名单。通用流程支持公开客户端认证（`none`）和 S256 PKCE。
+客户端支持 Streamable HTTP 和 OAuth 时，添加上方服务地址，选择**连接／认证**，在浏览器登录 MeiGen 并确认权限即可，无需复制 API Key 或申请共享客户端密钥。客户端通过公开身份资料（CIMD）或动态注册（DCR）接入。通用流程支持公开客户端认证（`none`）和 S256 PKCE。
 
 授权时核对应用名、客户端标识和返回地址；自行注册的名称未经 MeiGen 认证。授权最长 30 天，可以随时在[已连接应用](https://www.meigen.ai/oauth/connections)中撤销。付费调用仅使用已购积分，不使用每日免费积分或 Web 免费次数。
-
-通用 OAuth 需服务端完成开放，且客户端版本支持。如果服务没有声明自动注册能力，或客户端无法登录，请使用兼容客户端或 ChatGPT 官方插件，不以创建 API Key 作为替代。“支持 MCP”本身不代表支持远程 HTTP 和 OAuth。
 
 ### Codex
 
@@ -62,7 +56,7 @@ openclaw mcp login meigen
 
 在浏览器自行确认授权。即使插件提供服务定义，OpenClaw 登录仍需要保存同名 `mcp.servers.meigen` 条目；它覆盖插件默认配置，不会重复工具。已有 `meigen` 条目时，`add` 会拒绝覆盖。复用匹配的 OAuth 连接，不要盲目执行 `mcp set`。
 
-运行 `openclaw mcp doctor meigen --probe`，再打开新对话，让 MeiGen 查询 Skills 与当前价格。安装成功不等于已完成认证。插件包含搜索换一批、从收藏中查询偏好，以及仅在明确要求或事先允许时收藏的指引。私人资料库需要额外的资料库 OAuth 权限。
+运行 `openclaw mcp doctor meigen --probe`，再让 MeiGen 列出可用的图片工作流和价格。
 
 <Note>
   ClawHub 插件 4.0 的默认连接从本地 npm/stdio 改为远程 OAuth。更新前先备份配置；已保存的本地、代理或 BYOK 条目不会自动迁移，仍覆盖插件默认连接。自行选择保留本地能力或切换有效条目至 OAuth，私密保留旧凭据，并确保仅有一套有效 MeiGen 连接。远程 MCP 不能直接读取本地文件，也不提供本地偏好、提示词增强或 BYOK。[旧版兼容说明](/zh/mcp/setup)。
@@ -88,24 +82,21 @@ openclaw mcp login meigen
 
 如果账号／工作区提供 Developer mode 和自定义 MCP 入口，添加上方地址，选择 **OAuth**，在提供该选项时使用自动注册，然后完成 MeiGen 账号授权。参考 [OpenAI 当前指引](https://developers.openai.com/api/docs/guides/developer-mode#how-to-use)。不要把 MeiGen API Key 填入 OAuth 客户端密钥字段。
 
-这是手动 MCP 连接，与提供对话内结果卡片的 [ChatGPT 官方插件](/zh/mcp/overview#chatgpt)是不同的接入方式。可用性受套餐、工作区和服务端开放状态影响。选择 **No Authentication** 时仅支持公开工具，上传、生成、requestId 恢复和私有 Skill 结果都需要授权。命令行与商店插件的配置流程不同，不能在 ChatGPT 网页聊天中安装 npm。
+这是手动 MCP 连接，与提供对话内结果卡片的 [ChatGPT 官方插件](/zh/mcp/overview#chatgpt)是不同的接入方式。可用性受套餐和工作区设置影响。选择 **No Authentication** 时仅支持公开工具，上传、生成、requestId 恢复和私有 Skill 结果都需要授权。命令行与商店插件的配置流程不同，不能在 ChatGPT 网页聊天中安装 npm。
 
 ### 将已有本地连接迁移到 OAuth
 
-新建 MeiGen 连接使用 OAuth。已有本地 stdio 集成可在迁移前保留[旧版 Key 配置](/zh/mcp/setup)；外部供应商 BYOK 是独立的本地选项。切换远程 OAuth 时移除固定 Authorization 请求头，在宿主内完成账号登录。不要新建 MeiGen Key 或在聊天中发送凭据。
-
-<Note>
-  已有远程连接的固定 Authorization 请求头仍兼容旧版生成、公开搜索和 Skills 调用。API Key 无法访问收藏、画板、历史记录或私人条目详情。切换 OAuth 前须移除固定请求头；此兼容不作为新连接选项。
-</Note>
+要将已有 API Key 连接切换为 OAuth，请移除固定的 Authorization 请求头，并在客户端内登录。需要自带密钥或读取本地文件时，请看[本地配置](/zh/mcp/setup)。
 
 ## 工具
 
-通用远程 MCP 提供 **22 个工具**：15 个共享工具、五个私人资料库工具、`get_credit_balance` 和 `list_characters`。官方 ChatGPT 适配服务也提供 23 个工具，但拥有独立参数和结果卡片。更新后刷新客户端工具缓存；商店介绍版本审核与运行时工具发现分开进行。
+请在客户端的工具列表中查看当前可用工具。如果缺少工具，请刷新列表并核对已授权的权限。
 
 | 工具 | 用途 | 账号授权 |
 | --- | --- | --- |
 | `generate_image` | MeiGen Cloud 图片生成 | 是 |
 | `generate_video` | MeiGen Cloud 视频生成 | 是 |
+| `render_video_draft` | 将已完成的[视频草稿](/zh/mcp/drafts)转为单独计费的成片 | 是 |
 | `check_generation` | 按 generationId 或 requestId 查询／恢复 | 按请求 ID 查询需要授权所属账号 |
 | `list_models` | 当前模型与能力 | 否 |
 | `search_gallery` | 搜索公开提示词和图片预览，最多返回 3 条 | 否 —— 但授权后该次搜索计入这个账户的额度 |
@@ -134,13 +125,15 @@ openclaw mcp login meigen
 
 重连后询问：**“列出 MeiGen 当前可用的 Skills 和价格。”**确认真实工具调用成功；仅保存配置不能证明连接成功。这不会生成或扣点。然后提供实际材料，选择[五项工作流](/zh/api-reference/skills/overview)之一。Skills 提交后用 `check_skill` 查询；通用生成用 `check_generation` 恢复。
 
-通用远程 `search_gallery` 默认且**每批最多返回 3 条**。为兼容旧调用，schema 接受 1–30 的整数 `limit`，实际截断到 3 条。搜索支持匿名调用，按 IP 限流。使用 OAuth 时，开始一次搜索计入账号[每日搜索额度](/zh/features/gallery#搜索)，不消耗购买积分；后续翻页不重复计数。
+### 画廊搜索
 
-官方 ChatGPT 插件刷新工具后每批默认／最多 6 条，搜索必须 OAuth 授权；不能将其数量或授权规则套用到通用远程端。
+远程 MCP 每页最多返回 3 条，匿名搜索有频率限制。ChatGPT 插件每页最多返回 6 条，需要授权 `meigen:search`。授权后发起新搜索会使用账号的每日搜索额度。继续翻页时保留 `query`、`limit` 和 `snapshotId`，将 `nextOffset` 传为 `offset`，翻页不会重复计数。遇到 `hasMore=false` 时停止，快照失效后需重新搜索。
 
-远程工具不能读取本地文件路径。请使用公开图片 URL，或通过 `upload_skill_image` 上传实际可读取的字节。Upscale 直接传原图 URL，或使用 `purpose: "upscale"` 上传，不要先按普通参考图缩小。
+## Midjourney 参数
 
-### GPT Image 2.5 选项
+Midjourney V8.2 使用 `modelId: "midjourney-v8.1"`。`referenceType` 可选 `content` 或 `style`，Midjourney 专用的画质和风格参数填入 `niji7Options`。在 ChatGPT 插件中，先用 `upload_skill_image` 上传外部参考图和风格图，再使用返回的 URL。通用远程 MCP 支持公开 HTTPS 风格图地址。本地 npm 的高级选项需要 3.3.3 或更高版本，文件路径只用于 `referenceImages`。详见[生成参数](/zh/api-reference/endpoint/generate)。
+
+## GPT Image 2.5 选项
 
 当 `list_models` 返回 `gpt-image-2.5` 时，`generate_image` 支持五档质量，以及 `modelVariant: "sunburst"`（质量优先，默认）或 `"flare"`（速度优先）。两者积分相同。工具参数示例：
 
@@ -159,11 +152,11 @@ openclaw mcp login meigen
 示例使用 2K Standard，提交前请查询当前模型价格。通过 `referenceImages` 添加公开参考图 URL，即可编辑或提供视觉参考。示例 UUID 仅用于说明：每次逻辑尝试应分配并持久化自己的 `requestId`，恢复时沿用该 ID 和相同输入。`wait: false` 提交后即返回；中断后用 requestId 或 generationId 调用 `check_generation`。旧版 `attemptId` 仍兼容，新集成应使用 requestId。完整矩阵见[模型价格](/zh/features/models)。
 
 
-### 参考视频与音频
+## 参考视频与音频
 
-使用 `upload_reference_media`，传入 `kind: "video"` 或 `"audio"`、选定的 `modelId`、可选 `tier` 和直接 HTTPS `sourceUrl`。经用户允许导入后，将返回的 `url` 放入 `referenceVideos`／`referenceAudios`。远程端不能读取本地路径；附件需要客户端可访问的下载网址，官方 ChatGPT 适配服务可直接接收其附件结构。既有本地 npm 仍可准备本地文件。直接把外部视频／音频网址传给生成会在扣费前被拒绝。
+使用 `upload_reference_media`，传入 `kind: "video"` 或 `"audio"`、选定的 `modelId`、可选 `tier` 和直接 HTTPS `sourceUrl`。经用户允许导入后，将返回的 `url` 放入 `referenceVideos`／`referenceAudios`。远程端不能读取本地路径；附件需要客户端可访问的下载网址，官方 ChatGPT 插件可直接接收其附件结构。既有本地 npm 仍可准备本地文件。直接把外部视频／音频网址传给生成会在扣费前被拒绝。
 
-准备要求正数充值余额，但不扣积分；按模型限制格式、大小与时长，并有每日字节和并发限制。链接公开且临时，上传七天后进入清理范围，即使已用于生成也不保证长期保留。
+准备参考素材不扣点，但购买积分余额必须大于零。请查看所选模型的文件大小、格式与时长限制。返回的链接可公开访问，上传七天后失效，请保留原始文件。
 
 `firstFrame`／`lastFrame` 表示首尾帧，`contentReferenceImages` 表示内容／风格／身份参考；仅首尾帧时传空内容数组。按 `capabilities.videoInputs` 及档位覆盖设置遵守角色、数量与互斥约束。尾帧必须搭配首帧，已有角色占用内容槽位，不能与严格首尾帧混用。
 
@@ -175,31 +168,13 @@ openclaw mcp login meigen
   "resolution": "480p",
   "duration": 5,
   "referenceVideos": [
-    "https://images.meigen.ai/generations/eagle-dive.mp4",
-    "https://images.meigen.ai/ref-videos/2026-09-17/river-pan.mp4"
+    "https://images.meigen.ai/.../eagle-dive.mp4",
+    "https://images.meigen.ai/.../river-pan.mp4"
   ],
-  "referenceAudios": ["https://images.meigen.ai/ref-videos/2026-09-17/theme.mp3"],
+  "referenceAudios": ["https://images.meigen.ai/.../theme.mp3"],
   "requestId": "3f1c2b60-9d2a-4f1e-9a1f-0d3b7c5a8e42",
   "wait": false
 }
 ```
 
 引用格式以模型的 `capabilities.videoInputs.referenceMentionSyntax` 为准，各类素材从 1 编号。按 `pricingMode` 和 `capabilities.video.billing` 报价：只有明确声明计入输入的模式才加输入视频秒数，`output_only` 只计输出。音频秒数不计费，但音频或内容图可能触发参考档费率。HeyGen 已开放，参考视频是否可用以实时目录为准。遵守 `capabilities.video.referenceAudio.canCombineWithVideo`：为 false 时，不可同时提交视频与单独音频，视频自带音轨可保留。HeyGen 在同一分辨率下的文本和内容参考单价相同；参考视频按输出秒数＋每段视频向上取整后的秒数计费。恢复请求时保留原 requestId 和完全相同的素材。
-
-
-## 远程与本地
-
-| | 远程 | 本地 npm |
-| --- | --- | --- |
-| 工具数 | 23，含资料库、余额与已有角色 | 3.3.0：18 |
-| 安装 | HTTP 连接，不需要 Node.js | npm 进程，建议 Node.js 22+ |
-| 更新 | 后端部署后刷新缓存工具 | 更新已安装/固定的包版本并重启 |
-| 提供商 | MeiGen Cloud | 3.0.0：已有 MeiGen Key 或 OpenAI 兼容；Skills 只支持 MeiGen |
-| 本地文件 | 不能直接读取 | 宿主可读取的文件可自动上传 |
-| 附加工具 | — | 提示词增强与本地偏好 |
-| 结果 | 图片 URL/资源链接 | 通用生成可保存文件；Skills 返回 URL/资源链接 |
-| Claude 插件命令/Agent/Hook | 添加 URL 不会安装 | 独立 Claude 插件分发 |
-
-已有本地集成无需立即切换；本地专属能力不会随连接迁移。新建 MeiGen 连接使用远程 OAuth。详见[旧版本地安装与升级说明](/zh/mcp/setup)。
-
-`upload_skill_image` 要求购买积分余额大于零，上传本身不扣生成积分。Upscale 附件设置 `purpose: "upscale"`。`upscale_image` 的每次 MCP 调用（含首次）都需要 `confirmedCredits`，取自 `list_skills` 的实时报价，且符合用户或上层工作流已接受的预算；已有明确授权可复用。

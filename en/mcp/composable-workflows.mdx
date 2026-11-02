@@ -3,13 +3,11 @@ title: "Composable workflows"
 description: "Persist task IDs, generate frames and videos, and resume within an approved budget."
 ---
 
-<Note>3.0 was the major release that removed ComfyUI and the offline prompt library. New account connections use remote OAuth; API keys remain only for existing legacy local integrations. See [migration notes](/en/mcp/comfyui).</Note>
-
 [中文](/zh/mcp/composable-workflows) · [Connection setup](/en/mcp/setup) · [Five Skills HTTP API](/en/api-reference/skills/overview)
 
 Use MeiGen as a callable step inside an existing agent, Skill, script or application. The caller owns the creative plan, prompts, model/provider choices, output count, approved budget, scheduling and presentation. Optional MeiGen creative assistants can help develop a brief; they are not required before calling tools. Discovery can support any workflow. A resolved upstream plan does not need another approval for every frame, clip or batch.
 
-Use local [**`meigen` 3.3.3**](https://www.npmjs.com/package/meigen/v/3.3.3) (`npx -y meigen@3.3.3`), or the remote endpoint **`https://www.meigen.ai/api/mcp`** with OAuth. Reconnect and inspect the installed schemas for `requestId`, `wait` and request lookup. Backend rollbacks must preserve recovery endpoints and the durable POST contract.
+Use local [**`meigen` 3.3.3**](https://www.npmjs.com/package/meigen/v/3.3.3) (`npx -y meigen@3.3.3`), or the remote endpoint **`https://www.meigen.ai/api/mcp`** with OAuth. Reconnect and inspect the installed schemas for `requestId`, `wait` and request lookup.
 
 ## Ordinary task contract
 
@@ -58,7 +56,7 @@ if (result.nextAction?.type === 'check_generation') {
 
 ## Example: N scripts → N frames → N videos
 
-The upstream workflow first resolves the scripts, image/video settings, requested output count, maximum approved budget and any replacement policy. It can use `list_models` for current choices. No fixed model, price, duration or quality is assumed here.
+The calling workflow first resolves the scripts, image/video settings, requested output count, maximum approved budget and any replacement policy. It can use `list_models` for current choices. No fixed model, price, duration or quality is assumed here.
 
 1. Create and durably save one frame UUID and one video UUID per script, alongside the exact inputs. Do this once when creating the workflow, not on every run or retry.
 2. Before a new submission, reserve its expected charge against the remaining approved budget, including all other in-flight reservations. Use the selected live model/tier/duration and reference pricing — a video estimate must be built from the **sum** of every reference video's duration plus the output duration, because that sum is what the billed seconds come from; reference audio is free and adds nothing to the reservation. Reconcile actual `creditsUsed` and confirmed refunds as results arrive. An unknown charge stays reserved until resolved.
@@ -96,13 +94,12 @@ const frameStatus = await client.callTool({
 const video = await client.callTool({
   name: 'generate_video',
   arguments: {
-    ...plan.videoSettings, // Includes the caller-selected live model.
+    ...plan.videoSettings, // Includes the selected model.
     prompt: script.videoPrompt,
     firstFrame: script.selectedFrameUrl,
-    // Reference media are arrays. Local npm also accepts local file paths here;
-    // remote MCP takes images.meigen.ai URLs ONLY — any other host is a pre-charge
-    // 400. Omit a key entirely when the plan has no items for it: these fields are
-    // part of the requestId fingerprint.
+    // Reference media are arrays. Local npm also accepts local file paths here.
+    // For remote MCP, use the URLs returned by upload_reference_media.
+    // Omit unused reference fields and keep inputs unchanged on retry.
     referenceVideos: script.referenceVideoUrls, // billed on the SUM of their durations
     referenceAudios: script.referenceAudioUrls, // free — never billed
     requestId: script.videoRequestId,
@@ -113,11 +110,11 @@ const video = await client.callTool({
 // Persist video.structuredContent; recover with the same videoRequestId.
 ```
 
-Local npm has **four shared API submission slots**. Polling and downloading do not occupy these slots; this does not cap the number of accepted jobs still running remotely. The caller should bound both submissions and outstanding paid work. Respect actual backend rate limits and `Retry-After`; there is no universal ten-image workflow cap or blanket ban on parallel video jobs.
+Limit concurrent submissions and outstanding paid jobs to stay within your budget. If you receive a rate-limit response, respect `Retry-After`.
 
 The budget is a caller-managed limit, not an atomic server-enforced batch cap. Estimates can change; stop for a newly required price/resize decision outside existing authorization. Independent steps can partially succeed, and a failure does not roll back completed frames or clips.
 
-Local `wait: true` retries transient status-query errors within bounds: stop after three consecutive errors and reset the count on a valid status. Honor a larger `Retry-After`; queries and backoff share the total observation budget. Cancellation and terminal errors stop immediately. This retries queries only, never generation POSTs, and does not prove cancellation, failure or refund.
+If waiting ends without a final result, check the original request ID after the suggested wait. Respect `Retry-After`; do not submit another paid job.
 
 ## Resume without creating duplicate jobs
 
@@ -126,7 +123,7 @@ Local `wait: true` retries transient status-query errors within bounds: stop aft
 | `processing` | Keep the handle; follow `pollAfterSeconds`/`nextAction`. Do not submit another job. |
 | Transport timeout, 5xx or uncertain submit result | Query `check_generation` with the persisted `requestId`. Keep exact inputs and source URLs. If recovery calls for resubmission, reuse that same ID. |
 | JSON request_not_found + HTTP 404 | Verify account, ID and saved inputs. An interrupted first submission can be retried with the same ID; do not allocate a replacement ID. |
-| endpoint_unavailable / check_backend | HTML or unknown JSON 404 does not establish that a request was never submitted. Keep IDs/inputs, verify the API URL and restore the compatible backend. Do not automatically resubmit. Known generationId status can still use the existing status endpoint. |
+| endpoint_unavailable / check_backend | HTML or unknown JSON 404 does not establish that a request was never submitted. Keep IDs/inputs, verify the API URL and check again when the service is available. Do not automatically resubmit. Known generationId status can still use the existing status endpoint. |
 | review_media_type | The result is complete: preserve success, actual media and URLs. Compare requestedMediaType and review the model before advancing; do not automatically generate a replacement. |
 | Ordinary-generation 402 before dispatch | Top up the owning account, then resubmit the same ID and identical inputs within authorized scope. Polling does not restart it. Skill payment rejection follows the separate Skill rules. |
 | 429 or an in-progress reservation | Honor returned retry timing/`Retry-After`; preserve the attempt and keep its budget reservation. |
@@ -135,9 +132,9 @@ Local `wait: true` retries transient status-query errors within bounds: stop aft
 | Deleted original job / HTTP 410 | Preserve the attempt ID and report the unavailable original. Never reuse that ID to create a replacement. |
 | `observationEnded` | Stop aggressive polling and report the unresolved state to the caller. The job is not proven failed or cancelled. |
 
-For ordinary tasks, remote `attemptId` remains a legacy compatibility handle. Prefer UUID `requestId` in new integrations. Older receipts may lack the normalized input data needed to verify all past parameter mismatches; do not assume the new protection can retroactively validate every old task.
+For ordinary tasks, remote `attemptId` remains a legacy compatibility handle. Prefer UUID `requestId` in new integrations.
 
-**Legacy key rotation:** when an old `attemptId` submission lost its response, recover it using the original key before revoking that key. The old handle incorporates the key; a new key cannot reconstruct an unrecorded old identity. Keep a returned `generationId` when available, and do not automatically resubmit an unresolved legacy attempt with a new key.
+**Legacy key rotation:** when an old `attemptId` submission lost its response, recover it using the original key before revoking that key. Keep a returned `generationId` when available, and do not automatically resubmit an unresolved legacy attempt with a new key.
 
 ## Draft-first video steps
 

@@ -5,7 +5,7 @@ description: "Create and manage API tokens in your MeiGen account"
 
 Create and revoke tokens at [API Keys](https://www.meigen.ai/profile/api-keys) using a desktop browser. Each account supports up to 5 active tokens.
 
-Token format: `meigen_sk_` followed by 32 characters. The full value is shown only at creation — copy it immediately.
+Copy your token when you create it. Its full value is shown only once.
 
 Pass the token as a Bearer credential on any authenticated endpoint:
 
@@ -16,12 +16,8 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
   -d '{"prompt": "a minimalist logo"}'
 ```
 
-<Note>
-  Token management itself (`POST` / `GET` / `DELETE /api/tokens`) is authenticated with a logged-in browser session, not with an API key — an API key cannot create or revoke tokens. Manage them from account settings.
-</Note>
-
 <Warning>
   **API tokens can only spend purchased credits.** Daily free credits are not available via the API.
 </Warning>
 
-Use the same account that owns the key to choose **Top Up** on [Profile](https://www.meigen.ai/profile), or use [mobile checkout](https://www.meigen.ai/m/premium). API Skills have no free attempts, including cutouts. Store the key privately; do not paste it into chat, URLs or shared files. [Skills authentication and recovery](/en/api-reference/skills/overview) require the original key for `check_skill`.
+To add credits to the account that owns your key, choose **Top Up** on your [profile](https://www.meigen.ai/profile).

@@ -7,13 +7,7 @@ description: "查询可用模型 ID、默认设置、积分价格和生成能力
 GET /api/models
 ```
 
-返回所有可用于生成的活跃 AI 模型列表。公开端点，无需认证。
-
-默认活跃列表只包含公开生成模型，不包含技能专属计费项；此类工作流请通过技能界面使用。当前图片默认模型由 `is_default` 标记。只有活跃列表返回 GPT Image 2.5 后，才可请求该模型。
-
-<Note>
-  网页专属模型即使传入 `active=false` 也不会返回，显式适配的 HeyGen Gateway 除外。HeyGen Video 1 已在 API/MCP 的启用模型清单开放；此例外不开放原生 App，也不启用关闭的参考能力。
-</Note>
+此公开接口默认返回已启用的生成模型。读取 `is_default` 可获取每种媒体类型的默认模型，读取 `capabilities` 可查看支持的输入。专用图片工作流见 [Skills](/zh/api-reference/skills/overview)。
 
 ## 查询参数
 
@@ -62,7 +56,7 @@ GET /api/models
 </ResponseField>
 
 <ResponseField name="estimatedTiming" type="object">
-  该模型默认档位/分辨率的预估生成耗时（秒）：`{ p50, p90 }`。基于生产数据校准，用于设置用户预期，不是硬性截止时间；实际耗时仍会随分辨率、档位、时长变化。
+  该模型默认档位/分辨率的预估生成耗时（秒）：`{ p50, p90 }`。此估计值供参考，不是硬性截止时间；实际耗时仍会随分辨率、档位、时长变化。
 </ResponseField>
 
 <ResponseField name="capabilities" type="object">

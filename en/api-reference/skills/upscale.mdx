@@ -9,7 +9,7 @@ MCP: `upscale_image`
 
 One original still image is required; the mode is optional. Use the original URL directly instead of first resizing through reference upload. This endpoint exposes image enhancement only: Web video enhancement and AI Expand are not part of this API. One accepted request produces one paid image.
 
-Use the [shared authentication, upload and recovery guide](/en/api-reference/skills/overview) before submitting. This workflow requires a MeiGen API key and purchased credits; no free attempts or daily credits apply.
+[Authentication, uploads and request recovery](/en/api-reference/skills/overview)
 
 ## Parameters
 
@@ -43,15 +43,15 @@ curl -sS 'https://www.meigen.ai/api/skills/upscale/run' \
 
 ## Resizing and price confirmation
 
-The service prepares provider input within **4096px per edge, 16 million pixels and 10 MB**. An original above either pixel threshold returns **409 `upscale_resize_required`**, including `sourceWidth` and `sourceHeight`, before starting or charging a generation. Explain that it must be reduced, the output may be smaller than the original and clarity gains may be limited. After acceptance, submit a **new `requestId`** with the same source/mode and `allowDownscale: true`. Do not keep polling the rejected request.
+If either image edge exceeds **4,096 px** or the image exceeds **16 million pixels**, the API returns **409 `upscale_resize_required`**, including `sourceWidth` and `sourceHeight`, before starting or charging a generation. Explain that it must be reduced, the output may be smaller than the original and clarity gains may be limited. After acceptance, submit a **new `requestId`** with the same source/mode and `allowDownscale: true`. Do not keep polling the rejected request.
 
 Use `confirmedCredits` to communicate an accepted price from `GET /api/skills?skill=upscale`. If the current preflight price exceeds it, the API returns **409 `price_changed`** with `quotedCredits` and `confirmedCredits`, without starting or charging a generation. Obtain acceptance of the new price, then use a **new `requestId`** with the accepted `confirmedCredits`. A changed parameter cannot be replayed under the original UUID. Existing jobs should be recovered instead of confirmed and submitted again.
 
-The service checks the initial price, model availability and full eligible balance **before downloading or decoding**, then checks the accepted price again **immediately before dispatch**. It is not an atomic spending ceiling or price lock: the billing transaction uses its live price, which can change between the check and charge. If a strict atomic ceiling is required, do not treat this field as one.
+`confirmedCredits` checks the quote, but does not lock the price or guarantee a maximum charge.
 
-A source image server returning 429 or 5xx is surfaced as a temporary 503. Check status first and recover with the **same requestId and original parameters** when retryable; do not create a new paid request for this network failure.
+If the source image is temporarily unavailable, the API may return 503. Check status first and recover with the **same requestId and original parameters** when retryable; do not create a new paid request for this network failure.
 
-For local npm files, the source limit is 64 MiB / 64 MP and encoding must fit **9,500,000 bytes without reducing pixel dimensions**. If it cannot fit, use an original public URL (up to 64 MiB / 64 MP). For attachments use `/api/skills/upload` or `upload_skill_image` with `purpose: "upscale"`; base64 remains limited to 3 MiB decoded. Static JPEG/PNG/WebP only; alpha is preserved, metadata is stripped.
+For local npm files, use an original up to 64 MiB and 64 million pixels. If a file is too large to upload without resizing, pass its original public URL instead. For attachments use `/api/skills/upload` or `upload_skill_image` with `purpose: "upscale"`; base64 remains limited to 3 MiB decoded. Static JPEG/PNG/WebP only; alpha is preserved, metadata is stripped.
 
 API image preparation requires a positive purchased-credit balance; a 402 means top up the same account before retrying. Already accepted jobs remain recoverable at zero balance. An encoding timeout is a temporary processing failure, not evidence of a corrupt image.
 

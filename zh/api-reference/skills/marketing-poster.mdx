@@ -9,7 +9,7 @@ MCP: `generate_marketing_poster`
 
 必须提供主题，图片素材可选。请提供准确的时间、折扣与商品信息；要求保留文案时设 autoCopy 为 false。一次请求生成一张付费海报。
 
-提交前先阅读[通用认证、上传与恢复指南](/zh/api-reference/skills/overview)。此工作流需要 MeiGen API Key 和购买积分，不提供免费次数或每日积分。
+[认证、素材上传与请求恢复](/zh/api-reference/skills/overview)
 
 ## 参数
 
@@ -72,7 +72,7 @@ curl -sS 'https://www.meigen.ai/api/skills/brand-poster/run' \
 }
 ```
 
-需要当前风格、输出规格或价格时，用 `{"skill":"brand-poster"}` 调用 `list_skills`。耗时受排队、规划和供应商影响；轮询间隔与 HTTP 超时不是预计完成时间，应按实际状态和 `nextAction` 推进。
+需要当前风格、输出规格或价格时，用 `{"skill":"brand-poster"}` 调用 `list_skills`。完成时间不固定；轮询间隔与 HTTP 超时不是预计完成时间，应按实际状态和 `nextAction` 推进。
 
 ## 结果与恢复
 

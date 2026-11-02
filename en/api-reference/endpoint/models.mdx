@@ -7,13 +7,7 @@ description: "Read available model IDs, defaults, pricing, and generation capabi
 GET /api/models
 ```
 
-Returns a list of all active AI models available for generation. Public endpoint, no authentication required.
-
-The default active list contains public generation models. Skill-specific billing entries are excluded; use the Skills interface for those workflows. Read `is_default` for the current image default. GPT Image 2.5 can be requested only after it appears in this active list.
-
-<Note>
-  Web-only models are excluded even when `active=false`, except the explicit HeyGen gateway adapter. HeyGen Video 1 is available in the active API/MCP catalog. This exception does not enable native apps or disabled reference capabilities.
-</Note>
+This public endpoint lists active generation models by default. Read `is_default` for the default in each media type and `capabilities` for supported inputs. For dedicated image workflows, see [Skills](/en/api-reference/skills/overview).
 
 ## Query Parameters
 
@@ -62,7 +56,7 @@ The default active list contains public generation models. Skill-specific billin
 </ResponseField>
 
 <ResponseField name="estimatedTiming" type="object">
-  Estimated generation time for this model's default tier/resolution, in seconds: `{ p50, p90 }`. Calibrated from production data — use it to set user expectations, not as a hard deadline. Actual time still varies by resolution, tier, and duration.
+  Estimated generation time for this model's default tier/resolution, in seconds: `{ p50, p90 }`. Use this estimate to set user expectations, not as a hard deadline. Actual time still varies by resolution, tier, and duration.
 </ResponseField>
 
 <ResponseField name="capabilities" type="object">
@@ -190,5 +184,5 @@ curl https://www.meigen.ai/api/models
 ```
 
 <Note>
-  Example shows two representative model configurations with a partial `extra_config` for brevity. It does not assert that either model is currently enabled or the default. Timing values are an illustrative production snapshot and may change as estimates are recalibrated. The live endpoint returns all active models with their current full configuration. Responses are cached for 1 hour (plus stale-while-revalidate), so newly added or retired models can take up to an hour to appear.
+  Example shows two representative model configurations with a partial `extra_config` for brevity. It does not assert that either model is currently enabled or the default. Timing values are illustrative and may change. The live endpoint returns all active models with their current full configuration. Responses are cached for 1 hour (plus stale-while-revalidate), so newly added or retired models can take up to an hour to appear.
 </Note>

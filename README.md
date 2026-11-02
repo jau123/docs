@@ -41,3 +41,7 @@ mint dev
 ```
 
 Every page exists in both `en/` and `zh/`. When editing content, update both mirrors in the same change.
+
+## Public documentation
+
+Document what readers can do, what they need to supply, what they will be charged, and how to recover from an error. For API and MCP guides, show the public MeiGen endpoint, parameters and returned fields. Use illustrative media URLs and tell readers which returned URL to use. Keep service routing, storage layouts, internal parameters and processing logic out of published text, examples, comments and links. Apply the same check to both languages. Keep setup steps, model pricing and migration notes on their respective pages. Link to them when another guide needs that information.

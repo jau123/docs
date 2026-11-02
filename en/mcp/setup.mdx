@@ -3,33 +3,13 @@ title: "Connect MeiGen MCP"
 description: "Sign in through remote OAuth, or maintain an existing legacy local integration."
 ---
 
-## New connection: use account sign-in
-
-For ChatGPT, [install MeiGen from the official ChatGPT store](/en/mcp/overview#chatgpt) and sign in. Other users should add the Streamable HTTP server `https://www.meigen.ai/api/mcp` in an OAuth-capable MCP host, then choose **Connect / Authenticate** and approve the MeiGen account connection. No API key or Node.js is needed. See [remote setup](/en/mcp/remote) for Claude, Codex, Cursor and other compatible hosts.
-
-If the host cannot authenticate with OAuth, use a compatible client or the official ChatGPT plugin. API keys are only retained for existing legacy integrations, not offered as an alternative for new users. Do not paste credentials into chat.
-
-Private favorites, boards, history, prompt details and saving are available through standard remote MCP with OAuth. Local npm and API keys cannot access them. Refresh the host’s tool list after connecting; store listing review and runtime discovery are separate.
-
-## Ask an assistant to connect
-
-```text
-Connect MeiGen MCP at https://www.meigen.ai/api/mcp with remote OAuth.
-Preserve other servers and reuse an existing MeiGen entry. When switching from a
-fixed API key, remove its Authorization header and let me sign in through the host.
-Do not create a new API key or ask for credentials in chat. Keep a working legacy
-or BYOK setup only when needed, and do not add duplicate MeiGen tools.
-After reconnecting, call list_skills and report the result. Do not upload,
-generate or spend credits just to verify setup. Explain any unverified step.
-```
+For a new connection, use [remote OAuth](/en/mcp/remote) or [install the ChatGPT plugin](/en/mcp/overview#chatgpt).
 
 ## Existing local integrations and BYOK
 
-The following configuration is for maintaining an existing stdio/API-key integration or an explicitly selected OpenAI-compatible image provider. Local npm has no OAuth login and does not expose private account-library tools. It can prepare readable local files, save ordinary generation results, enhance prompts and store machine-local preferences.
+The following configuration is for maintaining an existing stdio/API-key integration or an explicitly selected OpenAI-compatible image provider. Local npm has no OAuth login and does not expose private account-library tools. Use `enhance_prompt` and `manage_preferences` locally. For image generation, local npm also accepts `model` as an alias for `modelId`. If both are supplied, they must match.
 
-<Note>
-  npm **3.3.3 is the current release**. Before upgrading, read the [3.0 migration notes](/en/mcp/comfyui): ComfyUI and the bundled prompt library are removed, with no offline search fallback. The examples below pin this version explicitly. Midjourney content/style reference selection and advanced `niji7Options` require local 3.3.3 or later; hosted connections should refresh their tool list. HeyGen reference videos require 3.1.1 or later; earlier local versions misread its per-clip and total duration limits.
-</Note>
+The examples pin `meigen@3.3.3`. If upgrading from 2.x, read the [migration guide](/en/mcp/comfyui) first.
 
 Node.js 22+ is recommended. Preserve an existing key privately as `MEIGEN_API_TOKEN`; do not create a new MeiGen key for these examples. The snippets below show relevant fields only; do not replace an existing entry or configuration file with them.
 
@@ -102,7 +82,7 @@ These generation examples are paid actions, not connection tests. `--json` retur
 
 ### OpenAI-compatible ordinary images
 
-For an explicitly selected BYOK provider, retain `OPENAI_API_KEY`, `OPENAI_BASE_URL` and `OPENAI_MODEL` in private local settings. Use that provider's supported models and billing. BYOK does not provide MeiGen videos, the five dedicated Skills or private library access. In 3.0.0, local provider priority is MeiGen (existing legacy key), then OpenAI-compatible; the removed ComfyUI provider is rejected rather than redirected to a paid provider.
+For an explicitly selected BYOK provider, retain `OPENAI_API_KEY`, `OPENAI_BASE_URL` and `OPENAI_MODEL` in private local settings. Use that provider's supported models and billing. BYOK does not provide MeiGen videos, the five dedicated Skills or private library access.
 
 ## Output directories
 

@@ -27,14 +27,9 @@ POST /api/generate/v2
 
   支持范围：所有接受参考图的图片模型（Flux 3 Image Klein 除外）+ 视频侧 **Seedance 2.5 / 2.0 和 HeyGen**。角色图片与用户上传图片共用内容参考图预算。模型不支持、角色不存在或无权访问、引用数超限均返回 `400`（`characters_not_supported`、`character_not_found`、`too_many_characters`）；部分角色需要更高的 `tier`（`character_tier_required`）。
 
-  **素材标记** —— 在提示词里内嵌 `[image1]`、`[video1]`、`[audio1]`，用来指明某句话针对哪个参考素材：*"沿用 [image1] 的调色，接续 [video1] 的运动，并按 [audio1] 的节奏配乐"*。编号**从 1 开始、按素材类型各自计数**，顺序与本请求体里 `referenceImages` / `referenceVideos` / `referenceAudios` 的数组顺序一致 —— `[video2]` 指 `referenceVideos` 的第二项，而不是全部素材里的第二个。Seedance 请求抵达模型前，两类标记的处理方式不同：
+  **素材引用：** 在提示词中用 `[image1]`、`[video1]`、`[audio1]` 指定素材，例如「接续 [video1] 的动作，配合 [audio1] 的节奏」。图片、视频和音频分别按提交顺序从 1 编号，只引用本次已添加的素材。
 
-  - **`[videoN]` / `[audioN]`** 会被改写成厂商自己的写法 —— `Video 1`、`Audio 1`；编号超过本次实际提交条数的标记会被**直接删除**，只传了两条视频却写 `[video3]`，那里什么都不会留下。也可以直接写厂商写法 —— `"Video 1"` —— MCP 和 REST 调用方通常这么写。
-  - **`[imageN]` 与 `[character:<uuid>]`** 会被展开成一句描述性短语，点名该标记落到的参考图位次 —— `[image1]` 变成 *"the subject in reference image 1"*，角色标记变成 *"the character in reference image 2"*。参考图在送进模型前可能被合并或重排，因此短语里的位次是模型实际看到的那个，不一定等于 `N`。编号超出你实际提交图片数量的 `[imageN]` **会原样留在提示词里**，不会被删除 —— 所以图片编号不要超过你实际传的张数。
-
-  改写只发生在发给模型的那一份上。落库的提示词保留你写的原始标记，重新打开编辑器仍能看到当初的 mention。
-
-  **HeyGen**：内容参考使用 `[imageN]`、`[videoN]`、`[audioN]`，按实际素材编号；越界 token 在扣点前拒绝。普通 `Picture N` / `Video N` 文字不会创建引用。首帧引用改写成自然描述，不生成内容参考 token；角色图占用 9 张内容图额度，首帧不能与内容图／视频／音频／角色混用。
+  **HeyGen：** 这些标记用于内容参考，编号越界会在扣点前被拒绝。角色图计入 9 张图片上限。首帧模式不能与内容图、角色、视频或音频混用。
 </ParamField>
 
 <ParamField body="modelId" type="string">
@@ -46,7 +41,6 @@ POST /api/generate/v2
 
   Nanobanana 2.1 使用 `modelId: "nanobanana-2.1"`，`resolution: "2K"` 为 5 积分，`"4K"` 为 8 积分。它与 `nanobanana-2` 是独立模型，后者仍可使用，两种分辨率均为 5 积分。
 
-  > `rhart-1.5`（GPT image 1.5）已于 2026-04-22 下线，请改用 `gpt-image-2`。`midjourney-v7` 已于 2026-05-09 由 `midjourney-v8.1` 接替（2026-09-02 原地升级为 V8.2，ID 不变）（出于向后兼容仍接受老 ID 调用）。
 </ParamField>
 
 <ParamField body="aspectRatio" type="string" default="auto">
@@ -89,18 +83,6 @@ POST /api/generate/v2
 <ParamField body="referenceImages" type="string[]">
   参考图数组。每一项必须是可公开访问的 HTTP(S) URL，或形如 `data:image/png;base64,...` 的内联 base64 数据。本地文件路径（如 `C:/Users/...`）与 `file://` URI 会被拒绝，返回 `400` / `invalid_reference_url`。
 
-  <Note>
-    **Agnes Video 2.5 Flash —— 图生视频会忽略 `aspectRatio`。**（该模型自 2026-09-22 起暂时下线，
-    以下规则在其启用时适用。）该模型的输出比例由首帧图本身
-    决定。对托管在 `images.meigen.ai` 上的图片（你在 MeiGen 生成或上传过的），我们会先在
-    CDN 边缘把首帧裁到你请求的 `aspectRatio`，因此输出与你选的比例一致；对其他来源
-    （外部 URL 或 `data:` base64），图片原样透传，**输出比例跟随你的图片，而不是
-    `aspectRatio`**。
-
-    如果外部图片也需要精确的输出比例，请在发送前自行裁到该比例，或改传此前生成产物的
-    `imageUrl`（本来就在我们 CDN 上）。
-  </Note>
-
   最大数量按模型不同。图片模型和视频首帧/末帧输入请读[模型列表](/zh/api-reference/endpoint/models)返回的 `max_reference_images`；Seedance 的 `content` 模式改读 `extra_config.maxContentReferenceImages`。撰写时的实况：
 
   | 上限 | 模型 |
@@ -130,7 +112,7 @@ POST /api/generate/v2
   - `frame`（默认）—— 首/尾帧参考，最多 2 张
   - `content` —— 内容参考，不绑定具体帧位置。当前 API 上限请读 `extra_config.maxContentReferenceImages`（Seedance 2.5 为 30，Seedance 2.0 为 9）
 
-  Veo、Grok、Agnes 视频模型不要传此字段：它们的 Provider 不实现内容参考模式，仍按各自的常规帧语义处理。超过受支持的上限会返回 `400`——Seedance `frame` 模式为 `frame_reference_limit`，内容参考或其他模型上限为 `too_many_references`。
+  Veo、Grok、Agnes 视频模型不要传此字段：它们不支持内容参考模式。超过受支持的上限会返回 `400`——Seedance `frame` 模式为 `frame_reference_limit`，内容参考或其他模型上限为 `too_many_references`。
 </ParamField>
 
 <ParamField body="niji7Options" type="object">
@@ -182,7 +164,7 @@ POST /api/generate/v2
 </ParamField>
 
 <ParamField body="referenceVideos" type="string[]">
-  用于 `capabilities.video.referenceVideo.enabled` 模型的参考视频数组，包括 Seedance 和 HeyGen。每一项都必须是 `https://images.meigen.ai/...` 地址 —— 要么来自此前 MeiGen 生成结果的 `videoUrl`，要么是通过[参考素材上传端点](#上传参考视频与音频)上传的文件。**不接受任意公网 URL**：其他域名一律在扣点前返回 `400` / `invalid_reference_video`。同一个 URL 只能出现一次，重复条目会在扣点前返回 `400` / `invalid_input`，不会被探测和计费两次。
+  用于 `capabilities.video.referenceVideo.enabled` 模型的参考视频数组，包括 Seedance 和 HeyGen。每一项都必须是 `https://images.meigen.ai/...` 地址 —— 要么来自此前 MeiGen 生成结果的 `videoUrl`，要么是通过[参考素材上传端点](#上传参考视频与音频)上传的文件。**不接受任意公网 URL**：其他域名一律在扣点前返回 `400` / `invalid_reference_video`。同一个 URL 只能出现一次，重复条目会在扣点前返回 `400` / `invalid_input`。
 
   | 模型 | 数量 | 单条时长 | 合计时长 | 单条大小 | 带参考视频单价 |
   | --- | --- | --- | --- | --- | --- |
@@ -190,7 +172,7 @@ POST /api/generate/v2
   | Seedance 2.5 | 最多 10 条 | 2–30 秒 | ≤30 秒 | ≤200MB | 480p 11 / 720p 24 / 1080p 54 积分/秒 |
   | Seedance 2.0 | 最多 3 条 | 2–15 秒 | ≤15 秒 | ≤50MB | Mini 480p 7 / 720p 13、Fast 480p 8 / 720p 14、Pro 720p 16 / 1080p 28 积分/秒(带参考视频时 Pro 仅限 720p / 1080p) |
 
-  服务端会逐条探测参考视频，以探测到的时长为准；你传的时长只作诊断提示。参考视频或参考音频的探测在预算内没完成时，请求**在扣点前**失败，返回 `503` / `reference_probe_timeout` 且 `retryable: true`：用同一个 `idempotencyKey` 原样重试即可。计费按所有参考视频时长的**总和**：
+  按每段参考视频的实际时长计费。如果素材校验返回 `503 reference_probe_timeout` 且 `retryable: true`，本次未扣点，请使用同一 `idempotencyKey` 和相同参数重试。Seedance 的参考视频时长按以下方式合计：
 
   `计费秒数 = max(参考视频时长总和 + 输出时长, 最低计费秒数)`
 
@@ -199,12 +181,12 @@ POST /api/generate/v2
   **旧字段别名。** 单数形式 `referenceVideo`（字符串）仍然受理，等价于只含一项的 `referenceVideos` 数组，并会长期保留。两者同时传时，`referenceVideo` 必须是 `referenceVideos` 的第一项；其他组合返回 `400` / `invalid_input`。
 </ParamField>
 
-**编辑与续写（Seedance 2.5）。** 续写应描述接下来发生的剧情；去掉文字、替换人物等属于编辑原视频。编辑请使用 4–30 秒的原视频，并把 `duration` 设为原视频四舍五入后的整数秒数。多段视频都可能被选作编辑对象时，每段都必须与所选输出时长一致；使用单段原视频可避免歧义。上游明确返回编辑时长限制后，后端仅在不改变已计费输出秒数的条件下，尝试一次继承原视频时长的恢复。时长不匹配则失败并按正常流程退款，不会自动追加扣费。公开 API 仍只接受**正整数**；`duration=-1` 和 `omni_reference_task_type` 仅为内部供应商参数。已失败并退款的任务若需修改输入重做，必须另行授权并使用新请求 ID；结果不确定的提交仍用原 ID 和完全相同的输入恢复。
+**编辑与续写（Seedance 2.5）。** 续写应描述接下来发生的剧情；去掉文字、替换人物等属于编辑原视频。编辑请使用 4–30 秒的原视频，并把 `duration` 设为原视频四舍五入后的整数秒数。多段视频都可能被选作编辑对象时，每段都必须与所选输出时长一致；使用单段原视频可避免歧义。已失败并退款的任务若需修改输入重做，必须另行授权并使用新请求 ID；结果不确定的提交仍用原 ID 和完全相同的输入恢复。
 
-Seedance 参考视频若能可靠测得帧率且不在 23.8–60 FPS 内，会在扣费前以 `400` / `unsupported_reference_video_frame_rate` 拒绝；请重新导出为 24–60 FPS。分片或不完整的时间表可能无法可靠确定帧率，仍可能由上游拒绝；此时以任务终态和实际退款状态为准。
+Seedance 参考视频若能可靠测得帧率且不在 23.8–60 FPS 内，会在扣费前以 `400` / `unsupported_reference_video_frame_rate` 拒绝；请重新导出为 24–60 FPS。
 
 <ParamField body="referenceAudios" type="string[]">
-  用于 `capabilities.video.referenceAudio.enabled` 模型的参考音频数组，包括 Seedance 和 HeyGen。每一项都必须是通过[参考素材上传端点](#上传参考视频与音频)得到的 `https://images.meigen.ai/...` 地址，格式为 **wav** 或 **mp3**，Seedance 单条不超过 **15MB**，HeyGen 不超过 **16MB**。**不接受任意公网 URL**：其他域名一律在扣点前返回 `400` / `invalid_reference_audio`。格式按文件自身字节校验，不看扩展名或 `Content-Type`。
+  用于 `capabilities.video.referenceAudio.enabled` 模型的参考音频数组，包括 Seedance 和 HeyGen。每一项都必须是通过[参考素材上传端点](#上传参考视频与音频)得到的 `https://images.meigen.ai/...` 地址，格式为 **wav** 或 **mp3**，Seedance 单条不超过 **15MB**，HeyGen 不超过 **16MB**。**不接受任意公网 URL**：其他域名一律在扣点前返回 `400` / `invalid_reference_audio`。
 
   | 模型 | 数量 | 单条时长 | 合计时长 | 纯音频请求 |
   | --- | --- | --- | --- | --- |
@@ -218,13 +200,13 @@ Seedance 参考视频若能可靠测得帧率且不在 23.8–60 FPS 内，会�
 </ParamField>
 
 <ParamField body="referenceVideoDuration" type="number">
-  已弃用的兼容提示，新集成应省略。若仍传入，必须是有限的非负数，服务端可能用它与探测值做诊断比对，但它不决定计费或裁剪。Seedance 2.5 / 2.0 续写均以服务端探测到的真实时长为准；使用 `referenceVideos` 时，计费用的是每条探测时长之和。音频没有对应字段 —— 音频时长始终由服务端探测，且从不计费。
+  已弃用，新集成请省略。如需传入，应为有限的非负数。它不决定裁剪时长或价格：计费使用参考视频的实际时长，参考音频免费。
 </ParamField>
 
 <ParamField body="idempotencyKey" type="string">
   可选 UUID。用于防止重复提交——例如弱网超时后的重试。
 
-  对于新的 API Token 请求，此 UUID 标识所属账号的一次逻辑尝试；提交前应保存 ID 和精确输入。沿用原 ID 与相同参数可恢复该尝试；已经建单时返回 `deduped: true`，不再扣费。修改参数返回 `409 idempotency_conflict`，不同账务上下文可能返回 `request_id_collision`，不能自动换 ID 绕过。对象字段顺序不影响比对，其它调用参数值在模型默认值应用前比较。旧任务可能缺少完整输入指纹，不能据此追溯保证所有旧回执。详见[按请求 ID 恢复](/zh/api-reference/endpoint/requests)。MCP 普通生成把此句柄称为 `requestId`。
+  对于新的 API Token 请求，此 UUID 标识所属账号的一次逻辑尝试；提交前应保存 ID 和精确输入。沿用原 ID 与相同参数可恢复该尝试；已经建单时返回 `deduped: true`，不再扣费。修改参数返回 `409 idempotency_conflict`，不同账务上下文可能返回 `request_id_collision`，不能自动换 ID 绕过。详见[按请求 ID 恢复](/zh/api-reference/endpoint/requests)。MCP 普通生成把此句柄称为 `requestId`。
 </ParamField>
 
 ## 响应
@@ -326,8 +308,8 @@ GET /api/generate/v2/status/:generationId
 {
   "jobId": "550e8400-e29b-41d4-a716-446655440000",
   "status": "completed",
-  "imageUrl": "https://images.meigen.ai/generations/xxx.png",
-  "imageUrls": ["https://images.meigen.ai/generations/xxx.png"],
+  "imageUrl": "https://images.meigen.ai/.../xxx.png",
+  "imageUrls": ["https://images.meigen.ai/.../xxx.png"],
   "videoUrl": null,
   "mediaType": "image",
   "error": null,
@@ -343,7 +325,7 @@ GET /api/generate/v2/status/:generationId
   "status": "completed",
   "imageUrl": null,
   "imageUrls": null,
-  "videoUrl": "https://images.meigen.ai/generations/xxx.mp4",
+  "videoUrl": "https://images.meigen.ai/.../xxx.mp4",
   "mediaType": "video",
   "error": null,
   "aspectRatio": "16:9"
@@ -380,18 +362,18 @@ GET /api/generate/v2/status/:generationId
 POST /api/upload/reference-video
 ```
 
-`referenceVideos` 与 `referenceAudios` 只接受托管在 `images.meigen.ai` 上的文件。本端点用于为本地文件申请预签名上传 URL，再由你自己 PUT 文件字节。它同时接受 **API Token**（`Bearer meigen_sk_...`）和登录态 session access token —— 只读 Bearer 请求头，不读 cookie。视频和音频共用该端点，用 `kind` 区分。
+使用 MeiGen API Token 申请上传地址，用 `kind: "video"` 或 `"audio"` 指定类型。通过 `PUT` 上传文件后，将返回的 `publicUrl` 填入 `referenceVideos` 或 `referenceAudios`。
 
-API Token 调用还要求账户**已购积分余额大于零**。上传本身不扣点，但余额为零时返回 `402` —— 为同一账号充值后重试。session 调用不受此限。
+上传本身不扣点，但购买积分余额必须大于零。若返回 `402`，请先给同一账号充值，再重试。
 
 ### 请求体参数
 
 <ParamField body="filename" type="string" required>
-  原始文件名。服务端只校验它是非空字符串：既不存储也不回显，它不会进入存储对象，也不会出现在响应里。对象的存储扩展名**只**由 `contentType` 推导：`video/mp4` → `mp4`、`video/quicktime` → `mov`、`audio/wav` / `audio/x-wav` / `audio/wave` / `audio/vnd.wave` → `wav`、`audio/mpeg` / `audio/mp3` → `mp3`。文件名叫 `clip.mov`、`contentType` 却传 `video/mp4` 时，仍然按 `.mp4` 落盘。所以请传与文件真实容器一致的 `contentType` —— 厂商是按存储 URL 的后缀判断容器的。
+  原始文件名，不能为空。`contentType` 须与文件的实际格式一致。
 </ParamField>
 
 <ParamField body="contentType" type="string" required>
-  文件的 MIME 类型，也是决定存储扩展名的唯一依据。视频接受 `video/mp4` 和 `video/quicktime`；音频接受 `audio/wav`、`audio/x-wav`、`audio/wave`、`audio/vnd.wave`、`audio/mpeg` 和 `audio/mp3`。它必须与 `kind` 一致 —— 音频类型配 `kind: "video"`（或反过来）会返回 `400`。后续 `PUT` 必须使用完全相同的值。
+  文件的 MIME 类型。视频接受 `video/mp4` 和 `video/quicktime`；音频接受 `audio/wav`、`audio/x-wav`、`audio/wave`、`audio/vnd.wave`、`audio/mpeg` 和 `audio/mp3`。它必须与 `kind` 一致 —— 音频类型配 `kind: "video"`（或反过来）会返回 `400`。后续 `PUT` 必须使用完全相同的值。
 </ParamField>
 
 <ParamField body="size" type="number" required>
@@ -417,7 +399,7 @@ API Token 调用还要求账户**已购积分余额大于零**。上传本身不
 </ResponseField>
 
 <ResponseField name="key" type="string">
-  对象存储 key，形如 `ref-videos/YYYY-MM-DD/{id}.{mp4|mov|wav|mp3}`。音频与视频共用该前缀。
+  上传标识。引用文件时请使用 `publicUrl`。
 </ResponseField>
 
 ```bash
@@ -549,7 +531,7 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
     "aspectRatio": "adaptive",
     "resolution": "480p",
     "duration": 5,
-    "referenceVideos": ["https://images.meigen.ai/generations/eagle-clip.mp4"]
+    "referenceVideos": ["https://images.meigen.ai/.../eagle-clip.mp4"]
   }'
 ```
 
@@ -568,29 +550,14 @@ curl -X POST https://www.meigen.ai/api/generate/v2 \
     "resolution": "480p",
     "duration": 5,
     "referenceVideos": [
-      "https://images.meigen.ai/generations/eagle-dive.mp4",
-      "https://images.meigen.ai/ref-videos/2026-09-17/river-pan.mp4"
+      "https://images.meigen.ai/.../eagle-dive.mp4",
+      "https://images.meigen.ai/.../river-pan.mp4"
     ],
-    "referenceAudios": ["https://images.meigen.ai/ref-videos/2026-09-17/theme.mp3"]
+    "referenceAudios": ["https://images.meigen.ai/.../theme.mp3"]
   }'
 ```
 
-计费：两条视频被探测为 3 秒和 4 秒，参考总时长 **7 秒**。计费秒数 = max(7 + 5, 9) = 12 秒，按 480p 带参考视频的 11 积分/秒，共 **132 积分**。参考音频加 **0** —— 它从不计费，时长也不计入总和。`[video1]` / `[video2]` / `[audio1]` 在请求抵达模型前会被改写成 `Video 1` / `Video 2` / `Audio 1`。
-
-### 让系统自动选比例（Auto）
-
-省略 `aspectRatio` 或显式传 `"auto"`，由 MeiGen 自动挑选合适比例：
-
-```bash
-curl -X POST https://www.meigen.ai/api/generate/v2 \
-  -H "Authorization: Bearer meigen_sk_YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "Blog hero banner image, abstract gradient background with code snippets"
-  }'
-```
-
-实际采用的比例会通过 `aspectRatio` 字段返回 —— 本次请求的响应和状态端点里都有。
+计费：两条视频被探测为 3 秒和 4 秒，参考总时长 **7 秒**。计费秒数 = max(7 + 5, 9) = 12 秒，按 480p 带参考视频的 11 积分/秒，共 **132 积分**。参考音频加 **0** —— 它从不计费，时长也不计入总和。
 
 ## 生成草稿成片
 

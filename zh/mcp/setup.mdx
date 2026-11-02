@@ -3,32 +3,13 @@ title: "连接 MeiGen MCP"
 description: "通过远程 OAuth 登录，或维护已有旧版本地集成。"
 ---
 
-## 新连接：使用账号登录
-
-ChatGPT 用户[从官方商店安装 MeiGen](/zh/mcp/overview#chatgpt)并登录。其他用户在支持 OAuth 的 MCP 客户端中添加 Streamable HTTP 地址 `https://www.meigen.ai/api/mcp`，选择**连接／认证**，登录 MeiGen 并授权；无需 API Key 或 Node.js。Claude、Codex、Cursor 等客户端步骤见[远程接入](/zh/mcp/remote)。
-
-客户端不支持 OAuth 时，请使用兼容客户端或 ChatGPT 官方插件。API Key 仅保留已有旧版集成的兼容，不作为新用户的另一种认证方式。不要在聊天发送凭据。
-
-收藏、画板、历史记录、提示词详情和保存可通过通用远程 MCP 的 OAuth 连接使用，本地 npm 和 API Key 均不可访问。连接后刷新客户端工具清单；商店介绍版本审核与运行时工具发现分开进行。
-
-## 复制给助手连接
-
-```text
-通过远程 OAuth 连接 https://www.meigen.ai/api/mcp。
-保留其他服务并复用已有 MeiGen 条目。从固定 API Key 切换时移除 Authorization
-请求头，让我在客户端完成登录。不要创建新 Key，也不要在聊天索要凭据。
-仅在需要时保留已有旧版集成或 BYOK，不添加重复的 MeiGen 工具。
-重连后调用 list_skills 并报告实际结果；不要为验证而上传、生成或消耗积分。
-说明尚未验证的步骤。
-```
+新连接请使用[远程 OAuth](/zh/mcp/remote) 或[安装 ChatGPT 插件](/zh/mcp/overview#chatgpt)。
 
 ## 已有本地集成与 BYOK
 
-下列配置仅用于维护现有 stdio／API Key 集成或明确选用的 OpenAI 兼容供应商。本地 npm 没有 OAuth 登录，也不提供私人资料库工具；它可处理宿主可读取的本地文件、保存普通生成结果、增强提示词并记录本机偏好。
+下列配置仅用于维护现有 stdio／API Key 集成或明确选用的 OpenAI 兼容供应商。本地 npm 没有 OAuth 登录，也不提供私人资料库工具；使用 `enhance_prompt` 和 `manage_preferences` 可以在本地增强提示词或设置偏好。本地 npm 生图也接受 `model` 作为 `modelId` 的别名，同时填写时两者须一致。
 
-<Note>
-  npm **3.3.3 是当前版本**。升级前阅读 [3.0 迁移说明](/zh/mcp/comfyui)：ComfyUI 与内置提示词库已移除，在线搜索没有离线回退。下方示例均明确固定此版本。Midjourney 内容／风格参考选择及高级 `niji7Options` 需本地 3.3.3 或更高版本；远程连接请刷新工具清单。HeyGen 参考视频需使用 3.1.1 或更高版本；更早的本地版本会误读单段与合计时长限制。
-</Note>
+以下示例使用 `meigen@3.3.3`。从 2.x 升级前，请先看[迁移说明](/zh/mcp/comfyui)。
 
 本地建议 Node.js 22+。仅将现有 Key 私密保留为 `MEIGEN_API_TOKEN`，不要为这些示例创建新的 MeiGen Key。下方片段只展示相关字段，不要用它们整体替换已有条目或配置文件。
 
@@ -101,7 +82,7 @@ npx -y meigen@3.3.3 gen --help
 
 ### OpenAI 兼容普通生图
 
-明确选用 BYOK 时，在私密本地设置中保留 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`，使用供应商实际支持的模型及计费。BYOK 不提供 MeiGen 视频、五项专用 Skills 或私人资料库。3.0.0 本地供应商优先级为 MeiGen（已有旧 Key）→ OpenAI 兼容；已移除的 ComfyUI provider 会被拒绝，不会自动转成付费供应商。
+明确选用 BYOK 时，在私密本地设置中保留 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL`，使用供应商实际支持的模型及计费。BYOK 不提供 MeiGen 视频、五项专用 Skills 或私人资料库。
 
 ## 输出目录
 

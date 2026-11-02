@@ -9,7 +9,7 @@ MCP: `generate_ai_background`
 
 One product photo is required. White mode creates a fixed-specification white background; smart selects a suitable scene; custom follows your background brief. This produces one paid image, not a transparent cutout. The three modes may have different prices.
 
-Use the [shared authentication, upload and recovery guide](/en/api-reference/skills/overview) before submitting. This workflow requires a MeiGen API key and purchased credits; no free attempts or daily credits apply.
+[Authentication, uploads and request recovery](/en/api-reference/skills/overview)
 
 ## Parameters
 
@@ -27,7 +27,7 @@ Use the [shared authentication, upload and recovery guide](/en/api-reference/ski
 ```json
 {
   "requestId": "550e8400-e29b-41d4-a716-446655440000",
-  "productImage": "https://images.meigen.ai/uploads/product.png",
+  "productImage": "https://images.meigen.ai/.../product.png",
   "mode": "custom",
   "customPrompt": "Soft daylight on a pale stone counter",
   "ratio": "auto",
